@@ -1,0 +1,329 @@
+[
+  {
+    "Title": "appdata",
+    "ServerRelativeUrl": "/sites/TestSite1/_catalogs/appdata",
+    "BaseTemplate": 125,
+    "ContentTypes": [
+      {
+        "Name": "appdata"
+      }
+    ],
+    "OnQuickLaunch": false,
+    "EnableFolderCreation": true,
+    "HasUniqueRoleAssignments": false
+  },
+  {
+    "Title": "appfiles",
+    "ServerRelativeUrl": "/sites/TestSite1/_catalogs/appfiles",
+    "BaseTemplate": 126,
+    "ContentTypes": [
+      {
+        "Name": "appfiles"
+      }
+    ],
+    "OnQuickLaunch": false,
+    "EnableFolderCreation": true,
+    "HasUniqueRoleAssignments": false
+  },
+  {
+    "Title": "Documenten",
+    "ServerRelativeUrl": "/sites/TestSite1/Gedeelde documenten",
+    "BaseTemplate": 101,
+    "ContentTypes": [
+      {
+        "Name": "Document"
+      },
+      {
+        "Name": "Map"
+      }
+    ],
+    "OnQuickLaunch": false,
+    "EnableFolderCreation": true,
+    "HasUniqueRoleAssignments": false
+  },
+  {
+    "Title": "DocumentLibraryTest",
+    "ServerRelativeUrl": "/sites/TestSite1/DocumentLibraryTest",
+    "BaseTemplate": 101,
+    "ContentTypes": [
+      {
+        "Name": "Document"
+      },
+      {
+        "Name": "Map"
+      }
+    ],
+    "OnQuickLaunch": true,
+    "EnableFolderCreation": true,
+    "HasUniqueRoleAssignments": false
+  },
+  {
+    "Title": "Formuliersjablonen",
+    "ServerRelativeUrl": "/sites/TestSite1/FormServerTemplates",
+    "BaseTemplate": 101,
+    "ContentTypes": [
+      {
+        "Name": "InfoPath-formuliersjabloon"
+      }
+    ],
+    "OnQuickLaunch": false,
+    "EnableFolderCreation": false,
+    "HasUniqueRoleAssignments": false
+  },
+  {
+    "Title": "Galerie met basispagina's",
+    "ServerRelativeUrl": "/sites/TestSite1/_catalogs/masterpage",
+    "BaseTemplate": 116,
+    "ContentTypes": [
+      {
+        "Name": "Hoofdpagina"
+      },
+      {
+        "Name": "Voorbeeld van basispagina"
+      },
+      {
+        "Name": "JavaScript-weergavesjabloon"
+      },
+      {
+        "Name": "Document"
+      },
+      {
+        "Name": "Map"
+      },
+      {
+        "Name": "Code van het weergavesjabloon"
+      },
+      {
+        "Name": "Ontwerpbestand"
+      }
+    ],
+    "OnQuickLaunch": false,
+    "EnableFolderCreation": true,
+    "HasUniqueRoleAssignments": false
+  },
+  {
+    "Title": "Galerie met lijstsjablonen",
+    "ServerRelativeUrl": "/sites/TestSite1/_catalogs/lt",
+    "BaseTemplate": 114,
+    "ContentTypes": [
+      {
+        "Name": "Galerie met lijstsjablonen"
+      }
+    ],
+    "OnQuickLaunch": false,
+    "EnableFolderCreation": false,
+    "HasUniqueRoleAssignments": false
+  },
+  {
+    "Title": "Galerie met webonderdelen",
+    "ServerRelativeUrl": "/sites/TestSite1/_catalogs/wp",
+    "BaseTemplate": 113,
+    "ContentTypes": [
+      {
+        "Name": "Galerie met webonderdelen"
+      }
+    ],
+    "OnQuickLaunch": false,
+    "EnableFolderCreation": false,
+    "HasUniqueRoleAssignments": false
+  },
+  {
+    "Title": "Galerie van oplossingen",
+    "ServerRelativeUrl": "/sites/TestSite1/_catalogs/solutions",
+    "BaseTemplate": 121,
+    "ContentTypes": [
+      {
+        "Name": "Galerie van oplossingen"
+      }
+    ],
+    "OnQuickLaunch": false,
+    "EnableFolderCreation": false,
+    "HasUniqueRoleAssignments": false
+  },
+  {
+    "Title": "Galerie van thema's",
+    "ServerRelativeUrl": "/sites/TestSite1/_catalogs/theme",
+    "BaseTemplate": 123,
+    "ContentTypes": [
+      {
+        "Name": "Galerie van thema's"
+      }
+    ],
+    "OnQuickLaunch": false,
+    "EnableFolderCreation": false,
+    "HasUniqueRoleAssignments": false
+  },
+  {
+    "Title": "Gebeurtenissen",
+    "ServerRelativeUrl": "/sites/TestSite1/Events",
+    "BaseTemplate": 106,
+    "ContentTypes": [
+      {
+        "Name": "Gebeurtenis"
+      }
+    ],
+    "OnQuickLaunch": false,
+    "EnableFolderCreation": false,
+    "HasUniqueRoleAssignments": false
+  },
+  {
+    "Title": "Geconverteerde formulieren",
+    "ServerRelativeUrl": "/sites/TestSite1/IWConvertedForms",
+    "BaseTemplate": 10102,
+    "ContentTypes": [
+      {
+        "Name": "Geconverteerde formulieren"
+      }
+    ],
+    "OnQuickLaunch": false,
+    "EnableFolderCreation": true,
+    "HasUniqueRoleAssignments": true
+  },
+  {
+    "Title": "Koppelingen voor delen",
+    "ServerRelativeUrl": "/sites/TestSite1/Koppelingen voor delen",
+    "BaseTemplate": 3300,
+    "ContentTypes": [
+      {
+        "Name": "Koppelingen voor delen"
+      }
+    ],
+    "OnQuickLaunch": false,
+    "EnableFolderCreation": false,
+    "HasUniqueRoleAssignments": true
+  },
+  {
+    "Title": "Lijst met gebruikersgegevens",
+    "ServerRelativeUrl": "/sites/TestSite1/_catalogs/users",
+    "BaseTemplate": 112,
+    "ContentTypes": [
+      {
+        "Name": "Person"
+      },
+      {
+        "Name": "SharePointGroup"
+      },
+      {
+        "Name": "DomainGroup"
+      }
+    ],
+    "OnQuickLaunch": false,
+    "EnableFolderCreation": true,
+    "HasUniqueRoleAssignments": true
+  },
+  {
+    "Title": "Samengesteld uiterlijk",
+    "ServerRelativeUrl": "/sites/TestSite1/_catalogs/design",
+    "BaseTemplate": 124,
+    "ContentTypes": [
+      {
+        "Name": "Samengesteld uiterlijk"
+      }
+    ],
+    "OnQuickLaunch": false,
+    "EnableFolderCreation": true,
+    "HasUniqueRoleAssignments": false
+  },
+  {
+    "Title": "Siteactiva",
+    "ServerRelativeUrl": "/sites/TestSite1/SiteAssets",
+    "BaseTemplate": 101,
+    "ContentTypes": [
+      {
+        "Name": "Document"
+      },
+      {
+        "Name": "Map"
+      }
+    ],
+    "OnQuickLaunch": false,
+    "EnableFolderCreation": true,
+    "HasUniqueRoleAssignments": true
+  },
+  {
+    "Title": "Sitepagina's",
+    "ServerRelativeUrl": "/sites/TestSite1/SitePages",
+    "BaseTemplate": 119,
+    "ContentTypes": [
+      {
+        "Name": "Wikipagina"
+      },
+      {
+        "Name": "Map"
+      },
+      {
+        "Name": "Pagina met webonderdelen"
+      },
+      {
+        "Name": "Sitepagina"
+      },
+      {
+        "Name": "Pagina Opnieuw posten"
+      }
+    ],
+    "OnQuickLaunch": false,
+    "EnableFolderCreation": false,
+    "HasUniqueRoleAssignments": true
+  },
+  {
+    "Title": "Stijlbibliotheek",
+    "ServerRelativeUrl": "/sites/TestSite1/Style Library",
+    "BaseTemplate": 101,
+    "ContentTypes": [
+      {
+        "Name": "Document"
+      },
+      {
+        "Name": "Map"
+      }
+    ],
+    "OnQuickLaunch": false,
+    "EnableFolderCreation": true,
+    "HasUniqueRoleAssignments": false
+  },
+  {
+    "Title": "TaxonomyHiddenList",
+    "ServerRelativeUrl": "/sites/TestSite1/Lists/TaxonomyHiddenList",
+    "BaseTemplate": 100,
+    "ContentTypes": [
+      {
+        "Name": "Item"
+      },
+      {
+        "Name": "Map"
+      }
+    ],
+    "OnQuickLaunch": false,
+    "EnableFolderCreation": false,
+    "HasUniqueRoleAssignments": true
+  },
+  {
+    "Title": "TestList",
+    "ServerRelativeUrl": "/sites/TestSite1/Lists/TestList",
+    "BaseTemplate": 100,
+    "ContentTypes": [
+      {
+        "Name": "Item"
+      },
+      {
+        "Name": "Map"
+      }
+    ],
+    "OnQuickLaunch": true,
+    "EnableFolderCreation": false,
+    "HasUniqueRoleAssignments": false
+  },
+  {
+    "Title": "Websjabloonextensies",
+    "ServerRelativeUrl": "/sites/TestSite1/_catalogs/wte",
+    "BaseTemplate": 3415,
+    "ContentTypes": [
+      {
+        "Name": "Websjabloonextensies"
+      }
+    ],
+    "OnQuickLaunch": false,
+    "EnableFolderCreation": true,
+    "HasUniqueRoleAssignments": false
+  }
+]
