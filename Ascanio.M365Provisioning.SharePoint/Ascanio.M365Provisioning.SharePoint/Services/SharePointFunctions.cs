@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SPList = Microsoft.SharePoint.Client.List;
 using ListTemplateType = Microsoft.SharePoint.Client.ListTemplateType;
+using Ascanio.M365Provisioning.SharePoint.SiteInformation;
 
 namespace Ascanio.M365Provisioning.SharePoint.Services
 {
@@ -12,7 +13,8 @@ namespace Ascanio.M365Provisioning.SharePoint.Services
 
         public SharePointFunction()
         {
-            ClientContext client = sharePointService.GetClientContext();
+            Lead_SiteSettings leadSiteSettings = new Lead_SiteSettings();
+            leadSiteSettings.Main();
 
         }
         
