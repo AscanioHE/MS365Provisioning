@@ -11,8 +11,11 @@ namespace Ascanio.M365Provisioning.SharePoint.Services
     {
         public SharePointFunction()
         {
-            Lead_SiteSettings leadSiteSettings = new();
-            leadSiteSettings.Main();
+            SharePointService sharePointService = new();
+            ClientContext context = sharePointService.GetClientContext();
+            Web web = context.Web;
+            Lead_SiteSettings lead_SiteSettings = new();
+            lead_SiteSettings.GetWebItemParameters(context,web);
         }       
     }
 }

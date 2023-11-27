@@ -13,15 +13,11 @@ namespace Ascanio.M365Provisioning.SharePoint.SiteInformation
     {
          public void Main()
          {
-            GetWebItemParameters();
 
          }
 
-         private void GetWebItemParameters()
+        public void GetWebItemParameters(ClientContext context, Web web)
          {
-            SharePointService sharePointService = new();
-            ClientContext context = sharePointService.GetClientContext();
-            Web web = context.Web;
             // Explicitly load the necessary properties
             context.Load(
                 web,
@@ -57,17 +53,8 @@ namespace Ascanio.M365Provisioning.SharePoint.SiteInformation
                 // Handle the exception as needed
             }
             string jsonFilePath = "JsonFiles/Lead_SiteSettings.json";
-                try
-                {
-                    string json = JsonConvert.SerializeObject(webTemplatesDTO, Formatting.Indented);
-                    File.AppendAllText(jsonFilePath, json);
-                }
-                catch (Exception ex)
-                {
-                    // Log or print the exception details for debugging
-                    Console.WriteLine($"Error serializing WebTemplate: {ex.Message}");
-                }
-            
+            WriteData2Json writeData2Json = new();
+            writeData2Json.Write2JsonFile(webTemplatesDTO,jsonFilePath);
         }
     }
 }

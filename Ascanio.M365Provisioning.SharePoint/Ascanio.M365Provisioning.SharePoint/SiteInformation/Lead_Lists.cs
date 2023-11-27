@@ -2,5 +2,9 @@
 {
     public class Lead_Lists
     {
+        public Lead_Lists()
+        {
+
+        }
     }
 }
