@@ -26,7 +26,7 @@ namespace Ascanio.M365Provisioning.SharePoint.SiteInformation
             context.ExecuteQuery();
             foreach (WebTemplate webTemplate in webtTemplateCollection)
             {
-                Console.WriteLine("Template Name: " + webTemplate.Name + "|    |" + webTemplate.Id);
+                Console.WriteLine("Template Name: " + webTemplate.Name + "|    |" + webTemplate.Id + "|  |" + webTemplate.Lcid);
             }
             try
             {
@@ -39,10 +39,7 @@ namespace Ascanio.M365Provisioning.SharePoint.SiteInformation
                 // Handle the exception as needed
             }
 
-            // Now you can access the properties
-            Console.WriteLine($"Web Title: {web.Title}");
-            Console.WriteLine($"Web Template: {web.WebTemplate}");
-
         }
     }
 }
+

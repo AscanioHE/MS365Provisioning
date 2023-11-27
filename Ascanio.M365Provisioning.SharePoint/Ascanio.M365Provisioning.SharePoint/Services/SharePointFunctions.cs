@@ -9,11 +9,9 @@ namespace Ascanio.M365Provisioning.SharePoint.Services
 {
     public class SharePointFunction
     {
-        readonly SharePointService sharePointService = new();
-
         public SharePointFunction()
         {
-            Lead_SiteSettings leadSiteSettings = new Lead_SiteSettings();
+            Lead_SiteSettings leadSiteSettings = new();
             leadSiteSettings.Main();
 
         }
@@ -21,3 +19,4 @@ namespace Ascanio.M365Provisioning.SharePoint.Services
        
     }
 }
+
