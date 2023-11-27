@@ -12,9 +12,21 @@ namespace Ascanio.M365Provisioning.SharePoint.Services
         {
             foreach (WebTemplate webTemplate in webTemplates)
             {
-                string json = JsonConvert.SerializeObject(webTemplate, Formatting.Indented);
-                File.WriteAllText(filePath, json);
+                try
+                {
+                    string json = JsonConvert.SerializeObject(webTemplate, Formatting.Indented);
+                    File.AppendAllText(filePath, json + Environment.NewLine);
+                }
+                catch (Exception ex)
+                {
+                    // Log or print the exception details for debugging
+                    Console.WriteLine($"Error serializing WebTemplate: {ex.Message}");
+                }
+
             }
         }
     }
+
+    
+
 }

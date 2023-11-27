@@ -1,7 +1,11 @@
 ﻿using Ascanio.M365Provisioning.SharePoint.Services;
 using Microsoft.Online.SharePoint.TenantAdministration;
 using Microsoft.SharePoint.Client;
+using Newtonsoft.Json;
 using PnP.Core;
+using PnP.Core.Model.SharePoint;
+using System.IO;
+using File = System.IO.File;
 
 namespace Ascanio.M365Provisioning.SharePoint.SiteInformation
 {
@@ -18,15 +22,29 @@ namespace Ascanio.M365Provisioning.SharePoint.SiteInformation
             SharePointService sharePointService = new();
             ClientContext context = sharePointService.GetClientContext();
             Web web = context.Web;
-
             // Explicitly load the necessary properties
-            context.Load(web, w => w.WebTemplate, w => w.Title);
+            context.Load(
+                web,
+                w => w.WebTemplate
+                );
+            context.ExecuteQuery();
             WebTemplateCollection webtTemplateCollection = web.GetAvailableWebTemplates(1033, true);
             context.Load(webtTemplateCollection);
             context.ExecuteQuery();
-            foreach (WebTemplate webTemplate in webtTemplateCollection)
+
+            List<Lead_SiteSettingsDTO> webTemplatesDTO = new();
+
+            foreach (WebTemplate template in webtTemplateCollection)
             {
-                Console.WriteLine("Template Name: " + webTemplate.Name + "|    |" + webTemplate.Id + "|  |" + webTemplate.Lcid);
+                Console.WriteLine("Template Name: " + template.Name + "|    |" + template.Id + "|  |" + template.Lcid);
+
+                // Create a Lead_SiteSettingsDTO and add it to the list
+                webTemplatesDTO.Add(new Lead_SiteSettingsDTO
+                {
+                    SiteTemplate = template.Name,
+                    Value = template.Lcid
+                    // Other properties as needed
+                });
             }
             try
             {
@@ -38,7 +56,18 @@ namespace Ascanio.M365Provisioning.SharePoint.SiteInformation
                 Console.WriteLine($"Error executing query: {ex.Message}");
                 // Handle the exception as needed
             }
-
+            string jsonFilePath = "JsonFiles/Lead_SiteSettings.json";
+                try
+                {
+                    string json = JsonConvert.SerializeObject(webTemplatesDTO, Formatting.Indented);
+                    File.AppendAllText(jsonFilePath, json + Environment.NewLine);
+                }
+                catch (Exception ex)
+                {
+                    // Log or print the exception details for debugging
+                    Console.WriteLine($"Error serializing WebTemplate: {ex.Message}");
+                }
+            
         }
     }
 }
