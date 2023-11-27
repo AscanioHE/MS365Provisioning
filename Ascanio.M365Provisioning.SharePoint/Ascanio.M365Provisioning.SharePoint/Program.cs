@@ -9,7 +9,6 @@ namespace Ascanio.M365Provisioning.SharePoint
         {
             Run();
         }
-
         static void Run()
         {
             _ = new SharePointFunction();

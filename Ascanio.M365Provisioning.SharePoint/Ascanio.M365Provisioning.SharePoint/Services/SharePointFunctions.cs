@@ -13,10 +13,7 @@ namespace Ascanio.M365Provisioning.SharePoint.Services
         {
             Lead_SiteSettings leadSiteSettings = new();
             leadSiteSettings.Main();
-
-        }
-        
-       
+        }       
     }
 }
 

@@ -60,7 +60,7 @@ namespace Ascanio.M365Provisioning.SharePoint.SiteInformation
                 try
                 {
                     string json = JsonConvert.SerializeObject(webTemplatesDTO, Formatting.Indented);
-                    File.AppendAllText(jsonFilePath, json + Environment.NewLine);
+                    File.AppendAllText(jsonFilePath, json);
                 }
                 catch (Exception ex)
                 {
