@@ -6,12 +6,12 @@ namespace Ascanio.M365Provisioning.SharePoint.Services
 {
     public class WriteData2Json
     {
-        public void Write2JsonFile(List<Lead_SiteSettingsDTO> webTemplatesDTO, string jsonFilePath)
+        public void Write2JsonFile(object dtoFile, string jsonFilePath)
         {
             try
             {
-                string json = JsonConvert.SerializeObject(webTemplatesDTO, Formatting.Indented);
-                File.AppendAllText(jsonFilePath, json + Environment.NewLine);
+                string json = JsonConvert.SerializeObject(dtoFile, Formatting.Indented);
+                File.WriteAllText(jsonFilePath, json + Environment.NewLine);
             }
             catch (Exception ex)
             {

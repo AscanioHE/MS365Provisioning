@@ -32,8 +32,6 @@ namespace Ascanio.M365Provisioning.SharePoint.SiteInformation
 
             foreach (WebTemplate template in webtTemplateCollection)
             {
-                Console.WriteLine("Template Name: " + template.Name + "|    |" + template.Id + "|  |" + template.Lcid);
-
                 // Create a Lead_SiteSettingsDTO and add it to the list
                 webTemplatesDTO.Add(new Lead_SiteSettingsDTO
                 {

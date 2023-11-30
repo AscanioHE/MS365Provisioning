@@ -1,0 +1,380 @@
+[
+  {
+    "Title": "appdata",
+    "Url": "/sites/TestSite1/_catalogs/appdata",
+    "ListType": "GenericList",
+    "ContentTypes": [
+      "appdata"
+    ],
+    "ShowOnQuickLaunch": false,
+    "AllowFolderCreation": true,
+    "EnterpriseKeywords": "00000000-0000-0000-0000-000000000000",
+    "BreakRoleInheritance": false,
+    "Permissions": {
+      "TestSite1 - Eigenaars": "Volledig beheer, ",
+      "TestSite1 - Bezoekers": "Lezen, ",
+      "TestSite1 - Leden": "Bewerken, ",
+      "Limited Access System Group For Web bc827196-78df-4870-8a29-91895d8ce95c": "Beperkte toegang alleen via het web, "
+    }
+  },
+  {
+    "Title": "appfiles",
+    "Url": "/sites/TestSite1/_catalogs/appfiles",
+    "ListType": "DocumentLibrary",
+    "ContentTypes": [
+      "appfiles"
+    ],
+    "ShowOnQuickLaunch": false,
+    "AllowFolderCreation": true,
+    "EnterpriseKeywords": "00000000-0000-0000-0000-000000000000",
+    "BreakRoleInheritance": false,
+    "Permissions": {
+      "TestSite1 - Eigenaars": "Volledig beheer, ",
+      "TestSite1 - Bezoekers": "Lezen, ",
+      "TestSite1 - Leden": "Bewerken, ",
+      "Limited Access System Group For Web bc827196-78df-4870-8a29-91895d8ce95c": "Beperkte toegang alleen via het web, "
+    }
+  },
+  {
+    "Title": "Documenten",
+    "Url": "/sites/TestSite1/Gedeelde documenten/Forms/AllItems.aspx",
+    "ListType": "DocumentLibrary",
+    "ContentTypes": [
+      "Document",
+      "Map"
+    ],
+    "ShowOnQuickLaunch": false,
+    "AllowFolderCreation": true,
+    "EnterpriseKeywords": "00000000-0000-0000-0000-000000000000",
+    "BreakRoleInheritance": false,
+    "Permissions": {
+      "TestSite1 - Eigenaars": "Volledig beheer, ",
+      "TestSite1 - Bezoekers": "Lezen, ",
+      "TestSite1 - Leden": "Bewerken, ",
+      "Limited Access System Group For Web bc827196-78df-4870-8a29-91895d8ce95c": "Beperkte toegang alleen via het web, "
+    }
+  },
+  {
+    "Title": "DocumentLibraryTest",
+    "Url": "/sites/TestSite1/DocumentLibraryTest/Forms/AllItems.aspx",
+    "ListType": "DocumentLibrary",
+    "ContentTypes": [
+      "Document",
+      "Map"
+    ],
+    "ShowOnQuickLaunch": true,
+    "AllowFolderCreation": true,
+    "EnterpriseKeywords": "00000000-0000-0000-0000-000000000000",
+    "BreakRoleInheritance": false,
+    "Permissions": {
+      "TestSite1 - Eigenaars": "Volledig beheer, ",
+      "TestSite1 - Bezoekers": "Lezen, ",
+      "TestSite1 - Leden": "Bewerken, ",
+      "Limited Access System Group For Web bc827196-78df-4870-8a29-91895d8ce95c": "Beperkte toegang alleen via het web, "
+    }
+  },
+  {
+    "Title": "Formuliersjablonen",
+    "Url": "/sites/TestSite1/FormServerTemplates/Forms/All Forms.aspx",
+    "ListType": "DocumentLibrary",
+    "ContentTypes": [
+      "InfoPath-formuliersjabloon"
+    ],
+    "ShowOnQuickLaunch": false,
+    "AllowFolderCreation": false,
+    "EnterpriseKeywords": "00000000-0000-0000-0000-000000000000",
+    "BreakRoleInheritance": false,
+    "Permissions": {
+      "TestSite1 - Eigenaars": "Volledig beheer, ",
+      "TestSite1 - Bezoekers": "Lezen, ",
+      "TestSite1 - Leden": "Bewerken, ",
+      "Limited Access System Group For Web bc827196-78df-4870-8a29-91895d8ce95c": "Beperkte toegang alleen via het web, "
+    }
+  },
+  {
+    "Title": "Galerie met basispagina's",
+    "Url": "/sites/TestSite1/_catalogs/masterpage/Forms/AllItems.aspx",
+    "ListType": "DocumentLibrary",
+    "ContentTypes": [
+      "Hoofdpagina",
+      "Voorbeeld van basispagina",
+      "JavaScript-weergavesjabloon",
+      "Document",
+      "Map",
+      "Code van het weergavesjabloon",
+      "Ontwerpbestand"
+    ],
+    "ShowOnQuickLaunch": false,
+    "AllowFolderCreation": true,
+    "EnterpriseKeywords": "00000000-0000-0000-0000-000000000000",
+    "BreakRoleInheritance": false,
+    "Permissions": {
+      "TestSite1 - Eigenaars": "Volledig beheer, ",
+      "TestSite1 - Bezoekers": "Lezen, ",
+      "TestSite1 - Leden": "Bewerken, ",
+      "Limited Access System Group For Web bc827196-78df-4870-8a29-91895d8ce95c": "Beperkte toegang alleen via het web, "
+    }
+  },
+  {
+    "Title": "Galerie met lijstsjablonen",
+    "Url": "/sites/TestSite1/_catalogs/lt/Forms/AllItems.aspx",
+    "ListType": "DocumentLibrary",
+    "ContentTypes": [
+      "Galerie met lijstsjablonen"
+    ],
+    "ShowOnQuickLaunch": false,
+    "AllowFolderCreation": false,
+    "EnterpriseKeywords": "00000000-0000-0000-0000-000000000000",
+    "BreakRoleInheritance": false,
+    "Permissions": {
+      "TestSite1 - Eigenaars": "Volledig beheer, ",
+      "TestSite1 - Bezoekers": "Lezen, ",
+      "TestSite1 - Leden": "Bewerken, ",
+      "Limited Access System Group For Web bc827196-78df-4870-8a29-91895d8ce95c": "Beperkte toegang alleen via het web, "
+    }
+  },
+  {
+    "Title": "Galerie met webonderdelen",
+    "Url": "/sites/TestSite1/_catalogs/wp/Forms/AllItems.aspx",
+    "ListType": "DocumentLibrary",
+    "ContentTypes": [
+      "Galerie met webonderdelen"
+    ],
+    "ShowOnQuickLaunch": false,
+    "AllowFolderCreation": false,
+    "EnterpriseKeywords": "00000000-0000-0000-0000-000000000000",
+    "BreakRoleInheritance": false,
+    "Permissions": {
+      "TestSite1 - Eigenaars": "Volledig beheer, ",
+      "TestSite1 - Bezoekers": "Lezen, ",
+      "TestSite1 - Leden": "Bewerken, ",
+      "Limited Access System Group For Web bc827196-78df-4870-8a29-91895d8ce95c": "Beperkte toegang alleen via het web, "
+    }
+  },
+  {
+    "Title": "Galerie van oplossingen",
+    "Url": "/sites/TestSite1/_catalogs/solutions/Forms/AllItems.aspx",
+    "ListType": "DocumentLibrary",
+    "ContentTypes": [
+      "Galerie van oplossingen"
+    ],
+    "ShowOnQuickLaunch": false,
+    "AllowFolderCreation": false,
+    "EnterpriseKeywords": "00000000-0000-0000-0000-000000000000",
+    "BreakRoleInheritance": false,
+    "Permissions": {
+      "TestSite1 - Eigenaars": "Volledig beheer, ",
+      "TestSite1 - Bezoekers": "Lezen, ",
+      "TestSite1 - Leden": "Bewerken, ",
+      "Limited Access System Group For Web bc827196-78df-4870-8a29-91895d8ce95c": "Beperkte toegang alleen via het web, "
+    }
+  },
+  {
+    "Title": "Galerie van thema's",
+    "Url": "/sites/TestSite1/_catalogs/theme/Forms/AllItems.aspx",
+    "ListType": "DocumentLibrary",
+    "ContentTypes": [
+      "Galerie van thema's"
+    ],
+    "ShowOnQuickLaunch": false,
+    "AllowFolderCreation": false,
+    "EnterpriseKeywords": "00000000-0000-0000-0000-000000000000",
+    "BreakRoleInheritance": false,
+    "Permissions": {
+      "TestSite1 - Eigenaars": "Volledig beheer, ",
+      "TestSite1 - Bezoekers": "Lezen, ",
+      "TestSite1 - Leden": "Bewerken, ",
+      "Limited Access System Group For Web bc827196-78df-4870-8a29-91895d8ce95c": "Beperkte toegang alleen via het web, "
+    }
+  },
+  {
+    "Title": "Gebeurtenissen",
+    "Url": "/sites/TestSite1/Events/calendar.aspx",
+    "ListType": "GenericList",
+    "ContentTypes": [
+      "Gebeurtenis"
+    ],
+    "ShowOnQuickLaunch": false,
+    "AllowFolderCreation": false,
+    "EnterpriseKeywords": "00000000-0000-0000-0000-000000000000",
+    "BreakRoleInheritance": false,
+    "Permissions": {
+      "TestSite1 - Eigenaars": "Volledig beheer, ",
+      "TestSite1 - Bezoekers": "Lezen, ",
+      "TestSite1 - Leden": "Bewerken, ",
+      "Limited Access System Group For Web bc827196-78df-4870-8a29-91895d8ce95c": "Beperkte toegang alleen via het web, "
+    }
+  },
+  {
+    "Title": "Geconverteerde formulieren",
+    "Url": "/sites/TestSite1/IWConvertedForms/Forms/AllItems.aspx",
+    "ListType": "DocumentLibrary",
+    "ContentTypes": [
+      "Geconverteerde formulieren"
+    ],
+    "ShowOnQuickLaunch": false,
+    "AllowFolderCreation": true,
+    "EnterpriseKeywords": "00000000-0000-0000-0000-000000000000",
+    "BreakRoleInheritance": true,
+    "Permissions": {}
+  },
+  {
+    "Title": "Koppelingen voor delen",
+    "Url": "/sites/TestSite1/Koppelingen voor delen",
+    "ListType": "GenericList",
+    "ContentTypes": [
+      "Koppelingen voor delen"
+    ],
+    "ShowOnQuickLaunch": false,
+    "AllowFolderCreation": false,
+    "EnterpriseKeywords": "00000000-0000-0000-0000-000000000000",
+    "BreakRoleInheritance": true,
+    "Permissions": {}
+  },
+  {
+    "Title": "Lijst met gebruikersgegevens",
+    "Url": "/sites/TestSite1/_catalogs/users/detail.aspx",
+    "ListType": "GenericList",
+    "ContentTypes": [
+      "Person",
+      "SharePointGroup",
+      "DomainGroup"
+    ],
+    "ShowOnQuickLaunch": false,
+    "AllowFolderCreation": true,
+    "EnterpriseKeywords": "00000000-0000-0000-0000-000000000000",
+    "BreakRoleInheritance": true,
+    "Permissions": {}
+  },
+  {
+    "Title": "Samengesteld uiterlijk",
+    "Url": "/sites/TestSite1/_catalogs/design/AllItems.aspx",
+    "ListType": "GenericList",
+    "ContentTypes": [
+      "Samengesteld uiterlijk"
+    ],
+    "ShowOnQuickLaunch": false,
+    "AllowFolderCreation": true,
+    "EnterpriseKeywords": "00000000-0000-0000-0000-000000000000",
+    "BreakRoleInheritance": false,
+    "Permissions": {
+      "TestSite1 - Eigenaars": "Volledig beheer, ",
+      "TestSite1 - Bezoekers": "Lezen, ",
+      "TestSite1 - Leden": "Bewerken, ",
+      "Limited Access System Group For Web bc827196-78df-4870-8a29-91895d8ce95c": "Beperkte toegang alleen via het web, "
+    }
+  },
+  {
+    "Title": "Siteactiva",
+    "Url": "/sites/TestSite1/SiteAssets/Forms/AllItems.aspx",
+    "ListType": "DocumentLibrary",
+    "ContentTypes": [
+      "Document",
+      "Map"
+    ],
+    "ShowOnQuickLaunch": false,
+    "AllowFolderCreation": true,
+    "EnterpriseKeywords": "00000000-0000-0000-0000-000000000000",
+    "BreakRoleInheritance": true,
+    "Permissions": {
+      "TestSite1 - Eigenaars": "Volledig beheer, ",
+      "TestSite1 - Bezoekers": "Lezen, ",
+      "TestSite1 - Leden": "Bewerken, ",
+      "Limited Access System Group For List 2500e74f-2009-46ed-b5da-43020776b6fd": "Beperkte toegang, "
+    }
+  },
+  {
+    "Title": "Sitepagina's",
+    "Url": "/sites/TestSite1/SitePages/Forms/ByAuthor.aspx",
+    "ListType": "DocumentLibrary",
+    "ContentTypes": [
+      "Wikipagina",
+      "Map",
+      "Pagina met webonderdelen",
+      "Sitepagina",
+      "Pagina Opnieuw posten"
+    ],
+    "ShowOnQuickLaunch": false,
+    "AllowFolderCreation": false,
+    "EnterpriseKeywords": "00000000-0000-0000-0000-000000000000",
+    "BreakRoleInheritance": true,
+    "Permissions": {
+      "TestSite1 - Eigenaars": "Volledig beheer, ",
+      "TestSite1 - Bezoekers": "Lezen, ",
+      "TestSite1 - Leden": "Bewerken, ",
+      "Limited Access System Group For List 2500e74f-2009-46ed-b5da-43020776b6fd": "Beperkte toegang, "
+    }
+  },
+  {
+    "Title": "Stijlbibliotheek",
+    "Url": "/sites/TestSite1/Style Library/Forms/AllItems.aspx",
+    "ListType": "DocumentLibrary",
+    "ContentTypes": [
+      "Document",
+      "Map"
+    ],
+    "ShowOnQuickLaunch": false,
+    "AllowFolderCreation": true,
+    "EnterpriseKeywords": "00000000-0000-0000-0000-000000000000",
+    "BreakRoleInheritance": false,
+    "Permissions": {
+      "TestSite1 - Eigenaars": "Volledig beheer, ",
+      "TestSite1 - Bezoekers": "Lezen, ",
+      "TestSite1 - Leden": "Bewerken, ",
+      "Limited Access System Group For Web bc827196-78df-4870-8a29-91895d8ce95c": "Beperkte toegang alleen via het web, "
+    }
+  },
+  {
+    "Title": "TaxonomyHiddenList",
+    "Url": "/sites/TestSite1/Lists/TaxonomyHiddenList/AllItems.aspx",
+    "ListType": "GenericList",
+    "ContentTypes": [
+      "Item",
+      "Map"
+    ],
+    "ShowOnQuickLaunch": false,
+    "AllowFolderCreation": false,
+    "EnterpriseKeywords": "00000000-0000-0000-0000-000000000000",
+    "BreakRoleInheritance": true,
+    "Permissions": {
+      "Iedereen": "Lezen, "
+    }
+  },
+  {
+    "Title": "TestList",
+    "Url": "/sites/TestSite1/Lists/TestList/AllItems.aspx",
+    "ListType": "GenericList",
+    "ContentTypes": [
+      "Item",
+      "Map"
+    ],
+    "ShowOnQuickLaunch": true,
+    "AllowFolderCreation": false,
+    "EnterpriseKeywords": "fee57326-3e86-40b0-97fc-c0d965aecfea",
+    "BreakRoleInheritance": false,
+    "Permissions": {
+      "TestSite1 - Eigenaars": "Volledig beheer, ",
+      "TestSite1 - Bezoekers": "Lezen, ",
+      "TestSite1 - Leden": "Bewerken, ",
+      "Limited Access System Group For Web bc827196-78df-4870-8a29-91895d8ce95c": "Beperkte toegang alleen via het web, "
+    }
+  },
+  {
+    "Title": "Websjabloonextensies",
+    "Url": "/sites/TestSite1/_catalogs/wte",
+    "ListType": "GenericList",
+    "ContentTypes": [
+      "Websjabloonextensies"
+    ],
+    "ShowOnQuickLaunch": false,
+    "AllowFolderCreation": true,
+    "EnterpriseKeywords": "00000000-0000-0000-0000-000000000000",
+    "BreakRoleInheritance": false,
+    "Permissions": {
+      "TestSite1 - Eigenaars": "Volledig beheer, ",
+      "TestSite1 - Bezoekers": "Lezen, ",
+      "TestSite1 - Leden": "Bewerken, ",
+      "Limited Access System Group For Web bc827196-78df-4870-8a29-91895d8ce95c": "Beperkte toegang alleen via het web, "
+    }
+  }
+]

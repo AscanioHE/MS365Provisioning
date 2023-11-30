@@ -16,6 +16,7 @@ namespace Ascanio.M365Provisioning.SharePoint.Services
             Web web = context.Web;
             Lead_SiteSettings lead_SiteSettings = new();
             lead_SiteSettings.GetWebItemParameters(context,web);
+            _ = new Lead_Lists(context, web);
         }       
     }
 }
