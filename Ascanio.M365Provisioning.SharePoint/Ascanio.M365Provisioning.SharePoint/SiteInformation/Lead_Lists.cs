@@ -71,7 +71,7 @@ namespace Ascanio.M365Provisioning.SharePoint.SiteInformation
             string jsonFilePath = "JsonFiles/lead_List.json";
             WriteData2Json writeData2Json = new();
             writeData2Json.Write2JsonFile(lead_ListsDTO, jsonFilePath);
-
+            context.Dispose();
         }
 
         private Dictionary<string, string> GetPermissionDetails(ClientContext context, IQueryable<RoleAssignment> queryString)

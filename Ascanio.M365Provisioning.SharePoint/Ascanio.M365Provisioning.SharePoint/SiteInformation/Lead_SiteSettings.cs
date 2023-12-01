@@ -11,11 +11,6 @@ namespace Ascanio.M365Provisioning.SharePoint.SiteInformation
 {
     public class Lead_SiteSettings
     {
-         public void Main()
-         {
-
-         }
-
         public void GetWebItemParameters(ClientContext context, Web web)
          {
             // Explicitly load the necessary properties
