@@ -41,20 +41,12 @@ namespace Ascanio.M365Provisioning.SharePoint.SiteInformation
                 {
                      enterpriseKeywordsValue = Guid.Empty;
                 }
-                foreach(Field field in list.Fields)
-                {
-                    Console.WriteLine(field.InternalName);
-                }
+                
                 IQueryable<RoleAssignment> queryForList = list.RoleAssignments.Include(roleAsg => roleAsg.Member,
                                                                                        roleAsg => roleAsg.RoleDefinitionBindings.Include(roleDef => roleDef.Name));
                 Dictionary<string, string> listPermissions = GetPermissionDetails(context, queryForList);
 
-                foreach (var sitePermission in listPermissions)
-                {
-                    Console.WriteLine(sitePermission.Key + "   " + sitePermission.Value);
-                }
-
-
+                
                 lead_ListsDTO.Add(new
                     (
                         list.Title,
