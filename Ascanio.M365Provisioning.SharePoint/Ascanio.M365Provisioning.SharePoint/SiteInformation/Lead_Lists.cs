@@ -17,7 +17,7 @@ namespace Ascanio.M365Provisioning.SharePoint.SiteInformation
             web = context.Web;
             context.Load(web, w => w.Lists);
             context.ExecuteQuery();
-            foreach (Microsoft.SharePoint.Client.List list in web.Lists)
+            foreach (List list in web.Lists)
             {
                 context.Load(list,
                     l => l.Title,
