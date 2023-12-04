@@ -7,11 +7,11 @@
         public bool DefaultView { get; set; } = false;
         public string ViewFields {  get; set; } = String.Empty;
         public uint RowLimit { get; set; }
-        public Enum ListScope { get; set; }
+        public string ListScope { get; set; } = string.Empty;
         public string JsonFormatterFile { get; set; } = string.Empty;
 
         public ListViewsDTO() { }
-        public ListViewsDTO(string listName,string viewName,bool defaultView,string viewFields,uint rowLimit,Enum scope, string jsonFormatterFile) 
+        public ListViewsDTO(string listName,string viewName,bool defaultView,string viewFields,uint rowLimit,string scope, string jsonFormatterFile) 
         {
             ListName = listName;
             ViewName = viewName;

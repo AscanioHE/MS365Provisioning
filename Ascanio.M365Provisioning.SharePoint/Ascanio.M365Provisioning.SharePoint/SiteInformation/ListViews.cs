@@ -21,7 +21,7 @@ namespace Ascanio.M365Provisioning.SharePoint.SiteInformation
             WriteData2Json writeData2Json = new();
             writeData2Json.Write2JsonFile(listViewsDTO, jsonFilePath);
             context.Dispose();
-        }  
+        }
         private List<ListViewsDTO> GetListViews(ClientContext context, ListCollection lists)
         {
             List<ListViewsDTO> listViewsDTO = new();
@@ -53,7 +53,7 @@ namespace Ascanio.M365Provisioning.SharePoint.SiteInformation
                         DefaultView = view.DefaultView,
                         ViewFields = GetViewFields(view),
                         RowLimit = view.RowLimit,
-                        ListScope = view.Scope,
+                        ListScope = view.Scope.ToString(),
                         JsonFormatterFile = $"{list.Title}.json"
                     });
 
