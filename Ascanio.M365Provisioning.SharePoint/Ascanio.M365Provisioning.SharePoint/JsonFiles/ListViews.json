@@ -38,7 +38,7 @@
   {
     "ListName": "DocumentLibraryTest",
     "ViewName": "Alle documenten",
-    "DefaultView": true,
+    "DefaultView": false,
     "ViewFields": "DocIcon,LinkFilename,Modified,Editor",
     "RowLimit": 30,
     "ListScope": "DefaultValue",
@@ -68,6 +68,15 @@
     "DefaultView": false,
     "ViewFields": "LinkFilename",
     "RowLimit": 20,
+    "ListScope": "DefaultValue",
+    "JsonFormatterFile": "DocumentLibraryTest.json"
+  },
+  {
+    "ListName": "DocumentLibraryTest",
+    "ViewName": "DefaultVieuw",
+    "DefaultView": true,
+    "ViewFields": "DocIcon,LinkFilename,Modified,Editor,TestColumn",
+    "RowLimit": 30,
     "ListScope": "DefaultValue",
     "JsonFormatterFile": "DocumentLibraryTest.json"
   },

@@ -56,7 +56,7 @@
   },
   {
     "Title": "DocumentLibraryTest",
-    "Url": "/sites/TestSite1/DocumentLibraryTest/Forms/AllItems.aspx",
+    "Url": "/sites/TestSite1/DocumentLibraryTest/Forms/DefaultVieuw.aspx",
     "ListType": "DocumentLibrary",
     "ContentTypes": [
       "Document",
@@ -65,12 +65,12 @@
     "ShowOnQuickLaunch": true,
     "AllowFolderCreation": true,
     "EnterpriseKeywords": "00000000-0000-0000-0000-000000000000",
-    "BreakRoleInheritance": false,
+    "BreakRoleInheritance": true,
     "Permissions": {
       "TestSite1 - Eigenaars": "Volledig beheer, ",
       "TestSite1 - Bezoekers": "Lezen, ",
       "TestSite1 - Leden": "Bewerken, ",
-      "Limited Access System Group For Web bc827196-78df-4870-8a29-91895d8ce95c": "Beperkte toegang alleen via het web, "
+      "Limited Access System Group For List ddb003c4-92d6-4e46-a94b-ad64fc8f4606": "Beperkte toegang, "
     }
   },
   {
