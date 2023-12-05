@@ -13,45 +13,33 @@ namespace Ascanio.M365Provisioning.SharePoint.SiteInformation
             using (ClientContext context = new SharePointService().GetClientContext())
             {
                 Console.WriteLine("Lead_SiteSettings.json File created...");
-                List<List> list = GetListsWithWebParts(context);
+                IEnumerable<List> Libraries = context.LoadQuery
+                                                            (
+                                                            context.Web.Lists.Where
+                                                                                (
+                                                                                l => l.BaseTemplate == (int)ListTemplateType.WebPageLibrary
+                                                                                )
+                                                            );
+                context.ExecuteQuery();
+                foreach (List lib in Libraries)
+                {
+                    CamlQuery query = CamlQuery.CreateAllItemsQuery();
+                    ListItemCollection sitePages = lib.GetItems(query);
+                    context.Load
+                        (
+                        sitePages,
+                        sp => sp.Include(sp=> sp.Client_Title)
+                        );
+                    context.ExecuteQuery();
+                    foreach(ListItem sitePage in sitePages)
+                    {
+                        Console.WriteLine(sitePage.Client_Title);
+                    }
+                }
             }
 
             Console.WriteLine("The SharePoint connection is closed");
         }
-
-        private List<List> GetListsWithWebParts(ClientContext context)
-        {
-            ListCollection lists = context.Web.Lists;
-            List<List> listsWithWebParts = new();
-            context.Load
-                (
-                lists,
-                l => l.Include
-                              (
-                              l => l.Title,
-                              l => l.RootFolder,
-                              l => l.RootFolder.ServerRelativeUrl,
-                              l => l.DefaultViewUrl,
-                              l => l.BaseTemplate,
-                              l => l.RootFolder.Properties
-                              )
-                );
-            context.ExecuteQuery();
-            foreach (List list in lists)
-            {
-                context.Load
-                    (
-                    list.RootFolder,
-                    f => f.Properties
-                    );
-                context.ExecuteQuery();
-                if (list.RootFolder.Properties.FieldValues.ContainsKey("vti_pagecustomized") &&
-                    (bool)list.RootFolder.Properties.FieldValues["vti_pagecustimized"])
-                {
-                    listsWithWebParts.Add(list);
-                }
-            }
-            return listsWithWebParts;
-        }
     }
 }
+    

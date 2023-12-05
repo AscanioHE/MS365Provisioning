@@ -25,6 +25,7 @@ namespace Ascanio.M365Provisioning.SharePoint
             {
                 GetListProperties(context, lib);
             }
+
             context.Dispose();
         }
 
