@@ -19,44 +19,17 @@ namespace Ascanio.M365Provisioning.SharePoint
             ClientContext context = sharePointService.GetClientContext();
             Web web = context.Web;
             context.ExecuteQuery();
-            // Laden van lijsten in de rootweb
-            var filteredLists = context.Web.Lists.Where(l => l.BaseTemplate == 100);
-            context.Load(filteredLists);
+            IEnumerable<List> Libraries = context.LoadQuery(context.Web.Lists.Where(l => l.BaseTemplate == 101));
             context.ExecuteQuery();
+            foreach (List lib in Libraries)
+            {
+                Console.WriteLine(lib.Title);
+                GetListProperties(context, lib);
 
 
-            IdentifyLists(context, lists);
+            }
 
 
-
-
-
-            // Voeg andere eigenschappen toe zoals nodig
-            //// Tonen van informatie over lijsten
-            //foreach (List list in lists)
-            //{
-            //    List appData = web.Lists.GetByTitle(list.Title);
-            //    context.Load(appData.Fields, fields => fields.Include(field => field.Title, field => field.InternalName));
-            //    context.ExecuteQuery();
-            //    context.Load(appData.Fields, fields => fields.Include(field => field.Title, field => field.InternalName,field => field.FieldTypeKind));
-            //    context.ExecuteQuery();
-
-            //    foreach (Field field in appData.Fields)
-            //    {
-            //        Console.WriteLine($"InternalName - {field.InternalName} | FieldTypeKind: {field.FieldTypeKind}");
-            //    }
-            //    // Tonen van informatie over velden
-            //    int columnCount = appData.Fields.Count;
-            //    ListItemCollection rows = appData.GetItems(CamlQuery.CreateAllItemsQuery());
-            //    context.Load(rows, items => items.Include(
-            //        item => item["Title"],
-            //        item => item["InternalName"],
-            //        item => item["FieldTypeKind"]
-            //        // ... voeg hier de andere velden toe die je nodig hebt
-            //    ));
-            //    context.ExecuteQuery();
-
-            //}
             context.Dispose();
             Console.WriteLine("Einde script");
         }
