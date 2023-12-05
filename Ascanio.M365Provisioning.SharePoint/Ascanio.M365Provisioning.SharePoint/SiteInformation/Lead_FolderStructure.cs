@@ -1,43 +1,73 @@
-﻿using Microsoft.SharePoint.Client;
+﻿using Ascanio.M365Provisioning.SharePoint.Services;
+using Microsoft.SharePoint.Client;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Ascanio.M365Provisioning.SharePoint.SiteInformation
 {
     public class Lead_FolderStructure
     {
-        public Lead_FolderStructure(ClientContext context, Web web) 
+        public List<Lead_FolderStructureDTO> lead_FolderStructureDTO { get; set; } = new List<Lead_FolderStructureDTO>();
+
+        public Lead_FolderStructure()
         {
-            context.Load
-                (
+            SharePointService sharePointService = new();
+            ClientContext context = sharePointService.GetClientContext();
+            Web web = context.Web;
+            context.Load(
                 web,
                 w => w.Lists
-                );
+            );
             context.ExecuteQuery();
-            List<Lead_FolderStructureDTO> lead_FolderStructureDTOs = new ();
+
             ListCollection lists = context.Web.Lists;
             context.Load(context.Web.Lists);
-            context.ExecuteQuery ();
+            context.ExecuteQuery();
+            List<Lead_FolderStructureDTO> lead_FolderStructureDTOs = new();
             foreach (List list in lists)
             {
-                context.Load (list, l => l.BaseTemplate, l => l.Fields);
+                context.Load(list, l => l.BaseTemplate, l => l.Fields, l => l.Title, l => l.RootFolder.Name,l => l.RootFolder.Folders);
                 context.ExecuteQuery();
-                bool isFolderList = list.BaseTemplate == (int)ListTemplateType.DocumentLibrary && list.Fields.Any(field => field.TypeAsString == "Folder");
-                List<Lead_FolderStructureDTO> lead_FolderStructureDTO = new();
-                if (isFolderList)
+                List<Folder> folders = new(list.RootFolder.Folders);                
+                foreach(Folder map in folders)
                 {
-                    if (isFolderList)
+                    Console.WriteLine(map.Name);
+                    List<Lead_FolderStructureDTO> subFolders = GetSubFolders(context,map,list);
+                    lead_FolderStructureDTO.Add(new Lead_FolderStructureDTO
                     {
-                        var folderStructureDTO = new Lead_FolderStructureDTO
-                        {
-                            Title = list.Title,
-                            Subfolders = GetSubfolders(context, list.RootFolder)
-                        };
-
-                        lead_FolderStructureDTOs.Add(folderStructureDTO);
-
-                    }
+                        ListName = list.Title,
+                        FolderName = map.Name,
+                        SubFolders = subFolders
+                    });
+                }
+                Console.WriteLine($"Writing data for list {list.Title} to the DTO fle");
             }
-            
+            Console.WriteLine("Writing data to json file");
+            WriteData2Json writeData2Json = new WriteData2Json();
+            string filePath = $"JsonFiles/Lead_FolderStructure";
+            writeData2Json.Write2JsonFile(lead_FolderStructureDTO, filePath);
+            context.Dispose();
         }
 
+        private List<Lead_FolderStructureDTO> GetSubFolders(ClientContext context, Folder folder, List list)
+        {
+            List<Lead_FolderStructureDTO> subFolders = new List<Lead_FolderStructureDTO>();
+            context.Load(folder, f => f.Folders, f => f.Name);
+            context.ExecuteQuery();
+            if (folder.Folders.Count > 0)
+            {
+            foreach (Folder subFolder in folder.Folders)
+            {
+                    subFolders.Add(new Lead_FolderStructureDTO
+                {
+                    ListName = list.Title,
+                    FolderName = subFolder.Name,
+                    SubFolders = GetSubFolders(context, subFolder, list)
+                    });
+            }
+            }
+
+            return subFolders;
+        }
     }
 }

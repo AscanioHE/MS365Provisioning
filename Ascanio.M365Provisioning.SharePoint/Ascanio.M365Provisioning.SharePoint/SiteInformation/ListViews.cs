@@ -7,8 +7,12 @@ namespace Ascanio.M365Provisioning.SharePoint.SiteInformation
 {
     public class ListViews
     {
-        public ListViews(ClientContext context, Web web) 
+        public ListViews() 
         {
+
+            SharePointService sharePointService = new();
+            ClientContext context = sharePointService.GetClientContext();
+            Web web = context.Web;
             web = context.Web;
             context.Load
                 (
@@ -59,6 +63,7 @@ namespace Ascanio.M365Provisioning.SharePoint.SiteInformation
 
                 }
             }
+            context.Dispose();
             return listViewsDTO;
         }
         private string GetViewFields (View view)

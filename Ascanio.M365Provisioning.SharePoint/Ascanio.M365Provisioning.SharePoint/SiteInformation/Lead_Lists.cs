@@ -11,8 +11,11 @@ namespace Ascanio.M365Provisioning.SharePoint.SiteInformation
 {
     public class Lead_Lists
     {
-        public Lead_Lists(ClientContext context, Web web)
+        public Lead_Lists()
         {
+            SharePointService sharePointService = new();
+            ClientContext context = sharePointService.GetClientContext();
+            Web web = context.Web;
             List<Lead_ListsDTO> lead_ListsDTO = new();
             web = context.Web;
             context.Load(web, w => w.Lists);

@@ -11,8 +11,11 @@ namespace Ascanio.M365Provisioning.SharePoint.SiteInformation
 {
     public class Lead_SiteSettings
     {
-        public void GetWebItemParameters(ClientContext context, Web web)
+        public Lead_SiteSettings()
          {
+            SharePointService sharePointService = new();
+            ClientContext context = sharePointService.GetClientContext();
+            Web web = context.Web;
             // Explicitly load the necessary properties
             context.Load(
                 web,
@@ -48,6 +51,7 @@ namespace Ascanio.M365Provisioning.SharePoint.SiteInformation
             string jsonFilePath = "JsonFiles/Lead_SiteSettings.json";
             WriteData2Json writeData2Json = new();
             writeData2Json.Write2JsonFile(webTemplatesDTO,jsonFilePath);
+            context.Dispose();
         }
     }
 }
