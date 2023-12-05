@@ -12,9 +12,8 @@ namespace Ascanio.M365Provisioning.SharePoint.SiteInformation
     public class Lead_SiteSettings
     {
         public Lead_SiteSettings()
-         {
-            SharePointService sharePointService = new();
-            ClientContext context = sharePointService.GetClientContext();
+        {
+            ClientContext context = new SharePointService().GetClientContext();
             Web web = context.Web;
             // Explicitly load the necessary properties
             context.Load(

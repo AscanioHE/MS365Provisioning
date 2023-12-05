@@ -23,15 +23,9 @@ namespace Ascanio.M365Provisioning.SharePoint
             context.ExecuteQuery();
             foreach (List lib in Libraries)
             {
-                Console.WriteLine(lib.Title);
                 GetListProperties(context, lib);
-
-
             }
-
-
             context.Dispose();
-            Console.WriteLine("Einde script");
         }
 
         private void IdentifyLists(ClientContext context, ListCollection lists)

@@ -9,9 +9,7 @@ namespace Ascanio.M365Provisioning.SharePoint.SiteInformation
     {
         public ListViews() 
         {
-
-            SharePointService sharePointService = new();
-            ClientContext context = sharePointService.GetClientContext();
+            ClientContext context = new SharePointService().GetClientContext();
             Web web = context.Web;
             web = context.Web;
             context.Load
@@ -50,6 +48,7 @@ namespace Ascanio.M365Provisioning.SharePoint.SiteInformation
                             v => v.Scope
                         );
                     context.ExecuteQuery();
+
                     listViewsDTO.Add(new ListViewsDTO
                     {
                         ListName = list.Title,

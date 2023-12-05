@@ -11,7 +11,7 @@
     "EnterpriseKeywords": "00000000-0000-0000-0000-000000000000",
     "BreakRoleInheritance": false,
     "Permissions": {
-      "TestSite1 - Eigenaars": "Volledig beheer, ",
+      "TestSite1 - Eigenaars": "Volledig beheer, Beperkte toegang, ",
       "TestSite1 - Bezoekers": "Lezen, ",
       "TestSite1 - Leden": "Bewerken, ",
       "Limited Access System Group For Web bc827196-78df-4870-8a29-91895d8ce95c": "Beperkte toegang alleen via het web, "
@@ -29,7 +29,7 @@
     "EnterpriseKeywords": "00000000-0000-0000-0000-000000000000",
     "BreakRoleInheritance": false,
     "Permissions": {
-      "TestSite1 - Eigenaars": "Volledig beheer, ",
+      "TestSite1 - Eigenaars": "Volledig beheer, Beperkte toegang, ",
       "TestSite1 - Bezoekers": "Lezen, ",
       "TestSite1 - Leden": "Bewerken, ",
       "Limited Access System Group For Web bc827196-78df-4870-8a29-91895d8ce95c": "Beperkte toegang alleen via het web, "
@@ -48,7 +48,7 @@
     "EnterpriseKeywords": "00000000-0000-0000-0000-000000000000",
     "BreakRoleInheritance": false,
     "Permissions": {
-      "TestSite1 - Eigenaars": "Volledig beheer, ",
+      "TestSite1 - Eigenaars": "Volledig beheer, Beperkte toegang, ",
       "TestSite1 - Bezoekers": "Lezen, ",
       "TestSite1 - Leden": "Bewerken, ",
       "Limited Access System Group For Web bc827196-78df-4870-8a29-91895d8ce95c": "Beperkte toegang alleen via het web, "
@@ -85,7 +85,7 @@
     "EnterpriseKeywords": "00000000-0000-0000-0000-000000000000",
     "BreakRoleInheritance": false,
     "Permissions": {
-      "TestSite1 - Eigenaars": "Volledig beheer, ",
+      "TestSite1 - Eigenaars": "Volledig beheer, Beperkte toegang, ",
       "TestSite1 - Bezoekers": "Lezen, ",
       "TestSite1 - Leden": "Bewerken, ",
       "Limited Access System Group For Web bc827196-78df-4870-8a29-91895d8ce95c": "Beperkte toegang alleen via het web, "
@@ -109,7 +109,7 @@
     "EnterpriseKeywords": "00000000-0000-0000-0000-000000000000",
     "BreakRoleInheritance": false,
     "Permissions": {
-      "TestSite1 - Eigenaars": "Volledig beheer, ",
+      "TestSite1 - Eigenaars": "Volledig beheer, Beperkte toegang, ",
       "TestSite1 - Bezoekers": "Lezen, ",
       "TestSite1 - Leden": "Bewerken, ",
       "Limited Access System Group For Web bc827196-78df-4870-8a29-91895d8ce95c": "Beperkte toegang alleen via het web, "
@@ -127,7 +127,7 @@
     "EnterpriseKeywords": "00000000-0000-0000-0000-000000000000",
     "BreakRoleInheritance": false,
     "Permissions": {
-      "TestSite1 - Eigenaars": "Volledig beheer, ",
+      "TestSite1 - Eigenaars": "Volledig beheer, Beperkte toegang, ",
       "TestSite1 - Bezoekers": "Lezen, ",
       "TestSite1 - Leden": "Bewerken, ",
       "Limited Access System Group For Web bc827196-78df-4870-8a29-91895d8ce95c": "Beperkte toegang alleen via het web, "
@@ -145,7 +145,7 @@
     "EnterpriseKeywords": "00000000-0000-0000-0000-000000000000",
     "BreakRoleInheritance": false,
     "Permissions": {
-      "TestSite1 - Eigenaars": "Volledig beheer, ",
+      "TestSite1 - Eigenaars": "Volledig beheer, Beperkte toegang, ",
       "TestSite1 - Bezoekers": "Lezen, ",
       "TestSite1 - Leden": "Bewerken, ",
       "Limited Access System Group For Web bc827196-78df-4870-8a29-91895d8ce95c": "Beperkte toegang alleen via het web, "
@@ -163,7 +163,7 @@
     "EnterpriseKeywords": "00000000-0000-0000-0000-000000000000",
     "BreakRoleInheritance": false,
     "Permissions": {
-      "TestSite1 - Eigenaars": "Volledig beheer, ",
+      "TestSite1 - Eigenaars": "Volledig beheer, Beperkte toegang, ",
       "TestSite1 - Bezoekers": "Lezen, ",
       "TestSite1 - Leden": "Bewerken, ",
       "Limited Access System Group For Web bc827196-78df-4870-8a29-91895d8ce95c": "Beperkte toegang alleen via het web, "
@@ -181,7 +181,7 @@
     "EnterpriseKeywords": "00000000-0000-0000-0000-000000000000",
     "BreakRoleInheritance": false,
     "Permissions": {
-      "TestSite1 - Eigenaars": "Volledig beheer, ",
+      "TestSite1 - Eigenaars": "Volledig beheer, Beperkte toegang, ",
       "TestSite1 - Bezoekers": "Lezen, ",
       "TestSite1 - Leden": "Bewerken, ",
       "Limited Access System Group For Web bc827196-78df-4870-8a29-91895d8ce95c": "Beperkte toegang alleen via het web, "
@@ -199,7 +199,7 @@
     "EnterpriseKeywords": "00000000-0000-0000-0000-000000000000",
     "BreakRoleInheritance": false,
     "Permissions": {
-      "TestSite1 - Eigenaars": "Volledig beheer, ",
+      "TestSite1 - Eigenaars": "Volledig beheer, Beperkte toegang, ",
       "TestSite1 - Bezoekers": "Lezen, ",
       "TestSite1 - Leden": "Bewerken, ",
       "Limited Access System Group For Web bc827196-78df-4870-8a29-91895d8ce95c": "Beperkte toegang alleen via het web, "
@@ -258,7 +258,7 @@
     "EnterpriseKeywords": "00000000-0000-0000-0000-000000000000",
     "BreakRoleInheritance": false,
     "Permissions": {
-      "TestSite1 - Eigenaars": "Volledig beheer, ",
+      "TestSite1 - Eigenaars": "Volledig beheer, Beperkte toegang, ",
       "TestSite1 - Bezoekers": "Lezen, ",
       "TestSite1 - Leden": "Bewerken, ",
       "Limited Access System Group For Web bc827196-78df-4870-8a29-91895d8ce95c": "Beperkte toegang alleen via het web, "
@@ -318,7 +318,7 @@
     "EnterpriseKeywords": "00000000-0000-0000-0000-000000000000",
     "BreakRoleInheritance": false,
     "Permissions": {
-      "TestSite1 - Eigenaars": "Volledig beheer, ",
+      "TestSite1 - Eigenaars": "Volledig beheer, Beperkte toegang, ",
       "TestSite1 - Bezoekers": "Lezen, ",
       "TestSite1 - Leden": "Bewerken, ",
       "Limited Access System Group For Web bc827196-78df-4870-8a29-91895d8ce95c": "Beperkte toegang alleen via het web, "
@@ -353,10 +353,25 @@
     "EnterpriseKeywords": "fee57326-3e86-40b0-97fc-c0d965aecfea",
     "BreakRoleInheritance": false,
     "Permissions": {
-      "TestSite1 - Eigenaars": "Volledig beheer, ",
+      "TestSite1 - Eigenaars": "Volledig beheer, Beperkte toegang, ",
       "TestSite1 - Bezoekers": "Lezen, ",
       "TestSite1 - Leden": "Bewerken, ",
       "Limited Access System Group For Web bc827196-78df-4870-8a29-91895d8ce95c": "Beperkte toegang alleen via het web, "
+    }
+  },
+  {
+    "Title": "Toegangsaanvragen",
+    "Url": "/sites/TestSite1/Toegangsaanvragen",
+    "ListType": "GenericList",
+    "ContentTypes": [
+      "Toegangsaanvragen"
+    ],
+    "ShowOnQuickLaunch": false,
+    "AllowFolderCreation": false,
+    "EnterpriseKeywords": "00000000-0000-0000-0000-000000000000",
+    "BreakRoleInheritance": true,
+    "Permissions": {
+      "TestSite1 - Eigenaars": "Volledig beheer, "
     }
   },
   {
@@ -371,7 +386,7 @@
     "EnterpriseKeywords": "00000000-0000-0000-0000-000000000000",
     "BreakRoleInheritance": false,
     "Permissions": {
-      "TestSite1 - Eigenaars": "Volledig beheer, ",
+      "TestSite1 - Eigenaars": "Volledig beheer, Beperkte toegang, ",
       "TestSite1 - Bezoekers": "Lezen, ",
       "TestSite1 - Leden": "Bewerken, ",
       "Limited Access System Group For Web bc827196-78df-4870-8a29-91895d8ce95c": "Beperkte toegang alleen via het web, "

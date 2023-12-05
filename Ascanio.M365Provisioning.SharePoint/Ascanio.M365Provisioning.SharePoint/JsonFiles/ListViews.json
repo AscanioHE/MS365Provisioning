@@ -394,5 +394,50 @@
     "RowLimit": 30,
     "ListScope": "DefaultValue",
     "JsonFormatterFile": "TestList.json"
+  },
+  {
+    "ListName": "Toegangsaanvragen",
+    "ViewName": "Uitnodigingen aan externe gebruikers",
+    "DefaultView": false,
+    "ViewFields": "ReqForUser,PermissionDisp,RequestDate,StatusDisp,ObjectRequestedTitleDisp",
+    "RowLimit": 15,
+    "ListScope": "DefaultValue",
+    "JsonFormatterFile": "Toegangsaanvragen.json"
+  },
+  {
+    "ListName": "Toegangsaanvragen",
+    "ViewName": "Geschiedenis",
+    "DefaultView": false,
+    "ViewFields": "ReqForUser,PermissionDisp,RequestDate,StatusDisp,ObjectRequestedTitleDisp",
+    "RowLimit": 30,
+    "ListScope": "DefaultValue",
+    "JsonFormatterFile": "Toegangsaanvragen.json"
+  },
+  {
+    "ListName": "Toegangsaanvragen",
+    "ViewName": "",
+    "DefaultView": false,
+    "ViewFields": "ReqForUser,ObjectRequestedTitleDisp,RequestDate,ApprovalAction",
+    "RowLimit": 15,
+    "ListScope": "DefaultValue",
+    "JsonFormatterFile": "Toegangsaanvragen.json"
+  },
+  {
+    "ListName": "Toegangsaanvragen",
+    "ViewName": "",
+    "DefaultView": false,
+    "ViewFields": "ReqForUser,PermissionDisp,RequestDate,StatusDisp,ObjectRequestedTitleDisp",
+    "RowLimit": 15,
+    "ListScope": "DefaultValue",
+    "JsonFormatterFile": "Toegangsaanvragen.json"
+  },
+  {
+    "ListName": "Toegangsaanvragen",
+    "ViewName": "",
+    "DefaultView": false,
+    "ViewFields": "ReqForUser,PermissionDisp,RequestDate,StatusDisp,ObjectRequestedTitleDisp",
+    "RowLimit": 30,
+    "ListScope": "DefaultValue",
+    "JsonFormatterFile": "Toegangsaanvragen.json"
   }
 ]
