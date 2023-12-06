@@ -9,11 +9,12 @@ using File = System.IO.File;
 
 namespace Ascanio.M365Provisioning.SharePoint.SiteInformation
 {
-    public class Lead_SiteSettings
+    public class SiteSettings
     {
-        public Lead_SiteSettings()
+        public SiteSettings()
         {
-            ClientContext context = new SharePointService().GetClientContext();
+            SharePointService sharePointService = new();
+            ClientContext context = sharePointService.GetClientContext();
             Web web = context.Web;
             // Explicitly load the necessary properties
             context.Load(
@@ -25,12 +26,12 @@ namespace Ascanio.M365Provisioning.SharePoint.SiteInformation
             context.Load(webtTemplateCollection);
             context.ExecuteQuery();
 
-            List<Lead_SiteSettingsDTO> webTemplatesDTO = new();
+            List<SiteSettingsDTO> webTemplatesDTO = new();
 
             foreach (WebTemplate template in webtTemplateCollection)
             {
                 // Create a Lead_SiteSettingsDTO and add it to the list
-                webTemplatesDTO.Add(new Lead_SiteSettingsDTO
+                webTemplatesDTO.Add(new SiteSettingsDTO
                 {
                     SiteTemplate = template.Name,
                     Value = template.Lcid
@@ -47,7 +48,7 @@ namespace Ascanio.M365Provisioning.SharePoint.SiteInformation
                 Console.WriteLine($"Error executing query: {ex.Message}");
                 // Handle the exception as needed
             }
-            string jsonFilePath = "JsonFiles/Lead_SiteSettings.json";
+            string jsonFilePath = sharePointService.SiteSettingsFilePath;
             WriteData2Json writeData2Json = new();
             writeData2Json.Write2JsonFile(webTemplatesDTO,jsonFilePath);
             context.Dispose();

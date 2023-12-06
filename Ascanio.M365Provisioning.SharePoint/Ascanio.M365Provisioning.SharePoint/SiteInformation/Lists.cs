@@ -9,13 +9,14 @@ using Ascanio.M365Provisioning.SharePoint.Services;
 
 namespace Ascanio.M365Provisioning.SharePoint.SiteInformation
 {
-    public class Lead_Lists
+    public class Lists
     {
-        public Lead_Lists()
+        public Lists()
         {
-            ClientContext context = new SharePointService().GetClientContext();
+            SharePointService sharePointService = new();
+            ClientContext context = sharePointService.GetClientContext();
             Web web = context.Web;
-            List<Lead_ListsDTO> lead_ListsDTO = new();
+            List<ListsDTO> lead_ListsDTO = new();
             web = context.Web;
             context.Load(web, w => w.Lists);
             context.ExecuteQuery();
@@ -66,7 +67,7 @@ namespace Ascanio.M365Provisioning.SharePoint.SiteInformation
                         listPermissions
                     ));
             }
-            string jsonFilePath = "JsonFiles/lead_List.json";
+            string jsonFilePath = sharePointService.ListsFilePath ;
             WriteData2Json writeData2Json = new();
             writeData2Json.Write2JsonFile(lead_ListsDTO, jsonFilePath);
             context.Dispose();

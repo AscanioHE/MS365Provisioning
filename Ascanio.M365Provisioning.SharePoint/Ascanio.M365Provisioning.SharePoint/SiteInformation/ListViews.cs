@@ -9,7 +9,8 @@ namespace Ascanio.M365Provisioning.SharePoint.SiteInformation
     {
         public ListViews() 
         {
-            ClientContext context = new SharePointService().GetClientContext();
+            SharePointService sharePointService = new();
+            ClientContext context = sharePointService.GetClientContext();
             Web web = context.Web;
             web = context.Web;
             context.Load
@@ -19,7 +20,7 @@ namespace Ascanio.M365Provisioning.SharePoint.SiteInformation
                 );
             context.ExecuteQuery();
             List<ListViewsDTO> listViewsDTO = GetListViews(context,web.Lists);
-            string jsonFilePath = "JsonFiles/ListViews.json";
+            string jsonFilePath = sharePointService.ListViewsFilePath;
             WriteData2Json writeData2Json = new();
             writeData2Json.Write2JsonFile(listViewsDTO, jsonFilePath);
             context.Dispose();
