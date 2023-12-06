@@ -48,7 +48,7 @@ namespace Ascanio.M365Provisioning.SharePoint.SiteInformation
                 }
             }
             WriteData2Json writeData2Json = new();
-            string filePath = $"JsonFiles/Lead_FolderStructure";
+            string filePath = $"JsonFiles/Lead_FolderStructure.json";
             writeData2Json.Write2JsonFile(lead_FolderStructureDTO, filePath);
             context.Dispose();
         }

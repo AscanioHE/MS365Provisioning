@@ -19,6 +19,7 @@ namespace Ascanio.M365Provisioning.SharePoint.SiteInformation
             web = context.Web;
             context.Load(web, w => w.Lists);
             context.ExecuteQuery();
+            
             foreach (List list in web.Lists)
             {
                 context.Load(list,
@@ -27,14 +28,15 @@ namespace Ascanio.M365Provisioning.SharePoint.SiteInformation
                     l => l.BaseType,
                     l => l.ContentTypes,
                     l => l.OnQuickLaunch,
-                    l => l.HasUniqueRoleAssignments
+                    l => l.HasUniqueRoleAssignments,
+                    l => l.Hidden
                 );
                 context.Load(list.Fields);
                 context.ExecuteQuery() ;
 
                 Guid enterpriseKeywordsValue = Guid.Empty;
                 try { 
-                    Field enterpriseKeywords = list.Fields.GetByInternalNameOrTitle("taxonomy");
+                    Field enterpriseKeywords = list.Fields.GetByInternalNameOrTitle("TaxKeyword");
                     context.Load(enterpriseKeywords);
                     context.ExecuteQuery();
                     enterpriseKeywordsValue = enterpriseKeywords.Id;
@@ -48,7 +50,9 @@ namespace Ascanio.M365Provisioning.SharePoint.SiteInformation
                                                                                        roleAsg => roleAsg.RoleDefinitionBindings.Include(roleDef => roleDef.Name));
                 Dictionary<string, string> listPermissions = GetPermissionDetails(context, queryForList);
 
-                
+                // TODO: Hidden test uitvoeren
+
+
                 lead_ListsDTO.Add(new
                     (
                         list.Title,

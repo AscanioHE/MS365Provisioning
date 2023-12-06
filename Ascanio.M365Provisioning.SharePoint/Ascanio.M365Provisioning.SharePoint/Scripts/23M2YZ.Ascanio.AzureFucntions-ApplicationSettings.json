@@ -9,7 +9,8 @@
     "ClientId": "ed0eb438-d94a-4a1c-ae0b-2a07dbe8dd41",
     "Thumbprint": "7a1abd6f8a5ee0d7c13d8faf0455630693ba7e51",
     "DirectoryId": "a569fa15-6e55-43dc-a47f-b4f38239e020",
-    "SiteUrl": "https://23m2yz.sharepoint.com/sites/TestSite1/"
+    "SiteUrl": "https://23m2yz.sharepoint.com/sites/TestSite1/",
+    "FilePath":  "jsonfiles/"
   },
   "AllowedHosts": "*"
 }

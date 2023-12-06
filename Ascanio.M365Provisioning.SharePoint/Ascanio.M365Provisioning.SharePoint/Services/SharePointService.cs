@@ -16,15 +16,15 @@ namespace Ascanio.M365Provisioning.SharePoint.Services
     {
         public ClientContext GetClientContext()
         {
-            (string clientId, string siteUrl, string directoryId, string thumbPrint) = GetClientConfiguration();
+            (string clientId, string siteUrl, string directoryId, string thumbPrint, string filePath) = GetClientConfiguration();
 
             // Get the certificate from the local computer with the corresponding thumbprint.
             var certificate = GetCertificateByThumbprint(thumbPrint);
 
             var authManager = new PnP.Framework.AuthenticationManager(clientId, certificate, directoryId);
-
+            string fullFilePath = Path.Combine(siteUrl, filePath);
             // Use the PnP Framework to get the SharePoint context.
-            SPClient.ClientContext context = authManager.GetContext(siteUrl);
+            ClientContext context = authManager.GetContext(siteUrl);
             return context;
         }    
 
@@ -43,7 +43,7 @@ namespace Ascanio.M365Provisioning.SharePoint.Services
                 throw new InvalidOperationException($"Certificate with thumbprint {thumbprint} not found!");
             }
         }
-        private static (string clientId, string siteUrl, string directoryId, string thumbPrint) GetClientConfiguration()
+        private static (string clientId, string siteUrl, string directoryId, string thumbPrint,string filePath) GetClientConfiguration()
             {
                 // Load the configuration file
                 var configuration = new ConfigurationBuilder()
@@ -54,8 +54,8 @@ namespace Ascanio.M365Provisioning.SharePoint.Services
                 string siteUrl = configuration["SharePointAscanio:SiteUrl"];
                 string directoryId = configuration["SharePointAscanio:DirectoryId"];
                 string thumbPrint = configuration["SharePointAscanio:ThumbPrint"];
-
-                return (clientId, siteUrl, directoryId, thumbPrint);
+                string filePath = configuration["SharePointAscanio:FilePath"];
+                return (clientId, siteUrl, directoryId, thumbPrint,filePath);
             }
 
     }

@@ -1,9 +1,11 @@
 ﻿using Ascanio.M365Provisioning.SharePoint.Services;
 using Microsoft.SharePoint.Client;
 using Microsoft.SharePoint.Client.WebParts;
+using Newtonsoft.Json;
 using System.Net.Http.Headers;
 using File = Microsoft.SharePoint.Client.File;
 using List = Microsoft.SharePoint.Client.List;
+using OfficeDevPnP.Core.Pages;
 
 namespace Ascanio.M365Provisioning.SharePoint.SiteInformation
 {
@@ -11,9 +13,8 @@ namespace Ascanio.M365Provisioning.SharePoint.SiteInformation
     {
         public Lead_WebPartPages()
         {
-            using  (ClientContext context = new SharePointService().GetClientContext())
+            using (ClientContext context = new SharePointService().GetClientContext())
             {
-                Console.WriteLine("Lead_SiteSettings.json File created...");
                 IEnumerable<List> Libraries = context.LoadQuery
                                                             (
                                                             context.Web.Lists.Where
@@ -29,74 +30,49 @@ namespace Ascanio.M365Provisioning.SharePoint.SiteInformation
                     context.Load
                         (
                         sitePages,
-                        sp => sp.Include(sp=> sp.Client_Title)
+                        sp => sp.Include(sp => sp.Client_Title)
                         );
                     context.ExecuteQuery();
-                    foreach(ListItem sitePage in sitePages)
-                    {
-                        File pageFile = sitePage.File;
-                        context.Load(pageFile);
+                    //foreach (ListItem sitePage in sitePages)
+                    //{
+                    //    string fullPageUrl = "https://23m2yz.sharepoint.com/sites/TestSite1/SitePages/Home.aspx";
 
-                        context.Load(lib.RootFolder);
-                        context.ExecuteQuery();
+                    //    File pageFile = context.Web.GetFileByServerRelativeUrl(fullPageUrl);
+                    //    context.Load(pageFile);
+                    //    context.ExecuteQuery();
 
-                        Console.WriteLine($"Processing page: {pageFile.ServerRelativeUrl}");
+                    //    var page = ClientSidePage.Load(context, pageFile);
+                    //    var components = page.Controls;
 
-                        List pageList = pageFile.ListItemAllFields.ParentList;
-                        string siteUrl = "https://23m2yz.sharepoint.com/sites/TestSite1";
-                        string endpointUrl = $"{siteUrl}/_api/web/GetFileByServerRelativeUrl('{pageFile.ServerRelativeUrl}')/GetLimitedWebPartManager";
-                        Uri endpointUri = new (endpointUrl, UriKind.Absolute);
-                        _=GetWebParts(context, endpointUri);
-                        string accessToken = context.GetAccessToken();
-                        using (HttpClient client = new HttpClient())
-                        {
-                            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
-
-                            HttpResponseMessage response = await client.GetAsync(endpointUri);
-                            if (response.IsSuccessStatusCode)
-                            {
-                                string result = await response.Content.ReadAsStringAsync();
-                                // Analyseer de resultaten om informatie over de webonderdelen te verkrijgen
-                                //...
-                            }
-                        }
-                        //LimitedWebPartManager webPartManager = pageFile.GetLimitedWebPartManager(PersonalizationScope.Shared);
-                        //context.Load
-                        //    (
-                        //    webPartManager.WebParts,
-                        //    wp => wp.Include(wp => wp.WebPart.Title)
-                        //    );
-                        //context.ExecuteQuery();
-                        //Console.WriteLine($"Number of web parts on the page: {webPartManager.WebParts.Count}");
-                        //foreach (WebPartDefinition webPartDefinition in webPartManager.WebParts)
-                        //{
-                        //    Console.WriteLine($"WebPart Title : {webPartDefinition.WebPart.Title}");
-                        //}
-                    }
+                    //    foreach (var component in components)
+                    //    {
+                    //        if (component is ClientSideWebPart)
+                    //        {
+                    //            var webPart = (ClientSideWebPart)component;
+                    //            Console.WriteLine($"WebPart Title: {webPart.Title}");
+                    //            //Console.WriteLine($"WebPart Id: {webPart.Id}");
+                    //            // Voeg andere eigenschappen toe die je nodig hebt
+                    //        }
+                    //    }
+                    //}
                 }
             }
 
+                Console.WriteLine("WebParts.json File created...");
             Console.WriteLine("The SharePoint connection is closed");
         }
 
-        private async Task GetWebParts(ClientContext context, Uri endpointUri)
-        {
-            string accessToken = context.GetAccessToken();
-            using (HttpClient client = new HttpClient())
-            {
-                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+    }
+    public class WebPartInfo
+    {
+        public List<WebPart> WebParts { get; set; }
+    }
 
-                HttpResponseMessage response = await client.GetAsync(endpointUri);
-                if (response.IsSuccessStatusCode)
-                {
-                    string result = await response.Content.ReadAsStringAsync();
-                    // Analyseer de resultaten om informatie over de webonderdelen te verkrijgen
-                    //...
-                }
-            }
-        }
+    public class WebPart
+    {
+        public string Title { get; set; }
+        public string Type { get; set; }
+        // Voeg andere eigenschappen toe die je nodig hebt
     }
 }
     
