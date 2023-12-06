@@ -27,10 +27,10 @@ namespace Ascanio.M365Provisioning.SharePoint.Services
 
             var authManager = new PnP.Framework.AuthenticationManager(clientId, certificate, directoryId);
 
-            SiteSettingsFilePath = Path.Combine(siteUrl, "jsonfiles", "SiteSettings.json");
-            ListsFilePath = Path.Combine(siteUrl, "jsonfiles", "Lists.json");
-            FolderStructureFilePath = Path.Combine(siteUrl, "jsonfiles", "FolderStructure.json");
-            ListViewsFilePath = Path.Combine(siteUrl, "jsonfiles", "ListViews.json");
+            SiteSettingsFilePath = "jsonfiles/SiteSettings.json";
+            ListsFilePath = "jsonfiles/Lists.json";
+            FolderStructureFilePath = "jsonfiles/FolderStructure.json";
+            ListViewsFilePath = "jsonfiles/ListViews.json";
 
             // Use the PnP Framework to get the SharePoint context.
             ClientContext context = authManager.GetContext(siteUrl);

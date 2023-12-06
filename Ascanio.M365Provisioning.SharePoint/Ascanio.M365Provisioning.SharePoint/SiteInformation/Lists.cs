@@ -34,38 +34,43 @@ namespace Ascanio.M365Provisioning.SharePoint.SiteInformation
                 );
                 context.Load(list.Fields);
                 context.ExecuteQuery() ;
-
-                Guid enterpriseKeywordsValue = Guid.Empty;
-                try { 
-                    Field enterpriseKeywords = list.Fields.GetByInternalNameOrTitle("TaxKeyword");
-                    context.Load(enterpriseKeywords);
-                    context.ExecuteQuery();
-                    enterpriseKeywordsValue = enterpriseKeywords.Id;
-                }
-                catch 
+                bool hidden = list.Hidden;
+                if (!hidden)
                 {
-                     enterpriseKeywordsValue = Guid.Empty;
+                    Guid enterpriseKeywordsValue = Guid.Empty;
+                    try
+                    {
+                        Field enterpriseKeywords = list.Fields.GetByInternalNameOrTitle("TaxKeyword");
+                        context.Load(enterpriseKeywords);
+                        context.ExecuteQuery();
+                        enterpriseKeywordsValue = enterpriseKeywords.Id;
+                    }
+                    catch
+                    {
+                        enterpriseKeywordsValue = Guid.Empty;
+                    }
+
+                    IQueryable<RoleAssignment> queryForList = list.RoleAssignments.Include(roleAsg => roleAsg.Member,
+                                                                                           roleAsg => roleAsg.RoleDefinitionBindings.Include(roleDef => roleDef.Name));
+                    Dictionary<string, string> listPermissions = GetPermissionDetails(context, queryForList);
+
+                    // TODO: Hidden test uitvoeren
+
+
+                    lead_ListsDTO.Add(new
+                        (
+                            list.Title,
+                            list.DefaultViewUrl,
+                            list.BaseType.ToString(),
+                            GetContentTypes(context, list),
+                            list.OnQuickLaunch,
+                            GetEnableFolderCreation(context, list),
+                            enterpriseKeywordsValue.ToString(),
+                            list.HasUniqueRoleAssignments,
+                            listPermissions,
+                            hidden
+                        ));
                 }
-                
-                IQueryable<RoleAssignment> queryForList = list.RoleAssignments.Include(roleAsg => roleAsg.Member,
-                                                                                       roleAsg => roleAsg.RoleDefinitionBindings.Include(roleDef => roleDef.Name));
-                Dictionary<string, string> listPermissions = GetPermissionDetails(context, queryForList);
-
-                // TODO: Hidden test uitvoeren
-
-
-                lead_ListsDTO.Add(new
-                    (
-                        list.Title,
-                        list.DefaultViewUrl,
-                        list.BaseType.ToString(),
-                        GetContentTypes(context, list),
-                        list.OnQuickLaunch,
-                        GetEnableFolderCreation(context, list),
-                        enterpriseKeywordsValue.ToString(),
-                        list.HasUniqueRoleAssignments,
-                        listPermissions
-                    ));
             }
             string jsonFilePath = sharePointService.ListsFilePath ;
             WriteData2Json writeData2Json = new();

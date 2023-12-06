@@ -1,0 +1,559 @@
+[
+  {
+    "ListName": "appdata",
+    "FolderName": "Attachments",
+    "SubFolders": []
+  },
+  {
+    "ListName": "appfiles",
+    "FolderName": "Forms",
+    "SubFolders": []
+  },
+  {
+    "ListName": "Documenten",
+    "FolderName": "Projecten",
+    "SubFolders": []
+  },
+  {
+    "ListName": "Documenten",
+    "FolderName": "Kwartaaloverzichten",
+    "SubFolders": []
+  },
+  {
+    "ListName": "Documenten",
+    "FolderName": "Algemeen",
+    "SubFolders": []
+  },
+  {
+    "ListName": "Documenten",
+    "FolderName": "Teamplanning",
+    "SubFolders": []
+  },
+  {
+    "ListName": "Documenten",
+    "FolderName": "Forms",
+    "SubFolders": [
+      {
+        "ListName": "Documenten",
+        "FolderName": "Document",
+        "SubFolders": []
+      }
+    ]
+  },
+  {
+    "ListName": "Documenten",
+    "FolderName": "Aankondigingen",
+    "SubFolders": []
+  },
+  {
+    "ListName": "Documenten",
+    "FolderName": "Jaarverslagen",
+    "SubFolders": []
+  },
+  {
+    "ListName": "DocumentLibraryTest",
+    "FolderName": "Forms",
+    "SubFolders": [
+      {
+        "ListName": "DocumentLibraryTest",
+        "FolderName": "Document",
+        "SubFolders": []
+      }
+    ]
+  },
+  {
+    "ListName": "Formuliersjablonen",
+    "FolderName": "Forms",
+    "SubFolders": [
+      {
+        "ListName": "Formuliersjablonen",
+        "FolderName": "InfoPath Form Template",
+        "SubFolders": []
+      }
+    ]
+  },
+  {
+    "ListName": "Galerie met basispagina's",
+    "FolderName": "Forms",
+    "SubFolders": [
+      {
+        "ListName": "Galerie met basispagina's",
+        "FolderName": "Display Template Code",
+        "SubFolders": []
+      },
+      {
+        "ListName": "Galerie met basispagina's",
+        "FolderName": "Design File",
+        "SubFolders": []
+      },
+      {
+        "ListName": "Galerie met basispagina's",
+        "FolderName": "Document",
+        "SubFolders": []
+      },
+      {
+        "ListName": "Galerie met basispagina's",
+        "FolderName": "MasterPage",
+        "SubFolders": []
+      }
+    ]
+  },
+  {
+    "ListName": "Galerie met basispagina's",
+    "FolderName": "Display Templates",
+    "SubFolders": [
+      {
+        "ListName": "Galerie met basispagina's",
+        "FolderName": "Language Files",
+        "SubFolders": [
+          {
+            "ListName": "Galerie met basispagina's",
+            "FolderName": "da-dk",
+            "SubFolders": []
+          },
+          {
+            "ListName": "Galerie met basispagina's",
+            "FolderName": "hr-hr",
+            "SubFolders": []
+          },
+          {
+            "ListName": "Galerie met basispagina's",
+            "FolderName": "ga-ie",
+            "SubFolders": []
+          },
+          {
+            "ListName": "Galerie met basispagina's",
+            "FolderName": "pl-pl",
+            "SubFolders": []
+          },
+          {
+            "ListName": "Galerie met basispagina's",
+            "FolderName": "mk-mk",
+            "SubFolders": []
+          },
+          {
+            "ListName": "Galerie met basispagina's",
+            "FolderName": "es-es",
+            "SubFolders": []
+          },
+          {
+            "ListName": "Galerie met basispagina's",
+            "FolderName": "tr-tr",
+            "SubFolders": []
+          },
+          {
+            "ListName": "Galerie met basispagina's",
+            "FolderName": "ko-kr",
+            "SubFolders": []
+          },
+          {
+            "ListName": "Galerie met basispagina's",
+            "FolderName": "vi-vn",
+            "SubFolders": []
+          },
+          {
+            "ListName": "Galerie met basispagina's",
+            "FolderName": "cs-cz",
+            "SubFolders": []
+          },
+          {
+            "ListName": "Galerie met basispagina's",
+            "FolderName": "kk-kz",
+            "SubFolders": []
+          },
+          {
+            "ListName": "Galerie met basispagina's",
+            "FolderName": "bs-latn-ba",
+            "SubFolders": []
+          },
+          {
+            "ListName": "Galerie met basispagina's",
+            "FolderName": "ca-es",
+            "SubFolders": []
+          },
+          {
+            "ListName": "Galerie met basispagina's",
+            "FolderName": "hu-hu",
+            "SubFolders": []
+          },
+          {
+            "ListName": "Galerie met basispagina's",
+            "FolderName": "en-us",
+            "SubFolders": []
+          },
+          {
+            "ListName": "Galerie met basispagina's",
+            "FolderName": "ru-ru",
+            "SubFolders": []
+          },
+          {
+            "ListName": "Galerie met basispagina's",
+            "FolderName": "sr-cyrl-rs",
+            "SubFolders": []
+          },
+          {
+            "ListName": "Galerie met basispagina's",
+            "FolderName": "lt-lt",
+            "SubFolders": []
+          },
+          {
+            "ListName": "Galerie met basispagina's",
+            "FolderName": "ro-ro",
+            "SubFolders": []
+          },
+          {
+            "ListName": "Galerie met basispagina's",
+            "FolderName": "ja-jp",
+            "SubFolders": []
+          },
+          {
+            "ListName": "Galerie met basispagina's",
+            "FolderName": "fi-fi",
+            "SubFolders": []
+          },
+          {
+            "ListName": "Galerie met basispagina's",
+            "FolderName": "sk-sk",
+            "SubFolders": []
+          },
+          {
+            "ListName": "Galerie met basispagina's",
+            "FolderName": "de-de",
+            "SubFolders": []
+          },
+          {
+            "ListName": "Galerie met basispagina's",
+            "FolderName": "bg-bg",
+            "SubFolders": []
+          },
+          {
+            "ListName": "Galerie met basispagina's",
+            "FolderName": "cy-gb",
+            "SubFolders": []
+          },
+          {
+            "ListName": "Galerie met basispagina's",
+            "FolderName": "sv-se",
+            "SubFolders": []
+          },
+          {
+            "ListName": "Galerie met basispagina's",
+            "FolderName": "az-latn-az",
+            "SubFolders": []
+          },
+          {
+            "ListName": "Galerie met basispagina's",
+            "FolderName": "prs-af",
+            "SubFolders": []
+          },
+          {
+            "ListName": "Galerie met basispagina's",
+            "FolderName": "ms-my",
+            "SubFolders": []
+          },
+          {
+            "ListName": "Galerie met basispagina's",
+            "FolderName": "el-gr",
+            "SubFolders": []
+          },
+          {
+            "ListName": "Galerie met basispagina's",
+            "FolderName": "it-it",
+            "SubFolders": []
+          },
+          {
+            "ListName": "Galerie met basispagina's",
+            "FolderName": "he-il",
+            "SubFolders": []
+          },
+          {
+            "ListName": "Galerie met basispagina's",
+            "FolderName": "et-ee",
+            "SubFolders": []
+          },
+          {
+            "ListName": "Galerie met basispagina's",
+            "FolderName": "uk-ua",
+            "SubFolders": []
+          },
+          {
+            "ListName": "Galerie met basispagina's",
+            "FolderName": "hi-in",
+            "SubFolders": []
+          },
+          {
+            "ListName": "Galerie met basispagina's",
+            "FolderName": "ar-sa",
+            "SubFolders": []
+          },
+          {
+            "ListName": "Galerie met basispagina's",
+            "FolderName": "sr-Latn-RS",
+            "SubFolders": []
+          },
+          {
+            "ListName": "Galerie met basispagina's",
+            "FolderName": "id-id",
+            "SubFolders": []
+          },
+          {
+            "ListName": "Galerie met basispagina's",
+            "FolderName": "nb-no",
+            "SubFolders": []
+          },
+          {
+            "ListName": "Galerie met basispagina's",
+            "FolderName": "zh-cn",
+            "SubFolders": []
+          },
+          {
+            "ListName": "Galerie met basispagina's",
+            "FolderName": "fr-fr",
+            "SubFolders": []
+          },
+          {
+            "ListName": "Galerie met basispagina's",
+            "FolderName": "pt-pt",
+            "SubFolders": []
+          },
+          {
+            "ListName": "Galerie met basispagina's",
+            "FolderName": "th-th",
+            "SubFolders": []
+          },
+          {
+            "ListName": "Galerie met basispagina's",
+            "FolderName": "zh-tw",
+            "SubFolders": []
+          },
+          {
+            "ListName": "Galerie met basispagina's",
+            "FolderName": "nl-nl",
+            "SubFolders": []
+          },
+          {
+            "ListName": "Galerie met basispagina's",
+            "FolderName": "lv-lv",
+            "SubFolders": []
+          },
+          {
+            "ListName": "Galerie met basispagina's",
+            "FolderName": "gl-es",
+            "SubFolders": []
+          },
+          {
+            "ListName": "Galerie met basispagina's",
+            "FolderName": "pt-br",
+            "SubFolders": []
+          },
+          {
+            "ListName": "Galerie met basispagina's",
+            "FolderName": "eu-es",
+            "SubFolders": []
+          },
+          {
+            "ListName": "Galerie met basispagina's",
+            "FolderName": "sl-si",
+            "SubFolders": []
+          }
+        ]
+      },
+      {
+        "ListName": "Galerie met basispagina's",
+        "FolderName": "Content Web Parts",
+        "SubFolders": []
+      },
+      {
+        "ListName": "Galerie met basispagina's",
+        "FolderName": "Filters",
+        "SubFolders": []
+      },
+      {
+        "ListName": "Galerie met basispagina's",
+        "FolderName": "Search",
+        "SubFolders": []
+      },
+      {
+        "ListName": "Galerie met basispagina's",
+        "FolderName": "Server Style Sheets",
+        "SubFolders": []
+      },
+      {
+        "ListName": "Galerie met basispagina's",
+        "FolderName": "System",
+        "SubFolders": []
+      }
+    ]
+  },
+  {
+    "ListName": "Galerie met lijstsjablonen",
+    "FolderName": "Forms",
+    "SubFolders": []
+  },
+  {
+    "ListName": "Galerie met webonderdelen",
+    "FolderName": "Forms",
+    "SubFolders": []
+  },
+  {
+    "ListName": "Galerie van oplossingen",
+    "FolderName": "Forms",
+    "SubFolders": []
+  },
+  {
+    "ListName": "Galerie van thema's",
+    "FolderName": "15",
+    "SubFolders": []
+  },
+  {
+    "ListName": "Galerie van thema's",
+    "FolderName": "Themed",
+    "SubFolders": [
+      {
+        "ListName": "Galerie van thema's",
+        "FolderName": "E8B14A70",
+        "SubFolders": []
+      }
+    ]
+  },
+  {
+    "ListName": "Galerie van thema's",
+    "FolderName": "Forms",
+    "SubFolders": []
+  },
+  {
+    "ListName": "Gebeurtenissen",
+    "FolderName": "Event",
+    "SubFolders": []
+  },
+  {
+    "ListName": "Gebeurtenissen",
+    "FolderName": "Attachments",
+    "SubFolders": []
+  },
+  {
+    "ListName": "Geconverteerde formulieren",
+    "FolderName": "Forms",
+    "SubFolders": []
+  },
+  {
+    "ListName": "Lijst met gebruikersgegevens",
+    "FolderName": "Attachments",
+    "SubFolders": []
+  },
+  {
+    "ListName": "Lijst met gebruikersgegevens",
+    "FolderName": "DomainGroup",
+    "SubFolders": []
+  },
+  {
+    "ListName": "Lijst met gebruikersgegevens",
+    "FolderName": "SharePointGroup",
+    "SubFolders": []
+  },
+  {
+    "ListName": "Lijst met gebruikersgegevens",
+    "FolderName": "Person",
+    "SubFolders": []
+  },
+  {
+    "ListName": "Samengesteld uiterlijk",
+    "FolderName": "Attachments",
+    "SubFolders": []
+  },
+  {
+    "ListName": "Siteactiva",
+    "FolderName": "Forms",
+    "SubFolders": [
+      {
+        "ListName": "Siteactiva",
+        "FolderName": "Document",
+        "SubFolders": []
+      }
+    ]
+  },
+  {
+    "ListName": "Siteactiva",
+    "FolderName": "_SiteTemplates",
+    "SubFolders": [
+      {
+        "ListName": "Siteactiva",
+        "FolderName": "development00001",
+        "SubFolders": []
+      }
+    ]
+  },
+  {
+    "ListName": "Siteactiva",
+    "FolderName": "TestSite1 Notitieblok",
+    "SubFolders": []
+  },
+  {
+    "ListName": "Siteactiva",
+    "FolderName": "SitePages",
+    "SubFolders": [
+      {
+        "ListName": "Siteactiva",
+        "FolderName": "LearningTeamHome",
+        "SubFolders": []
+      }
+    ]
+  },
+  {
+    "ListName": "Sitepagina's",
+    "FolderName": "Forms",
+    "SubFolders": [
+      {
+        "ListName": "Sitepagina's",
+        "FolderName": "Repost Page",
+        "SubFolders": []
+      },
+      {
+        "ListName": "Sitepagina's",
+        "FolderName": "Web Part Page",
+        "SubFolders": []
+      },
+      {
+        "ListName": "Sitepagina's",
+        "FolderName": "Sitepagina",
+        "SubFolders": []
+      }
+    ]
+  },
+  {
+    "ListName": "Stijlbibliotheek",
+    "FolderName": "Forms",
+    "SubFolders": [
+      {
+        "ListName": "Stijlbibliotheek",
+        "FolderName": "Document",
+        "SubFolders": []
+      }
+    ]
+  },
+  {
+    "ListName": "TaxonomyHiddenList",
+    "FolderName": "Item",
+    "SubFolders": []
+  },
+  {
+    "ListName": "TaxonomyHiddenList",
+    "FolderName": "Attachments",
+    "SubFolders": []
+  },
+  {
+    "ListName": "TestList",
+    "FolderName": "Attachments",
+    "SubFolders": []
+  },
+  {
+    "ListName": "Websjabloonextensies",
+    "FolderName": "86c7f580-4375-493a-aa83-44ba515d58c3",
+    "SubFolders": []
+  },
+  {
+    "ListName": "Websjabloonextensies",
+    "FolderName": "09c9e178-f91f-4ed2-8803-56defed213b8",
+    "SubFolders": []
+  }
+]
