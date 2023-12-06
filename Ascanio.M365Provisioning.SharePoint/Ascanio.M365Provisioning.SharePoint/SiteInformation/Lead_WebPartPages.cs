@@ -33,7 +33,23 @@ namespace Ascanio.M365Provisioning.SharePoint.SiteInformation
                     context.ExecuteQuery();
                     foreach(ListItem sitePage in sitePages)
                     {
-                        Console.WriteLine(sitePage.Client_Title);
+                        File pageFile = sitePage.File;
+                        context.Load(pageFile);
+                        context.ExecuteQuery();
+
+                        List pageList = pageFile.ListItemAllFields.ParentList;
+                        LimitedWebPartManager webPartManager = pageFile.GetLimitedWebPartManager(PersonalizationScope.Shared);
+                        context.Load
+                            (
+                            webPartManager.WebParts,
+                            wp => wp.Include(wp => wp.WebPart.Title)
+                            );
+                        context.ExecuteQuery();
+
+                        foreach(WebPartDefinition webPartDefinition in webPartManager.WebParts)
+                        {
+                            Console.WriteLine($"WebPart Title : {webPartDefinition.WebPart.Title}");
+                        }
                     }
                 }
             }
