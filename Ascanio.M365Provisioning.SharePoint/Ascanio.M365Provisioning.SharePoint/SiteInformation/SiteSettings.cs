@@ -16,12 +16,11 @@ namespace Ascanio.M365Provisioning.SharePoint.SiteInformation
             SharePointService sharePointService = new();
             ClientContext context = sharePointService.GetClientContext();
             Web web = context.Web;
-            // Explicitly load the necessary properties
             context.Load(
-                web,
-                w => w.WebTemplate
-                );
+                            web
+                        );
             context.ExecuteQuery();
+
             WebTemplateCollection webtTemplateCollection = web.GetAvailableWebTemplates(1033, true);
             context.Load(webtTemplateCollection);
             context.ExecuteQuery();
@@ -30,13 +29,16 @@ namespace Ascanio.M365Provisioning.SharePoint.SiteInformation
 
             foreach (WebTemplate template in webtTemplateCollection)
             {
-                // Create a Lead_SiteSettingsDTO and add it to the list
-                webTemplatesDTO.Add(new SiteSettingsDTO
+                if (!template.IsHidden)
                 {
-                    SiteTemplate = template.Name,
-                    Value = template.Lcid
-                    // Other properties as needed
-                });
+                    // Create a Lead_SiteSettingsDTO and add it to the list
+                    webTemplatesDTO.Add(new SiteSettingsDTO
+                    {
+                        SiteTemplate = template.Name,
+                        Value = template.Lcid
+                        // Other properties as needed
+                    });
+                }
             }
             try
             {

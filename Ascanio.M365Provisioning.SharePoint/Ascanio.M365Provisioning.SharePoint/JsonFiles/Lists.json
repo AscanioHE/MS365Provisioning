@@ -16,7 +16,8 @@
       "TestSite1 - Bezoekers": "Lezen, ",
       "TestSite1 - Leden": "Bewerken, ",
       "Limited Access System Group For Web bc827196-78df-4870-8a29-91895d8ce95c": "Beperkte toegang alleen via het web, "
-    }
+    },
+    "Hidden": false
   },
   {
     "Title": "DocumentLibraryTest",
@@ -35,7 +36,8 @@
       "TestSite1 - Bezoekers": "Lezen, ",
       "TestSite1 - Leden": "Bewerken, ",
       "Limited Access System Group For List ddb003c4-92d6-4e46-a94b-ad64fc8f4606": "Beperkte toegang, "
-    }
+    },
+    "Hidden": false
   },
   {
     "Title": "Formuliersjablonen",
@@ -53,7 +55,8 @@
       "TestSite1 - Bezoekers": "Lezen, ",
       "TestSite1 - Leden": "Bewerken, ",
       "Limited Access System Group For Web bc827196-78df-4870-8a29-91895d8ce95c": "Beperkte toegang alleen via het web, "
-    }
+    },
+    "Hidden": false
   },
   {
     "Title": "Gebeurtenissen",
@@ -71,7 +74,8 @@
       "TestSite1 - Bezoekers": "Lezen, ",
       "TestSite1 - Leden": "Bewerken, ",
       "Limited Access System Group For Web bc827196-78df-4870-8a29-91895d8ce95c": "Beperkte toegang alleen via het web, "
-    }
+    },
+    "Hidden": false
   },
   {
     "Title": "Siteactiva",
@@ -90,7 +94,8 @@
       "TestSite1 - Bezoekers": "Lezen, ",
       "TestSite1 - Leden": "Bewerken, ",
       "Limited Access System Group For List 2500e74f-2009-46ed-b5da-43020776b6fd": "Beperkte toegang, "
-    }
+    },
+    "Hidden": false
   },
   {
     "Title": "Sitepagina's",
@@ -112,7 +117,8 @@
       "TestSite1 - Bezoekers": "Lezen, ",
       "TestSite1 - Leden": "Bewerken, ",
       "Limited Access System Group For List 2500e74f-2009-46ed-b5da-43020776b6fd": "Beperkte toegang, "
-    }
+    },
+    "Hidden": false
   },
   {
     "Title": "Stijlbibliotheek",
@@ -131,7 +137,8 @@
       "TestSite1 - Bezoekers": "Lezen, ",
       "TestSite1 - Leden": "Bewerken, ",
       "Limited Access System Group For Web bc827196-78df-4870-8a29-91895d8ce95c": "Beperkte toegang alleen via het web, "
-    }
+    },
+    "Hidden": false
   },
   {
     "Title": "TestList",
@@ -150,6 +157,7 @@
       "TestSite1 - Bezoekers": "Lezen, ",
       "TestSite1 - Leden": "Bewerken, ",
       "Limited Access System Group For Web bc827196-78df-4870-8a29-91895d8ce95c": "Beperkte toegang alleen via het web, "
-    }
+    },
+    "Hidden": false
   }
 ]
