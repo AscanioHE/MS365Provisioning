@@ -12,46 +12,50 @@ namespace Ascanio.M365Provisioning.SharePoint.SiteInformation
         public FolderStructure()
         {
             SharePointService sharePointService = new ();
-            ClientContext context = sharePointService.GetClientContext();
-            Web web = context.Web;
-            context.Load(
-                web,
-                w => w.Lists
-            );
-            context.ExecuteQuery();
-
-            ListCollection lists = context.Web.Lists;
-            context.Load(context.Web.Lists);
-            context.ExecuteQuery();
-            List<FolderStructureDTO> lead_FolderStructureDTOs = new();
-            foreach (List list in lists)
+            using (ClientContext context = sharePointService.GetClientContext())
             {
-                context.Load
-                    (
-                    list, 
-                    l => l.BaseTemplate, 
-                    l => l.Fields, 
-                    l => l.Title, 
-                    l => l.RootFolder.Name,
-                    l => l.RootFolder.Folders
-                    );
+                Web web = context.Web;
+                context.Load(
+                    web,
+                    w => w.Lists
+                );
+                ListCollection lists = context.Web.Lists;
+                context.Load(context.Web.Lists);
                 context.ExecuteQuery();
-                List<Folder> folders = new(list.RootFolder.Folders);                
-                foreach(Folder map in folders)
+                List<FolderStructureDTO> lead_FolderStructureDTOs = new();
+                foreach (List list in lists)
                 {
-                    List<FolderStructureDTO> subFolders = GetSubFolders(context,map,list);
-                    lead_FolderStructureDTO.Add(new FolderStructureDTO
+                    context.Load
+                        (
+                        list,
+                        l => l.BaseTemplate,
+                        l => l.Fields,
+                        l => l.Title,
+                        l => l.RootFolder.Name,
+                        l => l.RootFolder.Folders,
+                        l => l.Hidden
+                        );
+                    context.ExecuteQuery();
+                    if(!list.Hidden)
                     {
-                        ListName = list.Title,
-                        FolderName = map.Name,
-                        SubFolders = subFolders
-                    });
+                        List<Folder> folders = new(list.RootFolder.Folders);
+                        foreach (Folder map in folders)
+                        {
+
+                            List<FolderStructureDTO> subFolders = GetSubFolders(context, map, list);
+                            lead_FolderStructureDTO.Add(new FolderStructureDTO
+                            {
+                                ListName = list.Title,
+                                FolderName = map.Name,
+                                SubFolders = subFolders
+                            });
+                        }
+                    }
                 }
+                WriteData2Json writeData2Json = new();
+                string filePath = sharePointService.FolderStructureFilePath;
+                writeData2Json.Write2JsonFile(lead_FolderStructureDTO, filePath);
             }
-            WriteData2Json writeData2Json = new();
-            string filePath = sharePointService.FolderStructureFilePath;
-            writeData2Json.Write2JsonFile(lead_FolderStructureDTO, filePath);
-            context.Dispose();
         }
 
         private List<FolderStructureDTO> GetSubFolders(ClientContext context, Folder folder, List list)
