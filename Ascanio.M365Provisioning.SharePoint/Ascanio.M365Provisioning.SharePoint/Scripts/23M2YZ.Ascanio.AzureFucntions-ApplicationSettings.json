@@ -13,7 +13,8 @@
     "SiteSettingsFilePath": "jsonfiles/SiteSettings.json",
     "ListsFilePath": "jsonfiles/Lists.json",
     "FolderStructureFilepath": "jsonfiles/FolderStructure.json",
-    "ListViewsFilepath": "jsonfiles/ListViews.json"
+    "ListViewsFilepath": "jsonfiles/ListViews.json",
+    "SiteColumnsFilepath": "jsonfiles/SiteColumns.json"
   },
   "AllowedHosts": "*"
 }

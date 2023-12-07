@@ -19,15 +19,16 @@ namespace Ascanio.M365Provisioning.SharePoint.Services
         public void GetAllSharePointItems()
         {
             //_ = new Lead_WebPartPages();
-            _ = new SiteSettings();
-            Console.WriteLine("Lead_SiteSettings.json File created...");
-            _ = new Lists();
-            Console.WriteLine("Lead_Lists.json File created...");
-            _ = new ListViews();
-            Console.WriteLine("ListViews.json File created...");
-            _ = new FolderStructure();
-            Console.WriteLine("Lead_FolderStructure.json File created...");
-            Console.WriteLine("Json files are created");
+            //_ = new SiteSettings();
+            //Console.WriteLine("Lead_SiteSettings.json File created...");
+            //_ = new Lists();
+            //Console.WriteLine("Lead_Lists.json File created...");
+            //_ = new ListViews();
+            //Console.WriteLine("ListViews.json File created...");
+            //_ = new FolderStructure();
+            //Console.WriteLine("Lead_FolderStructure.json File created...");
+            //Console.WriteLine("Json files are created");
+            _ = new SiteColumns();
         }
     }
             //
