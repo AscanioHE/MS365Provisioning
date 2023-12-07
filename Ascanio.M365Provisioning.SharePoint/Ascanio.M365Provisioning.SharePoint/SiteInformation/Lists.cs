@@ -59,10 +59,24 @@ namespace Ascanio.M365Provisioning.SharePoint.SiteInformation
                     {
                         enterpriseKeywordsValue = Guid.Empty;
                     }
+
+                    List<ListsDTO> listsDTO = new();
+                    listsDTO.Add(new ListsDTO
+                                (
+                                    list.Title,
+                                    list.DefaultViewUrl,
+                                    list.BaseType.ToString(),
+                                    contentTypes,
+                                    list.OnQuickLaunch,
+                                    list.EnableFolderCreation,
+                                    enterpriseKeywordsValue.ToString(),
+                                    true,
+                                    listPermissions
+                                 ));
+
                 }
 
 
-                List<ListsDTO> lead_ListsDTO = new();
             }
             //foreach (List list in web.Lists)
             //{
