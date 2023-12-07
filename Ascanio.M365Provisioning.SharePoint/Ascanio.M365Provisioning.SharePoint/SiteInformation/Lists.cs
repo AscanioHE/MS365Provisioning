@@ -39,9 +39,8 @@ namespace Ascanio.M365Provisioning.SharePoint.SiteInformation
 
                 GetListProperties(context, lead_ListsDTO, list);
             }
-            string jsonFilePath = sharePointService.ListsFilePath ;
             WriteData2Json writeData2Json = new();
-            writeData2Json.Write2JsonFile(lead_ListsDTO, jsonFilePath);
+            writeData2Json.Write2JsonFile(lead_ListsDTO, sharePointService.ListsFilePath);
             context.Dispose();
         }
 

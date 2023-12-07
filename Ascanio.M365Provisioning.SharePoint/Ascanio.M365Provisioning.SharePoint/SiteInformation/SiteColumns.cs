@@ -21,16 +21,23 @@ namespace Ascanio.M365Provisioning.SharePoint.SiteInformation
                                                   )
                             );
                 context.ExecuteQuery();
+                List<SiteColumnsDTO> siteColumnsDTO = new();
 
                 foreach(Field siteColumn in web.Fields)
                 {
                     if(!siteColumn.Hidden)
                     {
-                        Console.WriteLine($"Name: {siteColumn.Title}");
-                        Console.WriteLine($"SchemaXml: {siteColumn.SchemaXml}");
-                        Console.WriteLine($"DefaultValue: {siteColumn.DefaultValue}");
+                        siteColumnsDTO.Add(new
+                        (
+                            siteColumn.Title,
+                            siteColumn.SchemaXml,
+                            siteColumn.DefaultValue
+                        ));
                     }
                 }
+
+                WriteData2Json writeData2Json = new();
+                writeData2Json.Write2JsonFile(siteColumnsDTO, sharePointService.SiteColumnsFilePath);
             }
         }
 
