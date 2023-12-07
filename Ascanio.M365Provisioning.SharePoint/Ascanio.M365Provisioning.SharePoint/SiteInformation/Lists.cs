@@ -14,78 +14,116 @@ namespace Ascanio.M365Provisioning.SharePoint.SiteInformation
         public Lists()
         {
             SharePointService sharePointService = new();
-            ClientContext context = sharePointService.GetClientContext();
-            Web web = context.Web;
-            List<ListsDTO> lead_ListsDTO = new();
-            web = context.Web;
-            context.Load(web, w => w.Lists);
-            context.ExecuteQuery();
-            
-            foreach (List list in web.Lists)
+            using (ClientContext context = sharePointService.GetClientContext())
             {
-                context.Load(list,
-                    l => l.Title,
-                    l => l.DefaultViewUrl,
-                    l => l.BaseType,
-                    l => l.ContentTypes,
-                    l => l.OnQuickLaunch,
-                    l => l.HasUniqueRoleAssignments,
-                    l => l.Hidden
-                );
-                context.Load(list.Fields);
+                ListCollection listCollection = context.Web.Lists;
+
+                context.Load(
+                            context.Web.Lists,
+                            l => l.Where(l => l.Hidden == false),
+                            l => l.Include(
+                                                l => l.Title,
+                                                l => l.Hidden,
+                                                l => l.DefaultDisplayFormUrl,
+                                                l => l.BaseType,
+                                                l => l.ContentTypes,
+                                                l => l.EnableFolderCreation,
+                                                l => l.Fields.Include(
+                                                                      f => f.InternalName,
+                                                                      f => f.Title
+                                                                      )
+                                               )
+                            );
                 context.ExecuteQuery();
-
-                // TODO: Hidden test uitvoeren
-
-                GetListProperties(context, lead_ListsDTO, list);
-            }
-            WriteData2Json writeData2Json = new();
-            writeData2Json.Write2JsonFile(lead_ListsDTO, sharePointService.ListsFilePath);
-            context.Dispose();
-        }
-
-        private void GetListProperties(ClientContext context, List<ListsDTO> lead_ListsDTO, List list)
-        {
-            bool hidden = list.Hidden;
-            if (!hidden)
-            {
-                Guid enterpriseKeywordsValue = Guid.Empty;
-                try
+                foreach (List list in context.Web.Lists)
                 {
-                    Field enterpriseKeywords = list.Fields.GetByInternalNameOrTitle("TaxKeyword");
-                    context.Load(enterpriseKeywords);
-                    context.ExecuteQuery();
-                    enterpriseKeywordsValue = enterpriseKeywords.Id;
-                }
-                catch
-                {
-                    enterpriseKeywordsValue = Guid.Empty;
+                    List<string> contentTypes = new();
+
+                    foreach (ContentType contentType in list.ContentTypes)
+                    {
+                        contentTypes.Add(contentType.Name);
+                    }
+                    IQueryable<RoleAssignment> queryForList = list.RoleAssignments.Include(roleAsg => roleAsg.Member,
+                                                                                           roleAsg => roleAsg.RoleDefinitionBindings.Include(roleDef => roleDef.Name));
+                    Dictionary<string, string> listPermissions = GetPermissionDetails(context, queryForList);
+
+                    Guid enterpriseKeywordsValue = Guid.Empty;
+                    try
+                    {
+                        Field enterpriseKeywords = list.Fields.GetByInternalNameOrTitle("TaxKeyword");
+                        context.Load(enterpriseKeywords);
+                        context.ExecuteQuery();
+                        enterpriseKeywordsValue = enterpriseKeywords.Id;
+                    }
+                    catch
+                    {
+                        enterpriseKeywordsValue = Guid.Empty;
+                    }
                 }
 
-                IQueryable<RoleAssignment> queryForList = list.RoleAssignments.Include(roleAsg => roleAsg.Member,
-                                                                                       roleAsg => roleAsg.RoleDefinitionBindings.Include(roleDef => roleDef.Name));
-                Dictionary<string, string> listPermissions = GetPermissionDetails(context, queryForList);
 
-
-
-
-                lead_ListsDTO.Add(new
-                    (
-                        list.Title,
-                        list.DefaultViewUrl,
-                        list.BaseType.ToString(),
-                        GetContentTypes(context, list),
-                        list.OnQuickLaunch,
-                        GetEnableFolderCreation(context, list),
-                        enterpriseKeywordsValue.ToString(),
-                        list.HasUniqueRoleAssignments,
-                        listPermissions,
-                        hidden
-                    ));
+                List<ListsDTO> lead_ListsDTO = new();
             }
+            //foreach (List list in web.Lists)
+            //{
+            //    context.Load(list,
+            //        l => l.Title,
+            //        l => l.DefaultViewUrl,
+            //        l => l.BaseType,
+            //        l => l.ContentTypes,
+            //        l => l.OnQuickLaunch,
+            //        l => l.HasUniqueRoleAssignments,
+            //        l => l.Hidden
+            //    );
+            //    context.Load(list.Fields);
+            //    context.ExecuteQuery() ;
+            //    // TODO: Hidden test uitvoeren
+            //    bool hidden = list.Hidden;
+            //    if (!hidden)
+            //    {
+            //        Guid enterpriseKeywordsValue = Guid.Empty;
+            //        try
+            //        {
+            //            Field enterpriseKeywords = list.Fields.GetByInternalNameOrTitle("TaxKeyword");
+            //            context.Load(enterpriseKeywords);
+            //            context.ExecuteQuery();
+            //            enterpriseKeywordsValue = enterpriseKeywords.Id;
+            //        }
+            //        catch
+            //        {
+            //            enterpriseKeywordsValue = Guid.Empty;
+            //        }
+
+            //        IQueryable<RoleAssignment> queryForList = list.RoleAssignments.Include(roleAsg => roleAsg.Member,
+            //                                                                               roleAsg => roleAsg.RoleDefinitionBindings.Include(roleDef => roleDef.Name));
+            //        Dictionary<string, string> listPermissions = GetPermissionDetails(context, queryForList);
+
+                    
+
+
+            //        lead_ListsDTO.Add(new
+            //            (
+            //                list.Title,
+            //                list.DefaultViewUrl,
+            //                list.BaseType.ToString(),
+            //                GetContentTypes(context, list),
+            //                list.OnQuickLaunch,
+            //                GetEnableFolderCreation(context, list),
+            //                enterpriseKeywordsValue.ToString(),
+            //                list.HasUniqueRoleAssignments,
+            //                listPermissions,
+            //                hidden
+            //            ));
+            //    }
+            //    }
+            //}
+            //string jsonFilePath = sharePointService.ListsFilePath ;
+            //WriteData2Json writeData2Json = new();
+            //writeData2Json.Write2JsonFile(lead_ListsDTO, jsonFilePath);
+            //context.Dispose();
         }
 
-        private Dictionary<string, string> GetPermissionDetails(ClientContext context, IQueryable<RoleAssignment> queryString)
+        Dictionary<string, string> GetPermissionDetails(ClientContext context, IQueryable<RoleAssignment> queryString)
         {
             IEnumerable roles = context.LoadQuery(queryString);
             context.ExecuteQuery();
