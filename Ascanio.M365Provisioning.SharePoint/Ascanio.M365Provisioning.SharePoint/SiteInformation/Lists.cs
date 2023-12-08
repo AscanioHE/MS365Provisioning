@@ -18,7 +18,7 @@ namespace Ascanio.M365Provisioning.SharePoint.SiteInformation
             SharePointService sharePointService = new();
             using ClientContext context = sharePointService.GetClientContext();
             Web web = context.Web;
-            List<ListsDTO> listsDTO = new();
+            List<ListDTO> listsDTO = new();
             web = context.Web;
             context.Load
                 (
@@ -88,7 +88,7 @@ namespace Ascanio.M365Provisioning.SharePoint.SiteInformation
                         }
                     }
 
-                    listsDTO.Add(new ListsDTO
+                    listsDTO.Add(new ListDTO
                                     (
                                     list.Title,
                                     list.DefaultViewUrl,

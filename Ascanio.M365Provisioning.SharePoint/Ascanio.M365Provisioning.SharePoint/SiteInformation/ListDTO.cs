@@ -2,7 +2,7 @@
 
 namespace Ascanio.M365Provisioning.SharePoint.SiteInformation
 {
-    public class ListsDTO
+    public class ListDTO
     {
         public string Title { get; set; } = string.Empty;
         public string Url { get; set; } = string.Empty;
@@ -15,7 +15,7 @@ namespace Ascanio.M365Provisioning.SharePoint.SiteInformation
         public Dictionary<string, string> Permissions { get; set; } = new Dictionary<string, string>();
         public List<string> QuickLauncHeaders { get; set; }
 
-        public ListsDTO(string title, string url, string listType, List<string> contentTypes,
+        public ListDTO(string title, string url, string listType, List<string> contentTypes,
                              bool showOnQuickLaunch,List<string> quickLauncHeaders,bool allowFolderCreation, Guid enterpriseKeywords,
                              bool breakRoleInheritance, Dictionary<string, string> permissions)
         {
@@ -30,6 +30,6 @@ namespace Ascanio.M365Provisioning.SharePoint.SiteInformation
             BreakRoleInheritance = breakRoleInheritance;
             Permissions = permissions;
         }
-        public ListsDTO() { }
+        public ListDTO() { }
     }
 }

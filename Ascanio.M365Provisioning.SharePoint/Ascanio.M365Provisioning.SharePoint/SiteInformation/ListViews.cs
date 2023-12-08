@@ -19,15 +19,15 @@ namespace Ascanio.M365Provisioning.SharePoint.SiteInformation
                 w => w.Lists
                 );
             context.ExecuteQuery();
-            List<ListViewsDTO> listViewsDTO = GetListViews(context,web.Lists);
+            List<ListViewDTO> listViewsDTO = GetListViews(context,web.Lists);
             string jsonFilePath = sharePointService.ListViewsFilePath;
             WriteData2Json writeData2Json = new();
             writeData2Json.Write2JsonFile(listViewsDTO, jsonFilePath);
             context.Dispose();
         }
-        private List<ListViewsDTO> GetListViews(ClientContext context, ListCollection lists)
+        private List<ListViewDTO> GetListViews(ClientContext context, ListCollection lists)
         {
-            List<ListViewsDTO> listViewsDTO = new();
+            List<ListViewDTO> listViewsDTO = new();
             foreach (List list in lists)
             {
                 context.Load
@@ -50,7 +50,7 @@ namespace Ascanio.M365Provisioning.SharePoint.SiteInformation
                         );
                     context.ExecuteQuery();
 
-                    listViewsDTO.Add(new ListViewsDTO
+                    listViewsDTO.Add(new ListViewDTO
                     {
                         ListName = list.Title,
                         ViewName = view.Title,

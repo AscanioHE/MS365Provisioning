@@ -2,11 +2,13 @@
 using System.Configuration;
 using System.IO;
 using System.Security.Cryptography.X509Certificates;
+using Ascanio.M365Provisioning.SharePoint.SiteInformation;
 using Microsoft.SharePoint.Client;
+using Newtonsoft.Json;
 
 namespace Ascanio.M365Provisioning.SharePoint.Services
 {
-    public class SharePointService
+    public class SharePointService : ISharePointService
     {
         public string SiteSettingsFilePath { get; private set; } = string.Empty;
         public string ListsFilePath { get; private set; } = string.Empty;
@@ -77,6 +79,71 @@ namespace Ascanio.M365Provisioning.SharePoint.Services
             string thumbPrint = configuration["SharePointAscanio:ThumbPrint"];
             string filePath = configuration["SharePointAscanio:FilePath"];
             return (clientId, siteUrl, directoryId, thumbPrint, filePath);
+        }
+
+        public List<SiteSettingsDTO> GetSiteSettings()
+        {
+            SharePointService sharePointService = new();
+            ClientContext context = sharePointService.GetClientContext();
+            Web web = context.Web;
+            context.Load(
+                web
+            );
+            context.ExecuteQuery();
+
+            WebTemplateCollection webtTemplateCollection = web.GetAvailableWebTemplates(1033, true);
+            context.Load(webtTemplateCollection);
+            context.ExecuteQuery();
+
+            List<SiteSettingsDTO> webTemplatesDTO = new();
+
+            foreach (WebTemplate template in webtTemplateCollection)
+            {
+                if (!template.IsHidden)
+                {
+                    // Create a Lead_SiteSettingsDTO and add it to the list
+                    webTemplatesDTO.Add(new SiteSettingsDTO
+                    {
+                        SiteTemplate = template.Name,
+                        Value = template.Lcid
+                        // Other properties as needed
+                    });
+                }
+            }
+
+            try
+            {
+                // Execute the query to retrieve the data
+                context.ExecuteQuery();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error executing query: {ex.Message}");
+                // Handle the exception as needed
+            }
+            finally
+            {
+                context.Dispose();
+            }
+
+            return webTemplatesDTO;
+
+        }
+
+        public List<ListDTO> GetLists()
+        {
+            throw new NotImplementedException();
+        }
+
+        public List<ListViewDTO> GetListViews()
+        {
+            throw new NotImplementedException();
+        }
+
+        public string ConvertToJson(object o)
+        {
+            string json = JsonConvert.SerializeObject(o);
+            return json;
         }
     }
 }

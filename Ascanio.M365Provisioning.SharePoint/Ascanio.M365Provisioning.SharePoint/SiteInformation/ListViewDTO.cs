@@ -1,6 +1,6 @@
 ﻿namespace Ascanio.M365Provisioning.SharePoint.SiteInformation
 {
-    public class ListViewsDTO
+    public class ListViewDTO
     {
         public string ListName { get; set; } = String.Empty;
         public string ViewName { get; set; } = string.Empty;
@@ -10,8 +10,8 @@
         public string ListScope { get; set; } = string.Empty;
         public string JsonFormatterFile { get; set; } = string.Empty;
 
-        public ListViewsDTO() { }
-        public ListViewsDTO(string listName,string viewName,bool defaultView,string viewFields,uint rowLimit,string scope, string jsonFormatterFile) 
+        public ListViewDTO() { }
+        public ListViewDTO(string listName,string viewName,bool defaultView,string viewFields,uint rowLimit,string scope, string jsonFormatterFile) 
         {
             ListName = listName;
             ViewName = viewName;
