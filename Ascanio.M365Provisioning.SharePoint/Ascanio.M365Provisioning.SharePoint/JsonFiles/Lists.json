@@ -10,13 +10,16 @@
     "ShowOnQuickLaunch": false,
     "AllowFolderCreation": true,
     "EnterpriseKeywords": "00000000-0000-0000-0000-000000000000",
-    "BreakRoleInheritance": false,
+    "BreakRoleInheritance": true,
     "Permissions": {
       "Volledig beheer, Beperkte toegang, ": "TestSite1 - Eigenaars",
       "Lezen, ": "TestSite1 - Bezoekers",
       "Bewerken, ": "TestSite1 - Leden",
       "Beperkte toegang alleen via het web, ": "Limited Access System Group For Web bc827196-78df-4870-8a29-91895d8ce95c"
-    }
+    },
+    "QuickLauncHeaders": [
+      "Provision Document Libraries"
+    ]
   },
   {
     "Title": "DocumentLibraryTest",
@@ -35,7 +38,10 @@
       "Lezen, ": "TestSite1 - Bezoekers",
       "Bewerken, ": "TestSite1 - Leden",
       "Beperkte toegang, ": "Limited Access System Group For List ddb003c4-92d6-4e46-a94b-ad64fc8f4606"
-    }
+    },
+    "QuickLauncHeaders": [
+      "Provision Document Libraries"
+    ]
   },
   {
     "Title": "Formuliersjablonen",
@@ -47,13 +53,16 @@
     "ShowOnQuickLaunch": false,
     "AllowFolderCreation": false,
     "EnterpriseKeywords": "00000000-0000-0000-0000-000000000000",
-    "BreakRoleInheritance": false,
+    "BreakRoleInheritance": true,
     "Permissions": {
       "Volledig beheer, Beperkte toegang, ": "TestSite1 - Eigenaars",
       "Lezen, ": "TestSite1 - Bezoekers",
       "Bewerken, ": "TestSite1 - Leden",
       "Beperkte toegang alleen via het web, ": "Limited Access System Group For Web bc827196-78df-4870-8a29-91895d8ce95c"
-    }
+    },
+    "QuickLauncHeaders": [
+      "Provision Document Libraries"
+    ]
   },
   {
     "Title": "Gebeurtenissen",
@@ -65,13 +74,16 @@
     "ShowOnQuickLaunch": false,
     "AllowFolderCreation": false,
     "EnterpriseKeywords": "00000000-0000-0000-0000-000000000000",
-    "BreakRoleInheritance": false,
+    "BreakRoleInheritance": true,
     "Permissions": {
       "Volledig beheer, Beperkte toegang, ": "TestSite1 - Eigenaars",
       "Lezen, ": "TestSite1 - Bezoekers",
       "Bewerken, ": "TestSite1 - Leden",
       "Beperkte toegang alleen via het web, ": "Limited Access System Group For Web bc827196-78df-4870-8a29-91895d8ce95c"
-    }
+    },
+    "QuickLauncHeaders": [
+      "Provision Document Libraries"
+    ]
   },
   {
     "Title": "Siteactiva",
@@ -90,7 +102,10 @@
       "Lezen, ": "TestSite1 - Bezoekers",
       "Bewerken, ": "TestSite1 - Leden",
       "Beperkte toegang, ": "Limited Access System Group For List 2500e74f-2009-46ed-b5da-43020776b6fd"
-    }
+    },
+    "QuickLauncHeaders": [
+      "Provision Document Libraries"
+    ]
   },
   {
     "Title": "Sitepagina's",
@@ -112,7 +127,10 @@
       "Lezen, ": "TestSite1 - Bezoekers",
       "Bewerken, ": "TestSite1 - Leden",
       "Beperkte toegang, ": "Limited Access System Group For List 2500e74f-2009-46ed-b5da-43020776b6fd"
-    }
+    },
+    "QuickLauncHeaders": [
+      "Provision Document Libraries"
+    ]
   },
   {
     "Title": "Stijlbibliotheek",
@@ -125,13 +143,16 @@
     "ShowOnQuickLaunch": false,
     "AllowFolderCreation": true,
     "EnterpriseKeywords": "00000000-0000-0000-0000-000000000000",
-    "BreakRoleInheritance": false,
+    "BreakRoleInheritance": true,
     "Permissions": {
       "Volledig beheer, Beperkte toegang, ": "TestSite1 - Eigenaars",
       "Lezen, ": "TestSite1 - Bezoekers",
       "Bewerken, ": "TestSite1 - Leden",
       "Beperkte toegang alleen via het web, ": "Limited Access System Group For Web bc827196-78df-4870-8a29-91895d8ce95c"
-    }
+    },
+    "QuickLauncHeaders": [
+      "Provision Document Libraries"
+    ]
   },
   {
     "Title": "TestList",
@@ -144,12 +165,15 @@
     "ShowOnQuickLaunch": true,
     "AllowFolderCreation": false,
     "EnterpriseKeywords": "00000000-0000-0000-0000-000000000000",
-    "BreakRoleInheritance": false,
+    "BreakRoleInheritance": true,
     "Permissions": {
       "Volledig beheer, Beperkte toegang, ": "TestSite1 - Eigenaars",
       "Lezen, ": "TestSite1 - Bezoekers",
       "Bewerken, ": "TestSite1 - Leden",
       "Beperkte toegang alleen via het web, ": "Limited Access System Group For Web bc827196-78df-4870-8a29-91895d8ce95c"
-    }
+    },
+    "QuickLauncHeaders": [
+      "Provision Document Libraries"
+    ]
   }
 ]
