@@ -6,6 +6,7 @@ using System.Drawing.Text;
 using System.Collections;
 using Microsoft.SharePoint.News.DataModel;
 using Ascanio.M365Provisioning.SharePoint.Services;
+using AngleSharp.Dom;
 
 namespace Ascanio.M365Provisioning.SharePoint.SiteInformation
 {
@@ -14,34 +15,54 @@ namespace Ascanio.M365Provisioning.SharePoint.SiteInformation
         public Lists()
         {
             SharePointService sharePointService = new();
-            ClientContext context = sharePointService.GetClientContext();
-            Web web = context.Web;
-            List<ListsDTO> lead_ListsDTO = new();
-            web = context.Web;
-            context.Load(web, w => w.Lists);
-            context.ExecuteQuery();
-            
-            foreach (List list in web.Lists)
+            using (ClientContext context = sharePointService.GetClientContext())
             {
-                context.Load(list,
-                    l => l.Title,
-                    l => l.DefaultViewUrl,
-                    l => l.BaseType,
-                    l => l.ContentTypes,
-                    l => l.OnQuickLaunch,
-                    l => l.HasUniqueRoleAssignments,
-                    l => l.Hidden
-                );
-                context.Load(list.Fields);
+                Web web = context.Web;
+                List<ListsDTO> lead_ListsDTO = new();
+                web = context.Web;
+                context.Load
+                    (
+                    web, 
+                    w => w.Lists,
+                    w => w.Navigation.QuickLaunch
+                    );
                 context.ExecuteQuery();
+                List<string> quickLaunchHeaders = new List<string>();
+                foreach(NavigationNode node in web.Navigation.QuickLaunch)
+                {
+                    context.Load
+                        (
+                        node,
+                        n => n.Children
+                        );
+                    context.ExecuteQuery();
+                    Console.WriteLine( node.Title.ToString() );
+                    foreach (NavigationNode childNode in node.Children)
+                    {
+                        Console.WriteLine(childNode.Title.ToString() );
+                    }
+                }
 
-                // TODO: Hidden test uitvoeren
+                foreach (List list in web.Lists)
+                {
+                    context.Load
+                        (
+                        list,
+                        l => l.Title,
+                        l => l.DefaultViewUrl,
+                        l => l.BaseType,
+                        l => l.ContentTypes,
+                        l => l.OnQuickLaunch,
+                        l => l.HasUniqueRoleAssignments
+                        );
+                    context.Load(list.Fields);
+                    context.ExecuteQuery();
 
-                GetListProperties(context, lead_ListsDTO, list);
+                    GetListProperties(context, lead_ListsDTO, list);
+                }
+                WriteData2Json writeData2Json = new();
+                writeData2Json.Write2JsonFile(lead_ListsDTO, sharePointService.ListsFilePath);
             }
-            WriteData2Json writeData2Json = new();
-            writeData2Json.Write2JsonFile(lead_ListsDTO, sharePointService.ListsFilePath);
-            context.Dispose();
         }
 
         private void GetListProperties(ClientContext context, List<ListsDTO> lead_ListsDTO, List list)
@@ -66,9 +87,6 @@ namespace Ascanio.M365Provisioning.SharePoint.SiteInformation
                                                                                        roleAsg => roleAsg.RoleDefinitionBindings.Include(roleDef => roleDef.Name));
                 Dictionary<string, string> listPermissions = GetPermissionDetails(context, queryForList);
 
-
-
-
                 lead_ListsDTO.Add(new
                     (
                         list.Title,
@@ -77,10 +95,9 @@ namespace Ascanio.M365Provisioning.SharePoint.SiteInformation
                         GetContentTypes(context, list),
                         list.OnQuickLaunch,
                         GetEnableFolderCreation(context, list),
-                        enterpriseKeywordsValue.ToString(),
+                        enterpriseKeywordsValue,
                         list.HasUniqueRoleAssignments,
-                        listPermissions,
-                        hidden
+                        listPermissions
                     ));
             }
         }
@@ -99,7 +116,7 @@ namespace Ascanio.M365Provisioning.SharePoint.SiteInformation
                 {
                     permission += rdbc.Name.ToString() + ", ";
                 }
-                permisionDetails.Add(ra.Member.Title, permission);
+                permisionDetails.Add(permission, ra.Member.Title);
             }
             return permisionDetails;
         }

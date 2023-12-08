@@ -12,12 +12,11 @@
     "EnterpriseKeywords": "00000000-0000-0000-0000-000000000000",
     "BreakRoleInheritance": false,
     "Permissions": {
-      "TestSite1 - Eigenaars": "Volledig beheer, Beperkte toegang, ",
-      "TestSite1 - Bezoekers": "Lezen, ",
-      "TestSite1 - Leden": "Bewerken, ",
-      "Limited Access System Group For Web bc827196-78df-4870-8a29-91895d8ce95c": "Beperkte toegang alleen via het web, "
-    },
-    "Hidden": false
+      "Volledig beheer, Beperkte toegang, ": "TestSite1 - Eigenaars",
+      "Lezen, ": "TestSite1 - Bezoekers",
+      "Bewerken, ": "TestSite1 - Leden",
+      "Beperkte toegang alleen via het web, ": "Limited Access System Group For Web bc827196-78df-4870-8a29-91895d8ce95c"
+    }
   },
   {
     "Title": "DocumentLibraryTest",
@@ -32,12 +31,11 @@
     "EnterpriseKeywords": "00000000-0000-0000-0000-000000000000",
     "BreakRoleInheritance": true,
     "Permissions": {
-      "TestSite1 - Eigenaars": "Volledig beheer, ",
-      "TestSite1 - Bezoekers": "Lezen, ",
-      "TestSite1 - Leden": "Bewerken, ",
-      "Limited Access System Group For List ddb003c4-92d6-4e46-a94b-ad64fc8f4606": "Beperkte toegang, "
-    },
-    "Hidden": false
+      "Volledig beheer, ": "TestSite1 - Eigenaars",
+      "Lezen, ": "TestSite1 - Bezoekers",
+      "Bewerken, ": "TestSite1 - Leden",
+      "Beperkte toegang, ": "Limited Access System Group For List ddb003c4-92d6-4e46-a94b-ad64fc8f4606"
+    }
   },
   {
     "Title": "Formuliersjablonen",
@@ -51,12 +49,11 @@
     "EnterpriseKeywords": "00000000-0000-0000-0000-000000000000",
     "BreakRoleInheritance": false,
     "Permissions": {
-      "TestSite1 - Eigenaars": "Volledig beheer, Beperkte toegang, ",
-      "TestSite1 - Bezoekers": "Lezen, ",
-      "TestSite1 - Leden": "Bewerken, ",
-      "Limited Access System Group For Web bc827196-78df-4870-8a29-91895d8ce95c": "Beperkte toegang alleen via het web, "
-    },
-    "Hidden": false
+      "Volledig beheer, Beperkte toegang, ": "TestSite1 - Eigenaars",
+      "Lezen, ": "TestSite1 - Bezoekers",
+      "Bewerken, ": "TestSite1 - Leden",
+      "Beperkte toegang alleen via het web, ": "Limited Access System Group For Web bc827196-78df-4870-8a29-91895d8ce95c"
+    }
   },
   {
     "Title": "Gebeurtenissen",
@@ -70,12 +67,11 @@
     "EnterpriseKeywords": "00000000-0000-0000-0000-000000000000",
     "BreakRoleInheritance": false,
     "Permissions": {
-      "TestSite1 - Eigenaars": "Volledig beheer, Beperkte toegang, ",
-      "TestSite1 - Bezoekers": "Lezen, ",
-      "TestSite1 - Leden": "Bewerken, ",
-      "Limited Access System Group For Web bc827196-78df-4870-8a29-91895d8ce95c": "Beperkte toegang alleen via het web, "
-    },
-    "Hidden": false
+      "Volledig beheer, Beperkte toegang, ": "TestSite1 - Eigenaars",
+      "Lezen, ": "TestSite1 - Bezoekers",
+      "Bewerken, ": "TestSite1 - Leden",
+      "Beperkte toegang alleen via het web, ": "Limited Access System Group For Web bc827196-78df-4870-8a29-91895d8ce95c"
+    }
   },
   {
     "Title": "Siteactiva",
@@ -90,12 +86,11 @@
     "EnterpriseKeywords": "00000000-0000-0000-0000-000000000000",
     "BreakRoleInheritance": true,
     "Permissions": {
-      "TestSite1 - Eigenaars": "Volledig beheer, ",
-      "TestSite1 - Bezoekers": "Lezen, ",
-      "TestSite1 - Leden": "Bewerken, ",
-      "Limited Access System Group For List 2500e74f-2009-46ed-b5da-43020776b6fd": "Beperkte toegang, "
-    },
-    "Hidden": false
+      "Volledig beheer, ": "TestSite1 - Eigenaars",
+      "Lezen, ": "TestSite1 - Bezoekers",
+      "Bewerken, ": "TestSite1 - Leden",
+      "Beperkte toegang, ": "Limited Access System Group For List 2500e74f-2009-46ed-b5da-43020776b6fd"
+    }
   },
   {
     "Title": "Sitepagina's",
@@ -113,12 +108,11 @@
     "EnterpriseKeywords": "00000000-0000-0000-0000-000000000000",
     "BreakRoleInheritance": true,
     "Permissions": {
-      "TestSite1 - Eigenaars": "Volledig beheer, ",
-      "TestSite1 - Bezoekers": "Lezen, ",
-      "TestSite1 - Leden": "Bewerken, ",
-      "Limited Access System Group For List 2500e74f-2009-46ed-b5da-43020776b6fd": "Beperkte toegang, "
-    },
-    "Hidden": false
+      "Volledig beheer, ": "TestSite1 - Eigenaars",
+      "Lezen, ": "TestSite1 - Bezoekers",
+      "Bewerken, ": "TestSite1 - Leden",
+      "Beperkte toegang, ": "Limited Access System Group For List 2500e74f-2009-46ed-b5da-43020776b6fd"
+    }
   },
   {
     "Title": "Stijlbibliotheek",
@@ -133,12 +127,11 @@
     "EnterpriseKeywords": "00000000-0000-0000-0000-000000000000",
     "BreakRoleInheritance": false,
     "Permissions": {
-      "TestSite1 - Eigenaars": "Volledig beheer, Beperkte toegang, ",
-      "TestSite1 - Bezoekers": "Lezen, ",
-      "TestSite1 - Leden": "Bewerken, ",
-      "Limited Access System Group For Web bc827196-78df-4870-8a29-91895d8ce95c": "Beperkte toegang alleen via het web, "
-    },
-    "Hidden": false
+      "Volledig beheer, Beperkte toegang, ": "TestSite1 - Eigenaars",
+      "Lezen, ": "TestSite1 - Bezoekers",
+      "Bewerken, ": "TestSite1 - Leden",
+      "Beperkte toegang alleen via het web, ": "Limited Access System Group For Web bc827196-78df-4870-8a29-91895d8ce95c"
+    }
   },
   {
     "Title": "TestList",
@@ -153,11 +146,10 @@
     "EnterpriseKeywords": "00000000-0000-0000-0000-000000000000",
     "BreakRoleInheritance": false,
     "Permissions": {
-      "TestSite1 - Eigenaars": "Volledig beheer, Beperkte toegang, ",
-      "TestSite1 - Bezoekers": "Lezen, ",
-      "TestSite1 - Leden": "Bewerken, ",
-      "Limited Access System Group For Web bc827196-78df-4870-8a29-91895d8ce95c": "Beperkte toegang alleen via het web, "
-    },
-    "Hidden": false
+      "Volledig beheer, Beperkte toegang, ": "TestSite1 - Eigenaars",
+      "Lezen, ": "TestSite1 - Bezoekers",
+      "Bewerken, ": "TestSite1 - Leden",
+      "Beperkte toegang alleen via het web, ": "Limited Access System Group For Web bc827196-78df-4870-8a29-91895d8ce95c"
+    }
   }
 ]
