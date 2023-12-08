@@ -58,17 +58,45 @@ namespace Ascanio.M365Provisioning.SharePoint.SiteInformation
                     context.Load(list.Fields);
                     context.ExecuteQuery();
 
-                // TODO: Hidden test uitvoeren
-
-                GetListProperties(context, lead_ListsDTO, list);
+                    GetListProperties(context, lead_ListsDTO, list);
+                }
+                WriteData2Json writeData2Json = new();
+                writeData2Json.Write2JsonFile(lead_ListsDTO, sharePointService.ListsFilePath);
             }
-            WriteData2Json writeData2Json = new();
-            writeData2Json.Write2JsonFile(lead_ListsDTO, sharePointService.ListsFilePath);
-            context.Dispose();
-        }
         }
 
-                    Guid enterpriseKeywordsValue = Guid.Empty;
+        private void GetListProperties(ClientContext context, List<ListsDTO> lead_ListsDTO, List list)
+        {
+                Guid enterpriseKeywordsValue = Guid.Empty;
+                ListCollection listCollection = context.Web.Lists;
+
+                context.Load(
+                            context.Web.Lists,
+                            l => l.Where(l => l.Hidden == false),
+                            l => l.Include(
+                                                l => l.Title,
+                                                l => l.Hidden,
+                                                l => l.DefaultDisplayFormUrl,
+                                                l => l.BaseType,
+                                                l => l.ContentTypes,
+                                                l => l.EnableFolderCreation,
+                                                l => l.Fields.Include(
+                                                                      f => f.InternalName,
+                                                                      f => f.Title
+                                                                      )
+                                               )
+                            );
+                context.ExecuteQuery();
+                    List<string> contentTypes = new();
+
+                    foreach (ContentType contentType in list.ContentTypes)
+                    {
+                        contentTypes.Add(contentType.Name);
+                    }
+                    IQueryable<RoleAssignment> queryForList = list.RoleAssignments.Include(roleAsg => roleAsg.Member,
+                                                                                           roleAsg => roleAsg.RoleDefinitionBindings.Include(roleDef => roleDef.Name));
+                    Dictionary<string, string> listPermissions = GetPermissionDetails(context, queryForList);
+
                     try
                     {
                         Field enterpriseKeywords = list.Fields.GetByInternalNameOrTitle("TaxKeyword");
@@ -80,10 +108,22 @@ namespace Ascanio.M365Provisioning.SharePoint.SiteInformation
                     {
                         enterpriseKeywordsValue = Guid.Empty;
                     }
-                IQueryable<RoleAssignment> queryForList = list.RoleAssignments.Include(roleAsg => roleAsg.Member,
-                                                                                       roleAsg => roleAsg.RoleDefinitionBindings.Include(roleDef => roleDef.Name));
-                Dictionary<string, string> listPermissions = GetPermissionDetails(context, queryForList);
 
+                    List<ListsDTO> listsDTO = new();
+                    listsDTO.Add(new ListsDTO
+                                (
+                                    list.Title,
+                                    list.DefaultViewUrl,
+                                    list.BaseType.ToString(),
+                                    contentTypes,
+                                    list.OnQuickLaunch,
+                                    list.EnableFolderCreation,
+                                    enterpriseKeywordsValue,
+                                    true,
+                                    listPermissions
+                                 ));
+
+                
                 lead_ListsDTO.Add(new
                     (
                         list.Title,
@@ -96,11 +136,7 @@ namespace Ascanio.M365Provisioning.SharePoint.SiteInformation
                         list.HasUniqueRoleAssignments,
                         listPermissions
                     ));
-                        list.HasUniqueRoleAssignments,
-                        listPermissions,
-                        hidden
-                    ));
-            }
+            
             //foreach (List list in web.Lists)
             //{
             //    context.Load(list,
