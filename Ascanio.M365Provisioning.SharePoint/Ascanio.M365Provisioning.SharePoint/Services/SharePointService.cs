@@ -8,11 +8,11 @@ namespace Ascanio.M365Provisioning.SharePoint.Services
 {
     public class SharePointService
     {
-        public string SiteSettingsFilePath { get; private set; }
-        public string ListsFilePath { get; private set; }
-        public string FolderStructureFilePath { get; private set; }
-        public string ListViewsFilePath { get; private set; }
-        public string SiteColumnsFilePath { get; private set; }
+        public string SiteSettingsFilePath { get; private set; } = string.Empty;
+        public string ListsFilePath { get; private set; } = string.Empty;
+        public string FolderStructureFilePath { get; private set; } = string.Empty;
+        public string ListViewsFilePath { get; private set; } = string.Empty;
+        public string SiteColumnsFilePath { get; private set; } = string.Empty;
 
         public SharePointService()
         {

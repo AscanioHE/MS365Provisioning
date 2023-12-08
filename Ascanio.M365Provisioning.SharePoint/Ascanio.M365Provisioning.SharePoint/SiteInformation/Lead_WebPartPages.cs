@@ -5,7 +5,6 @@ using Newtonsoft.Json;
 using System.Net.Http.Headers;
 using File = Microsoft.SharePoint.Client.File;
 using List = Microsoft.SharePoint.Client.List;
-using OfficeDevPnP.Core.Pages;
 
 namespace Ascanio.M365Provisioning.SharePoint.SiteInformation
 {
@@ -65,13 +64,13 @@ namespace Ascanio.M365Provisioning.SharePoint.SiteInformation
     }
     public class WebPartInfo
     {
-        public List<WebPart> WebParts { get; set; }
+        public List<WebPart>? WebParts { get; set; } = null;
     }
 
     public class WebPart
     {
-        public string Title { get; set; }
-        public string Type { get; set; }
+        public string Title { get; set; } = string.Empty;
+        public string Type { get; set; } = string.Empty;
         // Voeg andere eigenschappen toe die je nodig hebt
     }
 }

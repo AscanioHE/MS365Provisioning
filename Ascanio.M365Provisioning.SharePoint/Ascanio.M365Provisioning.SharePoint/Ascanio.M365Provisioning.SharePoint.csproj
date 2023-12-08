@@ -9,7 +9,6 @@
   <ItemGroup>
     <PackageReference Include="Auth0.ManagementApi" Version="7.24.0" />
     <PackageReference Include="Microsoft.Graph" Version="5.34.0" />
-    <PackageReference Include="Microsoft.Identity.Client" Version="4.57.0" />
     <PackageReference Include="Microsoft.SharePointOnline.CSOM" Version="16.1.24301.12000" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="PnP.Framework" Version="1.13.0" />
