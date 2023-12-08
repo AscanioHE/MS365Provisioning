@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
@@ -13,7 +13,6 @@
     <PackageReference Include="Microsoft.SharePointOnline.CSOM" Version="16.1.24301.12000" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="PnP.Framework" Version="1.13.0" />
-    <PackageReference Include="SharePointPnPCoreOnline" Version="3.28.2012" />
     <PackageReference Include="System.ComponentModel" Version="4.3.0" />
   </ItemGroup>
 

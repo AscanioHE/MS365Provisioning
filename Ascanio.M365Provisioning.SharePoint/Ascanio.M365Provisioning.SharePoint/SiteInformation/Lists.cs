@@ -22,7 +22,7 @@ namespace Ascanio.M365Provisioning.SharePoint.SiteInformation
                 web = context.Web;
                 context.Load
                     (
-                    web, 
+                    web,
                     w => w.Lists,
                     w => w.Navigation.QuickLaunch
                     );
