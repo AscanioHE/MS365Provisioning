@@ -145,5 +145,6 @@ namespace Ascanio.M365Provisioning.SharePoint.Services
             string json = JsonConvert.SerializeObject(o);
             return json;
         }
+
     }
 }

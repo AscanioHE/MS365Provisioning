@@ -8,7 +8,6 @@ namespace M365Provisioning.SharePoint.Tests
     {
         private readonly ILogger _logger;
         private readonly ISiteSettingsService _siteSettingsService;
-
         public SiteSettingsTests(ITestOutputHelper output)
         {
             _logger = output.BuildLogger();
