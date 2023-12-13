@@ -10,13 +10,13 @@ namespace M365Provisioning.SharePoint.Functions
     {
 
 
-        private SharePointServices SharePointServices { get; set; }
+        private ISharePointServices SharePointServices { get; set; }
 
-        public List<SiteSettingsDto> Load()
+        public List<SiteSettingsDto> LoadSiteSettings()
         {
             SharePointServices = new SharePointServices();
             List<SiteSettingsDto> webTemplatesDto = new();
-            ClientContext context = SharePointServices.Context;
+            ClientContext context = SharePointServices.GetClientContext();
             Web web = context.Web;
             context.Load(web);
             try
@@ -48,13 +48,6 @@ namespace M365Provisioning.SharePoint.Functions
             }
 
             return webTemplatesDto;
-        }
-
-        public List<SiteSettingsDto> GetSiteSettings(ClientContext context)
-        {
-            List<SiteSettingsDto> siteSettings = new();
-
-            return siteSettings;
         }
 
     }

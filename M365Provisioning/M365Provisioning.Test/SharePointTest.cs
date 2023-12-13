@@ -25,7 +25,7 @@ namespace M365Provisioning.Test
         public void TryGetSiteSettings_Expect_DTO()
         {
             //Act
-            List<SiteSettingsDto> siteSettingsDtos = SharePointFunctions.Load();
+            List<SiteSettingsDto> siteSettingsDtos = SharePointFunctions.LoadSiteSettings();
             //Assert
             Assert.NotEmpty(siteSettingsDtos);
             Assert.IsType<List<SiteSettingsDto>>(siteSettingsDtos);

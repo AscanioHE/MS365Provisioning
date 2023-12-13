@@ -4,5 +4,5 @@ namespace M365Provisioning.SharePoint.Interfaces;
 
 public interface ISharePointFunctions
 {
-    List<SiteSettingsDto> Load();
+    List<SiteSettingsDto> LoadSiteSettings();
 }

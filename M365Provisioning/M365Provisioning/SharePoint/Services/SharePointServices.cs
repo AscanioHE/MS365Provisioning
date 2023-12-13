@@ -34,13 +34,17 @@ namespace M365Provisioning.SharePoint.Services
                 var configuration = new ConfigurationBuilder()
                     .AddJsonFile(appSettingsPath, optional: false, reloadOnChange: true)
                     .Build();
-                var configurationSection = configuration.GetSection("SharePoint");
-                SiteSettingsFilePath = configuration["SharePoint:SiteSettingsFilePath"];
-                ListsFilePath = configuration["SharePoint:ListsFilePath"];
-                FolderStructureFilePath = configuration["SharePoint:FolderStructureFilePath"];
-                ListViewsFilePath = configuration["SharePoint:ListViewsFilePath"];
-                SiteColumnsFilePath = configuration["SharePoint:SiteColumnsFilePath"];
 
+                SiteSettingsFilePath = configuration["SharePoint:SiteSettingsFilePath"]!;
+                ListsFilePath = configuration["SharePoint:ListsFilePath"]!;
+                FolderStructureFilePath = configuration["SharePoint:FolderStructureFilePath"]!;
+                ListViewsFilePath = configuration["SharePoint:ListViewsFilePath"]!;
+                SiteColumnsFilePath = configuration["SharePoint:SiteColumnsFilePath"]!;
+
+                ClientId = configuration["SharePoint:ClientID"]!;
+                SiteUrl = configuration["SharePoint:SiteUrl"]!;
+                DirectoryId = configuration["SharePoint:DirectoryId"]!;
+                ThumbPrint = configuration["SharePoint:ThumbPrint"]!;
 
                 X509Certificate2 certificate = GetCertificateByThumbprint(ThumbPrint);
                 var authManager = new PnP.Framework.AuthenticationManager(ClientId, certificate, DirectoryId);
