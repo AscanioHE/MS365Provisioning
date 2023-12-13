@@ -29,5 +29,15 @@ namespace M365Provisioning.Test
             Assert.NotEmpty(siteSettingsDtos);
             Assert.IsType<List<SiteSettingsDto>>(siteSettingsDtos);
         }
+
+        [Fact]
+        public void Try_GetLists_Expect_DTO()
+        {
+            //Act
+            List<ListDto> listDtos = SharePointFunctions.GetLists();
+            //Assert
+            Assert.NotEmpty(listDtos);
+            Assert.IsType<List<ListDto>>(listDtos);
+        }
     }
 }
