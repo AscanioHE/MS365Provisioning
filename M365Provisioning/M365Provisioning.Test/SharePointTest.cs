@@ -8,7 +8,6 @@ namespace M365Provisioning.Test
 {
     public class SharePointTest
     {
-        private ISharePointServices SharePointServices { get; set; } = new SharePointServices();
         private ISharePointFunctions SharePointFunctions { get; set; } = new SharePointFunctions();
 
 
@@ -16,7 +15,7 @@ namespace M365Provisioning.Test
         public void Try_GetClientContext_Expect_ClientContext()
         {
             //Act
-            ClientContext context = new SharePointServices().GetClientContext();
+            ClientContext context = new SharePointServices().Context;
 
             Assert.NotNull(context);
             Assert.IsType<ClientContext>(context);

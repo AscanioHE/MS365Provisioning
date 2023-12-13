@@ -1,4 +1,5 @@
-﻿using M365Provisioning.SharePoint.Interfaces;
+﻿using System.Diagnostics.Contracts;
+using M365Provisioning.SharePoint.Interfaces;
 using M365Provisioning.SharePoint.Services;
 using M365Provisioning.SharePoint.DTO;
 
@@ -10,11 +11,12 @@ namespace M365Provisioning.SharePoint.Functions
     {
 
 
-        private ISharePointServices SharePointServices { get; set; }
+        private ISharePointServices SharePointServices { get; set; } = new SharePointServices();
 
         public List<SiteSettingsDto> LoadSiteSettings()
         {
-            SharePointServices = new SharePointServices();
+            string jsonFilePath = SharePointServices.SiteSettingsFilePath;
+
             List<SiteSettingsDto> webTemplatesDto = new();
             ClientContext context = SharePointServices.GetClientContext();
             Web web = context.Web;
@@ -36,6 +38,7 @@ namespace M365Provisioning.SharePoint.Functions
                             Value = template.Lcid
                         });
                 }
+                
             }
             catch (Exception ex)
             {
@@ -46,9 +49,34 @@ namespace M365Provisioning.SharePoint.Functions
             {
                 context.Dispose();
             }
-
+            WriteDataToJson writeDataToJson = new ();
+            writeDataToJson.Write2JsonFile(webTemplatesDto, jsonFilePath);
             return webTemplatesDto;
         }
 
+        public List<ListDto> GetLists()
+        {
+            List<ListDto> listDtos = new ();
+            ClientContext context = SharePointServices.GetClientContext();
+            ListCollection listCollection = context.Web.Lists;
+            context.Load(listCollection,
+                         lc => lc.Where(
+                                                                    l =>l.Hidden == false));
+            try
+            {
+                context.ExecuteQuery();
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                throw;
+            }
+            finally
+            {
+                context.Dispose();
+            }
+            return listDtos;
+        }
     }
 }

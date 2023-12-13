@@ -31,6 +31,9 @@
     <Compile Update="SharePoint\DTO\Lead_WebPartPagesDTO.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
+    <Compile Update="SharePoint\DTO\ListDTO.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Compile>
     <Compile Update="SharePoint\DTO\ListViewDTO.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
@@ -58,6 +61,10 @@
     <Compile Update="SharePoint\Services\WriteDataToJson.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="SharePoint\JsonFiles\" />
   </ItemGroup>
 
 </Project>

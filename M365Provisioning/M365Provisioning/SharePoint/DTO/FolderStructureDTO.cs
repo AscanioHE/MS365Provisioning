@@ -1,18 +1,17 @@
 ﻿using Microsoft.SharePoint.Client;
 
-namespace Ascanio.M365Provisioning.SharePoint.SiteInformation
+namespace M365Provisioning.SharePoint.DTO
 {
-    public class FolderStructureDTO
+    public class FolderStructureDto
     {
-        public string ListName { get; set; } = string.Empty;
-        public string FolderName { get; set; } = string.Empty;
-        public List<FolderStructureDTO> SubFolders { get; set; } = new List<FolderStructureDTO>();
-        public FolderStructureDTO(string listName, string folderName, List<FolderStructureDTO> subfolders)
+        public string ListName { get; set; }
+        public string FolderName { get; set; }
+        public List<FolderStructureDto> SubFolders { get; set; }
+        public FolderStructureDto(string listName, string folderName, List<FolderStructureDto> subfolders)
         {
             ListName = listName;
             FolderName = folderName;
             SubFolders = subfolders;
         }
-        public FolderStructureDTO() { }
     }
 }

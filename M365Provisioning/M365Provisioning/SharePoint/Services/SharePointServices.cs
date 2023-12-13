@@ -10,21 +10,31 @@ namespace M365Provisioning.SharePoint.Services
 {
     public class SharePointServices : ISharePointServices
     {        
-        public string SiteSettingsFilePath { get; private set; } = string.Empty;
-        public string ListsFilePath { get; private set; } = string.Empty;
-        public string FolderStructureFilePath { get; private set; } = string.Empty;
-        public string ListViewsFilePath { get; private set; } = string.Empty;
-        public string SiteColumnsFilePath { get; private set; } = string.Empty;
-        public ClientContext Context { get; private set; } 
-        public string ClientId { get; private set; } = string.Empty;
-        public string SiteUrl { get; private set; } = string.Empty;
-        public string DirectoryId { get; private set; } = string.Empty;
+        public string SiteSettingsFilePath { get; set; } 
+        public string ListsFilePath { get;  set; }
+        public string FolderStructureFilePath { get;  set; }
+        public string ListViewsFilePath { get;  set; }
+        public string SiteColumnsFilePath { get; set; }
+        public ClientContext Context { get; set; } 
+        public string ClientId { get; set; } = string.Empty;
+        public string SiteUrl { get; set; } = string.Empty;
+        public string DirectoryId { get; set; } = string.Empty;
         public string ThumbPrint { get; set; } = string.Empty;
 
         public SharePointServices()
         {
             ClientContext context = GetClientContext();
-            Context = context;
+            Context = context; 
+            string appSettingsPath = "SharePoint/AppSettings/appsettings.json";
+            var configuration = new ConfigurationBuilder()
+                .AddJsonFile(appSettingsPath, optional: false, reloadOnChange: true)
+                .Build();
+
+            SiteSettingsFilePath = configuration["SharePoint:SiteSettingsFilePath"]!;
+            ListsFilePath = configuration["SharePoint:ListsFilePath"]!;
+            FolderStructureFilePath = configuration["SharePoint:FolderStructureFilePath"]!;
+            ListViewsFilePath = configuration["SharePoint:ListViewsFilePath"]!;
+            SiteColumnsFilePath = configuration["SharePoint:SiteColumnsFilePath"]!;
         }
         public ClientContext GetClientContext()
         {
@@ -34,12 +44,6 @@ namespace M365Provisioning.SharePoint.Services
                 var configuration = new ConfigurationBuilder()
                     .AddJsonFile(appSettingsPath, optional: false, reloadOnChange: true)
                     .Build();
-
-                SiteSettingsFilePath = configuration["SharePoint:SiteSettingsFilePath"]!;
-                ListsFilePath = configuration["SharePoint:ListsFilePath"]!;
-                FolderStructureFilePath = configuration["SharePoint:FolderStructureFilePath"]!;
-                ListViewsFilePath = configuration["SharePoint:ListViewsFilePath"]!;
-                SiteColumnsFilePath = configuration["SharePoint:SiteColumnsFilePath"]!;
 
                 ClientId = configuration["SharePoint:ClientID"]!;
                 SiteUrl = configuration["SharePoint:SiteUrl"]!;
@@ -54,7 +58,7 @@ namespace M365Provisioning.SharePoint.Services
             catch (InvalidOperationException ex)
             {
                 // Handle the exception here
-                Console.WriteLine($"Certificate with thumbprint {ThumbPrint} not found!");
+                Console.WriteLine($"Certificate with thumbprint {ThumbPrint} not found!",ex.Message);
                 throw;
             }
         }
