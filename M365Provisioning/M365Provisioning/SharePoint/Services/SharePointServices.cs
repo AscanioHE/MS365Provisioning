@@ -2,6 +2,7 @@
 using M365Provisioning.SharePoint.Interfaces;
 using System.Security.Cryptography.X509Certificates;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 
 namespace M365Provisioning.SharePoint.Services
 {
@@ -18,7 +19,7 @@ namespace M365Provisioning.SharePoint.Services
         public string DirectoryId { get; private set; }
         public string ThumbPrint { get; set; }
 
-        public SharePointServices()
+        public ClientContext GetClientContext()
         {
 
             var configuration = new ConfigurationBuilder()
@@ -38,8 +39,9 @@ namespace M365Provisioning.SharePoint.Services
             X509Certificate2 certificate =  GetCertificateByThumbprint(ThumbPrint);
             var authManager = new PnP.Framework.AuthenticationManager(ClientId, certificate, DirectoryId);
             Context = authManager.GetContext(SiteUrl);
+            return Context;
         }
-        private static X509Certificate2 GetCertificateByThumbprint(string thumbprint)
+        public static X509Certificate2 GetCertificateByThumbprint(string thumbprint)
         {
 
             using X509Store store = new(StoreName.My, StoreLocation.CurrentUser);
@@ -54,6 +56,27 @@ namespace M365Provisioning.SharePoint.Services
             {
                 throw new InvalidOperationException($"Certificate with thumbprint {thumbprint} not found!");
             }
+        }
+    }
+    public class WriteData2Json
+    {
+        public void Write2JsonFile(object dtoFile, string jsonFilePath)
+        {
+            try
+            {
+                string json = JsonConvert.SerializeObject(dtoFile, Formatting.Indented);
+                System.IO.File.WriteAllText(jsonFilePath, json + Environment.NewLine);
+            }
+            catch (Exception ex)
+            {
+                // Log or print the exception details for debugging
+                Console.WriteLine($"Error serializing WebTemplate: {ex.Message}");
+            }
+        }
+        public string ConvertToJsonString(object dtoFile)
+        {
+            string json = JsonConvert.SerializeObject(dtoFile, Formatting.Indented);
+            return json;
         }
     }
 }

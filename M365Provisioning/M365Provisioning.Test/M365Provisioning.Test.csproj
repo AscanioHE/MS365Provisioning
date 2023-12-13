@@ -25,4 +25,8 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\M365Provisioning\M365Provisioning.csproj" />
+  </ItemGroup>
+
 </Project>
