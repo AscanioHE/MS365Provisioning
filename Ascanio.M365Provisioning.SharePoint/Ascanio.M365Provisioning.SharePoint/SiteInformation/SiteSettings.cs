@@ -71,10 +71,7 @@ namespace Ascanio.M365Provisioning.SharePoint.SiteInformation
 
         public void WriteToJsonFile(List<SiteSettingsDTO> webTemplatesDTO, string jsonFilePath)
         {
-            //string jsonFilePath = sharePointService.SiteSettingsFilePath;
-            
-            WriteData2Json writeData2Json = new();
-            writeData2Json.Write2JsonFile(webTemplatesDTO, jsonFilePath);
+            throw new NotImplementedException();
         }
     }
 }
