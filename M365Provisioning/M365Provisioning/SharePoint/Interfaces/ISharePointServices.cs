@@ -8,3 +8,4 @@ public interface ISharePointServices
 {
     ClientContext GetClientContext();
 }
+

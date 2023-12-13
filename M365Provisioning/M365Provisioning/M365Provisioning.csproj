@@ -7,11 +7,45 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="SharePoint\AppSettings\appsettings.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="SharePoint\AppSettings\appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0" />
     <PackageReference Include="Microsoft.SharePointOnline.CSOM" Version="16.1.24322.12000" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="PnP.Framework" Version="1.14.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="SharePoint\DTO\SiteSettingsDTO.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Compile>
+    <Compile Update="SharePoint\Functions\SharePointFunctions.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Compile>
+    <Compile Update="SharePoint\Interfaces\ISharePointFunctions.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Compile>
+    <Compile Update="SharePoint\Interfaces\ISharePointServices.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Compile>
+    <Compile Update="SharePoint\Interfaces\IWriteDataToJson.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Compile>
+    <Compile Update="SharePoint\Services\SharePointServices.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Compile>
+    <Compile Update="SharePoint\Services\WriteDataToJson.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Compile>
   </ItemGroup>
 
 </Project>
