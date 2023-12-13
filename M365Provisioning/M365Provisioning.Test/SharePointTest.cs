@@ -10,7 +10,6 @@ namespace M365Provisioning.Test
     {
         private ISharePointFunctions SharePointFunctions { get; set; } = new SharePointFunctions();
 
-
         [Fact]
         public void Try_GetClientContext_Expect_ClientContext()
         {
@@ -39,5 +38,6 @@ namespace M365Provisioning.Test
             Assert.NotEmpty(listDtos);
             Assert.IsType<List<ListDto>>(listDtos);
         }
+
     }
 }

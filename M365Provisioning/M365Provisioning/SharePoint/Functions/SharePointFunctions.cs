@@ -16,8 +16,6 @@ namespace M365Provisioning.SharePoint.Functions
 
         public List<SiteSettingsDto> LoadSiteSettings()
         {
-            string jsonFilePath = SharePointServices.SiteSettingsFilePath;
-
             List<SiteSettingsDto> webTemplatesDto = new();
             ClientContext context = SharePointServices.GetClientContext();
             Web web = context.Web;
@@ -50,16 +48,24 @@ namespace M365Provisioning.SharePoint.Functions
             {
                 context.Dispose();
             }
-            WriteDataToJson writeDataToJson = new ();
-            writeDataToJson.Write2JsonFile(webTemplatesDto, jsonFilePath);
             return webTemplatesDto;
         }
 
         public List<ListDto> GetLists()
         {
             List<ListDto> listDtos = new ();
+            List<string> contentTypes = new ();
             string jsonFilePath = SharePointServices.ListsFilePath;
-            ClientContext context = SharePointServices.GetClientContext();
+            ClientContext context;
+            try
+            {
+                context = SharePointServices.GetClientContext();
+            }
+            catch (Exception ex)
+            {
+                    Console.WriteLine($"Error fetching ClientContext {ex.Message}");
+                    throw;
+            }
             ListCollection listCollection = context.Web.Lists;
             context.Load(context.Web.Navigation,
                         n => n.QuickLaunch);
@@ -69,6 +75,7 @@ namespace M365Provisioning.SharePoint.Functions
             try
             {
                 context.ExecuteQuery();
+                Dictionary<string, string> listPermissions;
                 foreach (List list in listCollection)
                 {
                     context.Load
@@ -86,44 +93,51 @@ namespace M365Provisioning.SharePoint.Functions
                         )
                     );
                     context.Load(list.Fields);
-                    context.ExecuteQuery();
-                    Guid enterpriseKeywordsValue = Guid.Empty;
-
-                    List<string> contentTypes = new();
-
-                    foreach (ContentType contentType in list.ContentTypes)
+                    try
                     {
-                        contentTypes.Add(contentType.Name);
+                        context.ExecuteQuery();
                     }
-                    IQueryable<RoleAssignment> queryForList = list.RoleAssignments.Include(roleAsg => roleAsg.Member,
-                        roleAsg => roleAsg.RoleDefinitionBindings.Include(roleDef => roleDef.Name));
-                    Dictionary<string, string> listPermissions = GetPermissionDetails(context, queryForList);
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Error loading ListSettings : {ex.Message}");
+                        throw;
+                    }
 
                     try
                     {
-                        Field enterpriseKeywords = list.Fields.GetByInternalNameOrTitle("TaxKeyword");
-                        context.Load(enterpriseKeywords);
-                        context.ExecuteQuery();
-                        enterpriseKeywordsValue = enterpriseKeywords.Id;
+                        contentTypes = GetListContentTypes(list);
                     }
-                    catch
+                    catch (Exception ex)
                     {
-                        enterpriseKeywordsValue = Guid.Empty;
+                        Console.WriteLine($"Error collecting ContentTypes : {ex.Message}");
+                        throw;
                     }
-                    List<string> quickLaunchHeaders = new();
-                    foreach (NavigationNode navigationNode in context.Web.Navigation.QuickLaunch)
+
+
+                    try
                     {
-                        context.Load
-                        (
-                            navigationNode,
-                            n => n.Children
-                        );
-                        context.ExecuteQuery();
-                        foreach (NavigationNode childNode in navigationNode.Children)
-                        {
-                            quickLaunchHeaders.Add(childNode.Title.ToString());
-                        }
+                        IQueryable<RoleAssignment> queryForList = list.RoleAssignments.Include(
+                            roleAsg => roleAsg.Member,
+                            roleAsg => roleAsg.RoleDefinitionBindings.Include(roleDef => roleDef.Name));
+                        listPermissions = GetPermissionDetails(context, queryForList);
                     }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Error collecting Permissions : {ex.Message}");
+                        throw;
+                    }
+
+                    Guid enterpriseKeywordsValue;
+                    try
+                    {
+                        enterpriseKeywordsValue = GetEnterpriseKeywordsValue(list, context);
+                    }catch (Exception ex)
+                    {
+                        Console.WriteLine($"Error collecting EnterpriseKeywordsValue : {ex.Message}");
+                    throw;
+                    }
+
+                    List<string> quickLaunchHeaders = GetQuickLaunchHeaders(context);
 
                     listDtos.Add(new ListDto
                         (
@@ -144,7 +158,7 @@ namespace M365Provisioning.SharePoint.Functions
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                Console.WriteLine($"Error loading ListCollection : {ex.Message}");
                 throw;
             }
             finally
@@ -152,34 +166,57 @@ namespace M365Provisioning.SharePoint.Functions
                 context.Dispose();
             }
 
-            WriteDataToJson writeDataToJson = new WriteDataToJson();
-            writeDataToJson.Write2JsonFile(listDtos, jsonFilePath);
             return listDtos;
         }
-        Dictionary<string, string> GetPermissionDetails(ClientContext context, IQueryable<RoleAssignment> queryString)
-        {
-            IEnumerable roles = context.LoadQuery(queryString);
-            context.ExecuteQuery();
 
-            Dictionary<string, string> permisionDetails = new();
-            foreach (RoleAssignment ra in roles)
+        private List<string> GetQuickLaunchHeaders(ClientContext context)
+        {
+            List<string> quickLaunchHeaders = new();
+            foreach (NavigationNode navigationNode in context.Web.Navigation.QuickLaunch)
             {
-                var rdc = ra.RoleDefinitionBindings;
-                string permission = string.Empty;
-                foreach (var rdbc in rdc)
+                context.Load
+                (
+                    navigationNode,
+                    n => n.Children
+                );
+                try
                 {
-                    permission += rdbc.Name.ToString() + ", ";
+                    context.ExecuteQuery();
+                    foreach (NavigationNode childNode in navigationNode.Children)
+                    {
+                        quickLaunchHeaders.Add(childNode.Title.ToString());
+                    }
                 }
-                permisionDetails.Add(permission, ra.Member.Title);
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error loading ClientContext: {ex}");
+                    throw;
+                }
             }
-            return permisionDetails;
+
+            return quickLaunchHeaders;
         }
 
-        private List<string> GetContentTypes(ClientContext context, List list)
+        private Guid GetEnterpriseKeywordsValue(List list, ClientContext context)
         {
-            context.Load(list, l => l.ContentTypes);
-            context.ExecuteQuery();
+            Guid enterpriseKeywordsValue;
+            try
+            {
+                Field enterpriseKeywords = list.Fields.GetByInternalNameOrTitle("TaxKeyword");
+                context.Load(enterpriseKeywords);
+                context.ExecuteQuery();
+                enterpriseKeywordsValue = enterpriseKeywords.Id;
+            }
+            catch
+            {
+                enterpriseKeywordsValue = Guid.Empty;
+            }
 
+            return enterpriseKeywordsValue;
+        }
+
+        private List<string> GetListContentTypes(List list)
+        {
             List<string> contentTypes = new();
 
             foreach (ContentType contentType in list.ContentTypes)
@@ -189,11 +226,24 @@ namespace M365Provisioning.SharePoint.Functions
 
             return contentTypes;
         }
-        private bool GetEnableFolderCreation(ClientContext context, List list)
+
+        Dictionary<string, string> GetPermissionDetails(ClientContext context, IQueryable<RoleAssignment> queryString)
         {
-            context.Load(list, l => l.EnableFolderCreation);
+            IEnumerable roles = context.LoadQuery(queryString);
             context.ExecuteQuery();
-            return list.EnableFolderCreation;
+
+            Dictionary<string, string> permissionDetails = new();
+            foreach (RoleAssignment ra in roles)
+            {
+                RoleDefinitionBindingCollection rdc = ra.RoleDefinitionBindings;
+                string permission = string.Empty;
+                foreach (RoleDefinition rd in rdc)
+                {
+                    permission += rd.Name.ToString() + ", ";
+                }
+                permissionDetails.Add(permission, ra.Member.Title);
+            }
+            return permissionDetails;
         }
     }
 }

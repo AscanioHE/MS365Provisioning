@@ -23,18 +23,29 @@ namespace M365Provisioning.SharePoint.Services
 
         public SharePointServices()
         {
-            ClientContext context = GetClientContext();
-            Context = context; 
-            string appSettingsPath = "SharePoint/AppSettings/appsettings.json";
-            var configuration = new ConfigurationBuilder()
+            ClientContext context;
+                IConfigurationRoot configuration;
+            try
+            {
+                context = GetClientContext();
+                Context = context; 
+                string appSettingsPath = "SharePoint/AppSettings/appsettings.json";
+                configuration = new ConfigurationBuilder()
                 .AddJsonFile(appSettingsPath, optional: false, reloadOnChange: true)
                 .Build();
+                SiteSettingsFilePath = configuration["SharePoint:SiteSettingsFilePath"]!;
+                ListsFilePath = configuration["SharePoint:ListsFilePath"]!;
+                FolderStructureFilePath = configuration["SharePoint:FolderStructureFilePath"]!;
+                ListViewsFilePath = configuration["SharePoint:ListViewsFilePath"]!;
+                SiteColumnsFilePath = configuration["SharePoint:SiteColumnsFilePath"]!;
 
-            SiteSettingsFilePath = configuration["SharePoint:SiteSettingsFilePath"]!;
-            ListsFilePath = configuration["SharePoint:ListsFilePath"]!;
-            FolderStructureFilePath = configuration["SharePoint:FolderStructureFilePath"]!;
-            ListViewsFilePath = configuration["SharePoint:ListViewsFilePath"]!;
-            SiteColumnsFilePath = configuration["SharePoint:SiteColumnsFilePath"]!;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error reading AppSettingsFile : {ex.Message}");
+                throw;
+            }
+
         }
         public ClientContext GetClientContext()
         {

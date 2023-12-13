@@ -58,9 +58,6 @@
     <Compile Update="SharePoint\Services\SharePointServices.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
-    <Compile Update="SharePoint\Services\WriteDataToJson.cs">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Compile>
   </ItemGroup>
 
   <ItemGroup>
