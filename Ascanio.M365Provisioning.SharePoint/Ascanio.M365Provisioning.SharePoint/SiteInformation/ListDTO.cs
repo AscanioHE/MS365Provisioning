@@ -30,6 +30,5 @@ namespace Ascanio.M365Provisioning.SharePoint.SiteInformation
             BreakRoleInheritance = breakRoleInheritance;
             Permissions = permissions;
         }
-        public ListDTO() { }
     }
 }

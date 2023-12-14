@@ -4,10 +4,10 @@ using WriteDataToJsonFiles;
 using Microsoft.SharePoint.Client;
 using System.Text;
 using M365Provisioning.SharePoint;
-using M365Provisioning.SharePoint.Functions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 using PnP.Framework.Provisioning.Model;
 using ContentType = Microsoft.SharePoint.Client.ContentType;
 using Field = Microsoft.SharePoint.Client.Field;
@@ -16,6 +16,10 @@ using RoleAssignment = Microsoft.SharePoint.Client.RoleAssignment;
 using RoleDefinition = Microsoft.SharePoint.Client.RoleDefinition;
 using View = Microsoft.SharePoint.Client.View;
 using ViewCollection = Microsoft.SharePoint.Client.ViewCollection;
+using Microsoft.Graph;
+using FieldCollection = Microsoft.SharePoint.Client.FieldCollection;
+using List = Microsoft.SharePoint.Client.List;
+using Site = Microsoft.Graph.Site;
 
 namespace M365Provisioning.SharePoint
 {
@@ -126,7 +130,7 @@ namespace M365Provisioning.SharePoint
                     }
                     catch (Exception ex)
                     {
-                        Debug.WriteLine($"Error loading ListSettings : {ex.Message}");
+                        Debug.WriteLine($"Error fetching ListSettings : {ex.Message}");
                         throw;
                     }
 
@@ -137,7 +141,7 @@ namespace M365Provisioning.SharePoint
                     }
                     catch (Exception ex)
                     {
-                        Debug.WriteLine($"Error collecting ContentTypes : {ex.Message}");
+                        Debug.WriteLine($"Error fetching ContentTypes : {ex.Message}");
                         throw;
                     }
 
@@ -152,7 +156,7 @@ namespace M365Provisioning.SharePoint
                     }
                     catch (Exception ex)
                     {
-                        Debug.WriteLine($"Error collecting Permissions : {ex.Message}");
+                        Debug.WriteLine($"Error fetching Permissions : {ex.Message}");
                         throw;
                     }
 
@@ -163,7 +167,7 @@ namespace M365Provisioning.SharePoint
                     }
                     catch (Exception ex)
                     {
-                        Debug.WriteLine($"Error collecting EnterpriseKeywordsValue : {ex.Message}");
+                        Debug.WriteLine($"Error fetching EnterpriseKeywordsValue : {ex.Message}");
                         throw;
                     }
 
@@ -193,16 +197,11 @@ namespace M365Provisioning.SharePoint
                     }
                 }
 
-                WriteDataToJsonFile writeDataToJson = new()
-                {
-                    DtoFile = listDtos,
-                    JsonFilePath = SharePointServices.ListsFilePath
-                };
-                writeDataToJson.Write2JsonFile();
+                WriteDataToJsonFile(SharePointServices.ListSettingsFilePath, listDtos);
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Error loading ListCollection : {ex.Message}");
+                Debug.WriteLine($"Error fetching ListCollection : {ex.Message}");
                 throw;
             }
             finally
@@ -233,7 +232,7 @@ namespace M365Provisioning.SharePoint
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"Error loading ClientContext: {ex}");
+                    Debug.WriteLine($"Error fetching ClientContext: {ex}");
                     throw;
                 }
             }
@@ -259,7 +258,7 @@ namespace M365Provisioning.SharePoint
             catch (Exception ex)
             {
                 // Log the exception
-                Debug.WriteLine($"Error retrieving Enterprise Keywords value: {ex.Message}");
+                Debug.WriteLine($"Error fetching Enterprise Keywords value: {ex.Message}");
             }
 
             return enterpriseKeywordsValue;
@@ -283,7 +282,7 @@ namespace M365Provisioning.SharePoint
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Error collecting ContentTypes: {ex.Message}");
+                Debug.WriteLine($"Error fetching ContentTypes: {ex.Message}");
 
                 // Return an empty list
                 contentTypes.Clear();
@@ -318,7 +317,7 @@ namespace M365Provisioning.SharePoint
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Error collecting permissions : {ex}");
+                Debug.WriteLine($"Error fetching permissions : {ex}");
                 return new Dictionary<string, string>();
             }
         }
@@ -328,55 +327,129 @@ namespace M365Provisioning.SharePoint
          _______________________________________________________________________________________________*/
         public List<ListViewDto> LoadListViews()
         {
-            List<ListViewDto> listViewDtos = new(); 
+            List<ListViewDto> listViewsDtos = new(); 
             ClientContext context = new SharePointServices().GetClientContext();
             try
             {
-                ListCollection listViewlists = context.Web.Lists;
-                context.Load(listViewlists,
+                ListCollection listViewslists = context.Web.Lists;
+                context.Load(listViewslists,
                     lc => lc.Where(
                         l => l.Hidden == false));
                 context.ExecuteQuery();
-                foreach (List list in listViewlists)
+                foreach (List list in listViewslists)
                 {
-                    
+                    List<ListViewDto> listViewDtos = GetListViews(context,list);
+                    listViewsDtos.AddRange(listViewDtos);
                 }
+                WriteDataToJsonFile(SharePointServices.ListViewsFilePath, listViewsDtos);
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Error loading ClientContext : {ex.Message}");
+                Debug.WriteLine($"Error fetching ClientContext : {ex.Message}");
                 throw;
             }
             finally
             {
                 context.Dispose();
             }
-            return listViewDtos;
+            return listViewsDtos;
         }
 
         private List<ListViewDto> GetListViews(ClientContext context, List list)
         {
-            List<ListViewDto> listViewDtos = new();
+            List<ListViewDto> listViewsDtos = new();
             ViewCollection listViews = list.Views;
             context.Load(listViews);
             try
             {
+                context.ExecuteQuery();
                 foreach (View listView in listViews)
                 {
-                    context.Load(listView,
-                                    lv => lv.Title,
-                                    lv =>lv.DefaultView,
-                                    lv=>lv.RowLimit,
-                                    lv => lv.RowLimit,
-                                    lv=> lv.Scope);
+                    try
+                    {
+                        context.Load(listView,
+                            lv => lv.Title,
+                            lv => lv.DefaultView,
+                            lv => lv.RowLimit,
+                            lv => lv.ViewFields,
+                            lv => lv.Scope);
+                        context.ExecuteQuery();
+
+                        listViewsDtos.Add(new ListViewDto(
+                            list.Title,listView.Title,listView.DefaultView,listView.ViewFields,listView.RowLimit,
+                            listView.Scope.ToString(),$"{list.Title}.json"));
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine($"Error fetching listview properties : {ex.Message}");
+                        throw;
+                    }
                 }
-                return listViewDtos;
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Error loading Listviews : {ex.Message}");
+                Debug.WriteLine($"Error fetching Listviews : {ex.Message}");
                 throw;
             }
+            return listViewsDtos;
+        }
+
+        /*______________________________________________________________________________________________
+         Collect SiteColumn information
+         _______________________________________________________________________________________________*/
+        public List<SiteColumnsDto> LoadSiteColumnsDtos()
+        {
+            List<SiteColumnsDto> siteColumnsDtos = new List<SiteColumnsDto>();
+            ClientContext context = SharePointServices.GetClientContext();
+            try
+            {
+                FieldCollection siteColumns = context.Web.Fields;
+                context.Load(siteColumns,
+                             scc => scc.Include(
+                                                                            sc=>sc.Hidden,
+                                                                            sc=>sc.InternalName,
+                                                                            sc=>sc.SchemaXml,
+                                                                            sc=>sc.DefaultValue));
+                try
+                {
+                    context.ExecuteQuery();
+                    foreach (Field siteColumn in siteColumns)
+                    {
+                        siteColumnsDtos.Add(new SiteColumnsDto(
+                            siteColumn.InternalName, siteColumn.SchemaXml, siteColumn.DefaultValue));
+                    }
+
+                    WriteDataToJsonFile(SharePointServices.SiteColumnsFilePath, siteColumnsDtos);
+                    return siteColumnsDtos;
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"Error fetching Site Column settings : {ex.Message}");
+                    throw;
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error fetching ContextClient");
+                throw;
+            }
+            finally
+            {
+                context.Dispose();
+            }
+        }
+        /*______________________________________________________________________________________________
+         Write all data to json file
+         _______________________________________________________________________________________________*/
+        private void WriteDataToJsonFile(string filePath, object jsonFile)
+        {
+
+            WriteDataToJsonFile writeDataToJson = new()
+            {
+                DtoFile = jsonFile,
+                JsonFilePath = filePath
+            };
+            writeDataToJson.Write2JsonFile();
         }
     }
 }

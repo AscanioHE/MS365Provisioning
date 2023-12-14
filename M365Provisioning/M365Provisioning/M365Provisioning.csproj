@@ -27,6 +27,9 @@
     <Compile Update="SharePoint\ListsSettingsDTO.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
+    <Compile Update="SharePoint\SiteColumnsDTO.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Compile>
     <Compile Update="SharePoint\SiteSettingsDTO.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>

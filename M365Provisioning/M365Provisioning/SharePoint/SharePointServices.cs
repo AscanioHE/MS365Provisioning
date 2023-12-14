@@ -8,12 +8,12 @@ using Newtonsoft.Json;
 using System;
 using System.Diagnostics;
 
-namespace M365Provisioning.SharePoint.Functions
+namespace M365Provisioning.SharePoint
 {
     public class SharePointServices : ISharePointServices
     {
         public string SiteSettingsFilePath { get; set; }
-        public string ListsFilePath { get; set; }
+        public string ListSettingsFilePath { get; set; }
         public string FolderStructureFilePath { get; set; }
         public string ListViewsFilePath { get; set; }
         public string SiteColumnsFilePath { get; set; }
@@ -34,7 +34,7 @@ namespace M365Provisioning.SharePoint.Functions
                     .AddJsonFile(appSettingsPath, optional: false, reloadOnChange: true)
                     .Build();
                 SiteSettingsFilePath = configuration["SharePoint:SiteSettingsFilePath"]!;
-                ListsFilePath = configuration["SharePoint:ListsFilePath"]!;
+                ListSettingsFilePath = configuration["SharePoint:ListsFilePath"]!;
                 FolderStructureFilePath = configuration["SharePoint:FolderStructureFilePath"]!;
                 ListViewsFilePath = configuration["SharePoint:ListViewsFilePath"]!;
                 SiteColumnsFilePath = configuration["SharePoint:SiteColumnsFilePath"]!;

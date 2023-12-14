@@ -1,5 +1,4 @@
 using M365Provisioning.SharePoint;
-using M365Provisioning.SharePoint.Functions;
 using Microsoft.SharePoint.Client;
 using System.Collections.Generic;
 using WriteDataToJsonFiles;
@@ -20,7 +19,7 @@ namespace M365Provisioning.Test
             Assert.IsType<ClientContext>(context);
         }
         [Fact]
-        public void TryGetSiteSettings_Expect_DTO()
+        public void Try_SiteSettings_Expect_DTO()
         {
             //Act
             List<SiteSettingsDto> siteSettingsDtos = SharePointFunctions.LoadSiteSettings();
@@ -30,7 +29,7 @@ namespace M365Provisioning.Test
         }
 
         [Fact]
-        public void Try_GetLists_Expect_DTO()
+        public void Try_Lists_Expect_DTO()
         {
             //Act
             List<ListsSettingsDto> listDtos = SharePointFunctions.LoadListsSettings();
@@ -43,10 +42,21 @@ namespace M365Provisioning.Test
         public void Try_ListViews_Expect_DTO()
         {
             //Act
-            List<ListViewDto> ListViewDtos = SharePointFunctions.LoadListViews();
+            List<ListViewDto> listViewDtos = SharePointFunctions.LoadListViews();
             //Assert
-            Assert.NotEmpty(ListViewDtos);
-            Assert.IsType<ListViewDto>(ListViewDtos);
+            Assert.NotEmpty(listViewDtos);
+            Assert.IsType<List<ListViewDto>>(listViewDtos);
+        }
+
+        [Fact]
+        public void Try_SiteColumns_Expect_Dto()
+        {
+            //Act
+            List<SiteColumnsDto> siteColumnsDtos = SharePointFunctions.LoadSiteColumnsDtos();
+            //Assert
+            Assert.NotEmpty(siteColumnsDtos);
+            Assert.IsType<List<SiteColumnsDto>>(siteColumnsDtos);
+
         }
     }
 

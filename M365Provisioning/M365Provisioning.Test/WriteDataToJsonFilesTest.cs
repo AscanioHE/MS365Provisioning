@@ -1,7 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
 using M365Provisioning.SharePoint;
 using WriteDataToJsonFiles;
-using M365Provisioning.SharePoint.Functions;
 using Newtonsoft.Json;
 
 namespace M365Provisioning.Test;

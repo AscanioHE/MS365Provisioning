@@ -20,8 +20,8 @@ namespace M365Provisioning.SharePoint
         public List<string> QuickLauncHeaders { get; set; }
 
         public ListsSettingsDto(string title, string url, string listType, List<string> contentTypes,
-            bool showOnQuickLaunch, List<string> quickLauncHeaders, bool allowFolderCreation, Guid enterpriseKeywords,
-            bool breakRoleInheritance, Dictionary<string, string> permissions)
+                                bool showOnQuickLaunch, List<string> quickLauncHeaders, bool allowFolderCreation, 
+                                Guid enterpriseKeywords, bool breakRoleInheritance, Dictionary<string, string> permissions)
         {
             Title = title;
             Url = url;

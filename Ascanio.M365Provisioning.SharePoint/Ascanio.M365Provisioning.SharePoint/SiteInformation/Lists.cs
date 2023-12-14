@@ -83,7 +83,6 @@ namespace Ascanio.M365Provisioning.SharePoint.SiteInformation
                         context.ExecuteQuery();
                         foreach (NavigationNode childNode in navigationNode.Children)
                         {
-                            Console.WriteLine(childNode.Title.ToString());
                             quickLaunchHeaders.Add(childNode.Title.ToString());
                         }
                     }
@@ -105,7 +104,7 @@ namespace Ascanio.M365Provisioning.SharePoint.SiteInformation
                     );
                 }
             }
-                    WriteData2Json writeData2Json = new();
+            WriteData2Json writeData2Json = new();
             writeData2Json.Write2JsonFile(listsDTO, sharePointService.ListsFilePath);
         }
 

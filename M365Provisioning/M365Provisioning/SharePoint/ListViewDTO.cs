@@ -1,19 +1,19 @@
 ﻿using System;
+using Microsoft.SharePoint.Client;
 
 namespace M365Provisioning.SharePoint
 {
     public class ListViewDto
     {
-        public string ListName { get; set; } = String.Empty;
-        public string ViewName { get; set; } = string.Empty;
+        public string ListName { get; set; }
+        public string ViewName { get; set; }
         public bool DefaultView { get; set; } = false;
-        public string ViewFields {  get; set; } = String.Empty;
+        public ViewFieldCollection ViewFields {  get; set; } 
         public uint RowLimit { get; set; }
-        public string ListScope { get; set; } = string.Empty;
-        public string JsonFormatterFile { get; set; } = string.Empty;
+        public string ListScope { get; set; }
+        public string JsonFormatterFile { get; set; } 
 
-        public ListViewDto() { }
-        public ListViewDto(string listName,string viewName,bool defaultView,string viewFields,uint rowLimit,string scope, string jsonFormatterFile) 
+        public ListViewDto(string listName,string viewName,bool defaultView, ViewFieldCollection viewFields,uint rowLimit,string scope, string jsonFormatterFile) 
         {
             ListName = listName;
             ViewName = viewName;
