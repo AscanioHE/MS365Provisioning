@@ -21,9 +21,11 @@ namespace M365Provisioning.SharePoint
     {
         private ISharePointServices SharePointServices { get; } = new SharePointServices();
 
+        /*______________________________________________________________________________________________
+         Collect Site Settings information
+         _______________________________________________________________________________________________*/
         public List<SiteSettingsDto> LoadSiteSettings()
         {
-            string jsonFilePath = SharePointServices.ListsFilePath;
             List<SiteSettingsDto> webTemplatesDto = new();
             ClientContext context = SharePointServices.GetClientContext();
             Web web = context.Web;
@@ -49,7 +51,7 @@ namespace M365Provisioning.SharePoint
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error executing query: {ex.Message}");
+                Debug.WriteLine($"Error executing query: {ex.Message}");
                 return new List<SiteSettingsDto>();
             }
             finally
@@ -73,6 +75,10 @@ namespace M365Provisioning.SharePoint
             }
             return webTemplatesDto;
         }
+
+        /*______________________________________________________________________________________________
+         Collect List Settings information
+         _______________________________________________________________________________________________*/
         public List<ListsSettingsDto> LoadListsSettings()
         {
             List<ListsSettingsDto> listDtos = new();
@@ -83,7 +89,7 @@ namespace M365Provisioning.SharePoint
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error fetching ClientContext {ex.Message}");
+                Debug.WriteLine($"Error fetching ClientContext {ex.Message}");
                 throw;
             }
             ListCollection listCollection = context.Web.Lists;
@@ -118,7 +124,7 @@ namespace M365Provisioning.SharePoint
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine($"Error loading ListSettings : {ex.Message}");
+                        Debug.WriteLine($"Error loading ListSettings : {ex.Message}");
                         throw;
                     }
 
@@ -129,7 +135,7 @@ namespace M365Provisioning.SharePoint
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine($"Error collecting ContentTypes : {ex.Message}");
+                        Debug.WriteLine($"Error collecting ContentTypes : {ex.Message}");
                         throw;
                     }
 
@@ -144,7 +150,7 @@ namespace M365Provisioning.SharePoint
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine($"Error collecting Permissions : {ex.Message}");
+                        Debug.WriteLine($"Error collecting Permissions : {ex.Message}");
                         throw;
                     }
 
@@ -155,7 +161,7 @@ namespace M365Provisioning.SharePoint
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine($"Error collecting EnterpriseKeywordsValue : {ex.Message}");
+                        Debug.WriteLine($"Error collecting EnterpriseKeywordsValue : {ex.Message}");
                         throw;
                     }
 
@@ -180,7 +186,7 @@ namespace M365Provisioning.SharePoint
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine($"Error writing to DTO File :{ex.Message}");
+                        Debug.WriteLine($"Error writing to DTO File :{ex.Message}");
                         throw;
                     }
                 }
@@ -194,7 +200,7 @@ namespace M365Provisioning.SharePoint
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error loading ListCollection : {ex.Message}");
+                Debug.WriteLine($"Error loading ListCollection : {ex.Message}");
                 throw;
             }
             finally
@@ -225,7 +231,7 @@ namespace M365Provisioning.SharePoint
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Error loading ClientContext: {ex}");
+                    Debug.WriteLine($"Error loading ClientContext: {ex}");
                     throw;
                 }
             }
@@ -310,9 +316,27 @@ namespace M365Provisioning.SharePoint
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error collecting permissions : {ex}");
+                Debug.WriteLine($"Error collecting permissions : {ex}");
                 return new Dictionary<string, string>();
             }
+        }
+
+        /*______________________________________________________________________________________________
+         Collect Site Settings information
+         _______________________________________________________________________________________________*/
+        public List<ListViewDto> LoadListViews()
+        {
+            List<ListViewDto> listViewDtos = new();
+            try
+            {
+
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error loading ClientContext : {ex.Message}");
+                throw;
+            }
+            return listViewDtos;
         }
     }
 }

@@ -1,15 +1,15 @@
 ﻿namespace M365Provisioning.SharePoint
 {
-    public class SiteColumnsDTO
+    public class SiteColumnsDto
     {
-        public string Name {  get; set; }  = string.Empty;
-        public string SchemaXML { get; set; } = string.Empty;  
-        public string DefaultValue {  get; set; } = string.Empty;
+        public string Name {  get; set; } 
+        public string SchemaXml { get; set; }
+        public string DefaultValue {  get; set; } 
 
-        public SiteColumnsDTO(string name, string schemaXML,string defaultValue) 
+        public SiteColumnsDto(string name, string schemaXml,string defaultValue) 
         { 
             Name = name;
-            SchemaXML = schemaXML;
+            SchemaXml = schemaXml;
             DefaultValue = defaultValue;
         }
 

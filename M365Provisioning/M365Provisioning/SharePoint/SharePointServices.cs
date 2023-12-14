@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration.Json;
 using Microsoft.Graph;
 using Newtonsoft.Json;
 using System;
+using System.Diagnostics;
 
 namespace M365Provisioning.SharePoint.Functions
 {
@@ -41,7 +42,7 @@ namespace M365Provisioning.SharePoint.Functions
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error reading AppSettingsFile : {ex.Message}");
+                Debug.WriteLine($"Error reading AppSettingsFile : {ex.Message}");
                 throw;
             }
 
@@ -64,7 +65,7 @@ namespace M365Provisioning.SharePoint.Functions
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Error reading AppSetting file : {ex.Message}");
+                    Debug.WriteLine($"Error reading AppSetting file : {ex.Message}");
                     throw;
                 }
 
@@ -78,7 +79,7 @@ namespace M365Provisioning.SharePoint.Functions
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Error creating the ClientContext : {ex.Message}");
+                    Debug.WriteLine($"Error creating the ClientContext : {ex.Message}");
                     throw;
                 }
                 return Context;
@@ -86,7 +87,7 @@ namespace M365Provisioning.SharePoint.Functions
             catch (InvalidOperationException ex)
             {
                 // Handle the exception here
-                Console.WriteLine($"Certificate with thumbprint {ThumbPrint} not found!", ex.Message);
+                Debug.WriteLine($"Certificate with thumbprint {ThumbPrint} not found!", ex.Message);
                 throw;
             }
         }
@@ -99,7 +100,7 @@ namespace M365Provisioning.SharePoint.Functions
                 var certificates = store.Certificates.Find(X509FindType.FindByThumbprint, thumbprint, false);
                 if (certificates.Count > 0)
                 {
-                    Console.WriteLine("Authenticated and connected to SharePoint!");
+                    Debug.WriteLine("Authenticated and connected to SharePoint!");
                     return certificates[0];
                 }
                 else
@@ -109,7 +110,7 @@ namespace M365Provisioning.SharePoint.Functions
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error creating a Certificate : {ex}");
+                Debug.WriteLine($"Error creating a Certificate : {ex}");
                 throw;
             }
         }

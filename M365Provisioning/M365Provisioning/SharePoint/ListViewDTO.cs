@@ -1,6 +1,8 @@
-﻿namespace M365Provisioning.SharePoint
+﻿using System;
+
+namespace M365Provisioning.SharePoint
 {
-    public class ListViewDTO
+    public class ListViewDto
     {
         public string ListName { get; set; } = String.Empty;
         public string ViewName { get; set; } = string.Empty;
@@ -10,8 +12,8 @@
         public string ListScope { get; set; } = string.Empty;
         public string JsonFormatterFile { get; set; } = string.Empty;
 
-        public ListViewDTO() { }
-        public ListViewDTO(string listName,string viewName,bool defaultView,string viewFields,uint rowLimit,string scope, string jsonFormatterFile) 
+        public ListViewDto() { }
+        public ListViewDto(string listName,string viewName,bool defaultView,string viewFields,uint rowLimit,string scope, string jsonFormatterFile) 
         {
             ListName = listName;
             ViewName = viewName;

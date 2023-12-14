@@ -8,12 +8,8 @@ namespace WriteDataToJsonFiles
     public class WriteDataToJsonFile : IWriteDataToJson
     {
         public object DtoFile { get; set; } = new();
+        public string JsonFilePath { get; set; } = String.Empty;
 
-        public WriteDataToJsonFile()
-        {
-        }
-
-        public string JsonFilePath { get; set; }
         public string ConvertDtoToString()
         {
             try
@@ -23,7 +19,7 @@ namespace WriteDataToJsonFiles
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error creating Json String : {ex.Message}");
+                Debug.WriteLine($"Error creating Json String : {ex.Message}");
                 throw;
             }
         }
@@ -37,7 +33,7 @@ namespace WriteDataToJsonFiles
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error Writing Json String to file : {ex.Message}");
+                Debug.WriteLine($"Error Writing Json String to file : {ex.Message}");
                 throw;
             }
         }

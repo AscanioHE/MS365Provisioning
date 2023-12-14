@@ -1,16 +1,16 @@
 ﻿namespace M365Provisioning.SharePoint
 {
-    public class Lead_WebPartPagesDTO
+    public class LeadWebPartPagesDto
     {
-        public string Title { get; set; } = string.Empty;
-        public string Name { get; set; } = string.Empty;
-        public string QuickLaunchHeader { get; set; } = string.Empty;
+        public string Title { get; set; }
+        public string Name { get; set; }
+        public string QuickLaunchHeader { get; set; }
         public bool ShowComments { get; set; }
-        public string WebPartType { get; set; } = string.Empty;
-        public string List { get; set; } = string.Empty;
-        public string View { get; set; } = string.Empty;
+        public string WebPartType { get; set; }
+        public string List { get; set; }
+        public string View { get; set; }
 
-        public Lead_WebPartPagesDTO(string title, string name, string quickLaunchHeader,
+        public LeadWebPartPagesDto(string title, string name, string quickLaunchHeader,
             bool showComments, string webPartType, string list, string view)
         {
             Title = title;
