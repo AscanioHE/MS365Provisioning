@@ -1,13 +1,21 @@
 ﻿using System.Collections;
 using System.Diagnostics;
-using M365Provisioning.SharePoint.Interfaces;
-using M365Provisioning.SharePoint.DTO;
 using WriteDataToJsonFiles;
-
 using Microsoft.SharePoint.Client;
 using System.Text;
+using M365Provisioning.SharePoint;
+using M365Provisioning.SharePoint.Functions;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using PnP.Framework.Provisioning.Model;
+using ContentType = Microsoft.SharePoint.Client.ContentType;
+using Field = Microsoft.SharePoint.Client.Field;
+using NavigationNode = Microsoft.SharePoint.Client.NavigationNode;
+using RoleAssignment = Microsoft.SharePoint.Client.RoleAssignment;
+using RoleDefinition = Microsoft.SharePoint.Client.RoleDefinition;
 
-namespace M365Provisioning.SharePoint.Functions
+namespace M365Provisioning.SharePoint
 {
     public class SharePointFunctions : ISharePointFunctions
     {
@@ -31,13 +39,13 @@ namespace M365Provisioning.SharePoint.Functions
 
                 foreach (WebTemplate template in webTemplateCollection)
                 {
-                        webTemplatesDto.Add(new SiteSettingsDto
-                        {
-                            SiteTemplate = template.Name,
-                            Value = template.Lcid
-                        });
+                    webTemplatesDto.Add(new SiteSettingsDto
+                    {
+                        SiteTemplate = template.Name,
+                        Value = template.Lcid
+                    });
                 }
-                
+
             }
             catch (Exception ex)
             {
@@ -51,11 +59,7 @@ namespace M365Provisioning.SharePoint.Functions
 
             try
             {
-                WriteDataToJsonFile writeDataToJson = new (jsonFilePath)
-                {
-                    DtoFile = webTemplatesDto,
-                    JsonFilePath = jsonFilePath
-                };
+                WriteDataToJsonFile writeDataToJson = new(jsonFilePath);
                 writeDataToJson.Write2JsonFile();
             }
             catch (Exception ex)
@@ -64,10 +68,9 @@ namespace M365Provisioning.SharePoint.Functions
             }
             return webTemplatesDto;
         }
-
-        public List<ListDto> GetLists()
+        public List<ListsSettingsDto> LoadListsSettings()
         {
-            List<ListDto> listDtos = new ();
+            List<ListsSettingsDto> listDtos = new();
             ClientContext context;
             try
             {
@@ -75,15 +78,15 @@ namespace M365Provisioning.SharePoint.Functions
             }
             catch (Exception ex)
             {
-                    Console.WriteLine($"Error fetching ClientContext {ex.Message}");
-                    throw;
+                Console.WriteLine($"Error fetching ClientContext {ex.Message}");
+                throw;
             }
             ListCollection listCollection = context.Web.Lists;
             context.Load(context.Web.Navigation,
                         n => n.QuickLaunch);
             context.Load(listCollection,
                          lc => lc.Where(
-                                                                    l =>l.Hidden == false));
+                                                                    l => l.Hidden == false));
             try
             {
                 context.ExecuteQuery();
@@ -143,17 +146,18 @@ namespace M365Provisioning.SharePoint.Functions
                     Guid enterpriseKeywordsValue;
                     try
                     {
-                        enterpriseKeywordsValue = GetEnterpriseKeywordsValue(list, context);
-                    }catch (Exception ex)
+                        enterpriseKeywordsValue = GetEnterpriseKeywordsValue(context);
+                    }
+                    catch (Exception ex)
                     {
                         Console.WriteLine($"Error collecting EnterpriseKeywordsValue : {ex.Message}");
-                    throw;
+                        throw;
                     }
 
                     List<string> quickLaunchHeaders = GetQuickLaunchHeaders(context);
                     try
                     {
-                        listDtos.Add(new ListDto
+                        listDtos.Add(new ListsSettingsDto
                                         (
                                             list.Title,
                                             list.DefaultViewUrl,
@@ -217,7 +221,7 @@ namespace M365Provisioning.SharePoint.Functions
             return quickLaunchHeaders;
         }
 
-        private Guid GetEnterpriseKeywordsValue(List list, ClientContext context)
+        private Guid GetEnterpriseKeywordsValue(ClientContext context)
         {
             Guid enterpriseKeywordsValue = Guid.Empty;
 
@@ -280,7 +284,7 @@ namespace M365Provisioning.SharePoint.Functions
                 foreach (RoleAssignment ra in roles)
                 {
                     RoleDefinitionBindingCollection rdc = ra.RoleDefinitionBindings;
-                    StringBuilder permissionBuilder = new ();
+                    StringBuilder permissionBuilder = new();
                     foreach (RoleDefinition rd in rdc)
                     {
                         permissionBuilder.Append(rd.Name + ", ");

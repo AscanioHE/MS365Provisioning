@@ -1,10 +1,11 @@
 ﻿using Microsoft.SharePoint.Client;
-using M365Provisioning.SharePoint.Interfaces;
+using M365Provisioning.SharePoint;
 using System.Security.Cryptography.X509Certificates;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.Json;
 using Microsoft.Graph;
 using Newtonsoft.Json;
+using System;
 
 namespace M365Provisioning.SharePoint.Functions
 {
@@ -27,7 +28,7 @@ namespace M365Provisioning.SharePoint.Functions
             {
                 ClientContext context = GetClientContext();
                 Context = context;
-                string appSettingsPath = "SharePoint/AppSettings/appsettings.json";
+                string appSettingsPath = "appsettings.json";
                 IConfigurationRoot configuration = new ConfigurationBuilder()
                     .AddJsonFile(appSettingsPath, optional: false, reloadOnChange: true)
                     .Build();
@@ -52,7 +53,7 @@ namespace M365Provisioning.SharePoint.Functions
 
                 try
                 {
-                    string appSettingsPath = "SharePoint/AppSettings/appsettings.json";
+                    string appSettingsPath = "appsettings.json";
                     IConfigurationRoot configuration = new ConfigurationBuilder()
                         .AddJsonFile(appSettingsPath, optional: false, reloadOnChange: true)
                         .Build();

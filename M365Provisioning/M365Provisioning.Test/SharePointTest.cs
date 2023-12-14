@@ -1,6 +1,5 @@
-using M365Provisioning.SharePoint.DTO;
+using M365Provisioning.SharePoint;
 using M365Provisioning.SharePoint.Functions;
-using M365Provisioning.SharePoint.Interfaces;
 using Microsoft.SharePoint.Client;
 using WriteDataToJsonFiles;
 
@@ -33,10 +32,10 @@ namespace M365Provisioning.Test
         public void Try_GetLists_Expect_DTO()
         {
             //Act
-            List<ListDto> listDtos = SharePointFunctions.GetLists();
+            List<ListsSettingsDto> listDtos = SharePointFunctions.LoadListsSettings();
             //Assert
             Assert.NotEmpty(listDtos);
-            Assert.IsType<List<ListDto>>(listDtos);
+            Assert.IsType<List<ListsSettingsDto>>(listDtos);
         }
     }
 

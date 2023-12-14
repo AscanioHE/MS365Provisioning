@@ -1,7 +1,7 @@
 ﻿using Microsoft.SharePoint.Client;
 using System.Security.Cryptography.X509Certificates;
 
-namespace M365Provisioning.SharePoint.Interfaces;
+namespace M365Provisioning.SharePoint;
 
 public interface ISharePointServices
 {

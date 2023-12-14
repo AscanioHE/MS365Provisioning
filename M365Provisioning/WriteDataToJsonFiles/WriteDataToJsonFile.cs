@@ -7,36 +7,42 @@ namespace WriteDataToJsonFiles
 {
     public class WriteDataToJsonFile : IWriteDataToJson
     {
-        
-        public object DtoFile = new();
-        public string JsonFilePath { get; set; }
-        public string JsonString { get; set; }
+        public object DtoFile { get; set; } = new();
 
         public WriteDataToJsonFile(string jsonFilePath)
         {
-            
             JsonFilePath = jsonFilePath;
-            JsonString = ConvertDtoToString();
         }
 
+        public string JsonFilePath { get; set; }
         public string ConvertDtoToString()
         {
-            string jsonString = JsonConvert.SerializeObject(DtoFile, Formatting.Indented);
-            
-            return jsonString;
+            try
+            {
+                string jsonString = JsonConvert.SerializeObject(DtoFile, Formatting.Indented);
+                return jsonString;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error creating Json String : {ex.Message}");
+                throw;
+            }
         }
-        public void Write2JsonFile()
+        public string Write2JsonFile()
         {
             try
             {
                 string json = JsonConvert.SerializeObject(DtoFile, Formatting.Indented);
-                File.WriteAllText(JsonFilePath, json + Environment.NewLine);
+                File.WriteAllText("lists.json", json + Environment.NewLine);
+                return json;
             }
             catch (Exception ex)
             {
-                // Log or print the exception details for debugging
-                Debug.WriteLine($"Error serializing WebTemplate : {ex.Message}");
+                Console.WriteLine($"Error Writing Json String to file : {ex.Message}");
+                throw;
             }
         }
+
+
     }
 }

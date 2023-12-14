@@ -7,13 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="SharePoint\AppSettings\appsettings.json" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="SharePoint\AppSettings\appsettings.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+    <Compile Remove="bin\**" />
+    <Compile Remove="obj\**" />
+    <EmbeddedResource Remove="bin\**" />
+    <EmbeddedResource Remove="obj\**" />
+    <None Remove="bin\**" />
+    <None Remove="obj\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -25,40 +24,21 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="SharePoint\DTO\FolderStructureDTO.cs">
+    <Compile Update="SharePoint\SharePointSettingsDTO.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
-    <Compile Update="SharePoint\DTO\Lead_WebPartPagesDTO.cs">
+    <Compile Update="SharePoint\SharePointFunctions.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
-    <Compile Update="SharePoint\DTO\ListDTO.cs">
+    <Compile Update="SharePoint\ISharePointFunctions.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
-    <Compile Update="SharePoint\DTO\ListViewDTO.cs">
+    <Compile Update="SharePoint\ISharePointServices.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
-    <Compile Update="SharePoint\DTO\SiteColumnsDTO.cs">
+    <Compile Update="SharePoint\SharePointServices.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
-    <Compile Update="SharePoint\DTO\SiteSettingsDTO.cs">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Compile>
-    <Compile Update="SharePoint\Functions\SharePointFunctions.cs">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Compile>
-    <Compile Update="SharePoint\Interfaces\ISharePointFunctions.cs">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Compile>
-    <Compile Update="SharePoint\Interfaces\ISharePointServices.cs">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Compile>
-    <Compile Update="SharePoint\Functions\SharePointServices.cs">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Compile>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="SharePoint\JsonFiles\" />
   </ItemGroup>
 
   <ItemGroup>
