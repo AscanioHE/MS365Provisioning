@@ -1,11 +1,12 @@
 using M365Provisioning.SharePoint;
 using M365Provisioning.SharePoint.Functions;
 using Microsoft.SharePoint.Client;
+using System.Collections.Generic;
 using WriteDataToJsonFiles;
 
 namespace M365Provisioning.Test
 {
-    public class SharePointTest
+    public class SharePointFunctionsTest
     {
         private ISharePointFunctions SharePointFunctions { get; } = new SharePointFunctions();
 

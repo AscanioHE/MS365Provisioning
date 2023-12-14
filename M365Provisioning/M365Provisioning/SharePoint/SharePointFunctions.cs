@@ -59,7 +59,12 @@ namespace M365Provisioning.SharePoint
 
             try
             {
-                WriteDataToJsonFile writeDataToJson = new(jsonFilePath);
+
+                WriteDataToJsonFile writeDataToJson = new()
+                {
+                    DtoFile = webTemplatesDto,
+                    JsonFilePath = SharePointServices.SiteSettingsFilePath
+                };
                 writeDataToJson.Write2JsonFile();
             }
             catch (Exception ex)
@@ -179,6 +184,13 @@ namespace M365Provisioning.SharePoint
                         throw;
                     }
                 }
+
+                WriteDataToJsonFile writeDataToJson = new()
+                {
+                    DtoFile = listDtos,
+                    JsonFilePath = SharePointServices.ListsFilePath
+                };
+                writeDataToJson.Write2JsonFile();
             }
             catch (Exception ex)
             {

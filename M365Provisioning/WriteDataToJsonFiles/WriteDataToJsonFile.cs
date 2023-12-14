@@ -9,9 +9,8 @@ namespace WriteDataToJsonFiles
     {
         public object DtoFile { get; set; } = new();
 
-        public WriteDataToJsonFile(string jsonFilePath)
+        public WriteDataToJsonFile()
         {
-            JsonFilePath = jsonFilePath;
         }
 
         public string JsonFilePath { get; set; }
@@ -33,7 +32,7 @@ namespace WriteDataToJsonFiles
             try
             {
                 string json = JsonConvert.SerializeObject(DtoFile, Formatting.Indented);
-                File.WriteAllText("lists.json", json + Environment.NewLine);
+                File.WriteAllText(JsonFilePath, json + Environment.NewLine);
                 return json;
             }
             catch (Exception ex)
