@@ -27,6 +27,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\M365Provisioning\M365Provisioning.csproj" />
+    <ProjectReference Include="..\WriteDataToJsonFiles\WriteDataToJsonFiles.csproj" />
   </ItemGroup>
 
 </Project>

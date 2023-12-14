@@ -12,7 +12,7 @@
 
   <ItemGroup>
     <Content Include="SharePoint\AppSettings\appsettings.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
 
@@ -52,16 +52,17 @@
     <Compile Update="SharePoint\Interfaces\ISharePointServices.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
-    <Compile Update="SharePoint\Interfaces\IWriteDataToJson.cs">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Compile>
-    <Compile Update="SharePoint\Services\SharePointServices.cs">
+    <Compile Update="SharePoint\Functions\SharePointServices.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="SharePoint\JsonFiles\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\WriteDataToJsonFiles\WriteDataToJsonFiles.csproj" />
   </ItemGroup>
 
 </Project>

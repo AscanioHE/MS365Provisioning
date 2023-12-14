@@ -1,14 +1,14 @@
 using M365Provisioning.SharePoint.DTO;
 using M365Provisioning.SharePoint.Functions;
 using M365Provisioning.SharePoint.Interfaces;
-using M365Provisioning.SharePoint.Services;
 using Microsoft.SharePoint.Client;
+using WriteDataToJsonFiles;
 
 namespace M365Provisioning.Test
 {
     public class SharePointTest
     {
-        private ISharePointFunctions SharePointFunctions { get; set; } = new SharePointFunctions();
+        private ISharePointFunctions SharePointFunctions { get; } = new SharePointFunctions();
 
         [Fact]
         public void Try_GetClientContext_Expect_ClientContext()
@@ -38,6 +38,6 @@ namespace M365Provisioning.Test
             Assert.NotEmpty(listDtos);
             Assert.IsType<List<ListDto>>(listDtos);
         }
-
     }
+
 }
