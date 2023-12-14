@@ -2,6 +2,7 @@
 using M365Provisioning.SharePoint;
 using WriteDataToJsonFiles;
 using Newtonsoft.Json;
+using System.IO;
 
 namespace M365Provisioning.Test;
 

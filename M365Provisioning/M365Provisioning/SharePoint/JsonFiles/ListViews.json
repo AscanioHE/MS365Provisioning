@@ -1,0 +1,478 @@
+[
+  {
+    "ListName": "Documenten",
+    "ViewName": "Alle documenten",
+    "DefaultView": true,
+    "ViewFields": [
+      "DocIcon",
+      "LinkFilename",
+      "Modified",
+      "Editor"
+    ],
+    "RowLimit": 30,
+    "ListScope": "DefaultValue",
+    "JsonFormatterFile": "Documenten.json"
+  },
+  {
+    "ListName": "Documenten",
+    "ViewName": "Documenten opnieuw koppelen",
+    "DefaultView": false,
+    "ViewFields": [
+      "DocIcon",
+      "LinkFilenameNoMenu",
+      "RepairDocument",
+      "Modified",
+      "Editor",
+      "ContentType",
+      "TemplateUrl"
+    ],
+    "RowLimit": 30,
+    "ListScope": "DefaultValue",
+    "JsonFormatterFile": "Documenten.json"
+  },
+  {
+    "ListName": "Documenten",
+    "ViewName": "assetLibTemp",
+    "DefaultView": false,
+    "ViewFields": [
+      "LinkFilename"
+    ],
+    "RowLimit": 20,
+    "ListScope": "DefaultValue",
+    "JsonFormatterFile": "Documenten.json"
+  },
+  {
+    "ListName": "Documenten",
+    "ViewName": "Documenten samenvoegen",
+    "DefaultView": false,
+    "ViewFields": [
+      "DocIcon",
+      "LinkFilename",
+      "Combine",
+      "Modified",
+      "Editor"
+    ],
+    "RowLimit": 30,
+    "ListScope": "DefaultValue",
+    "JsonFormatterFile": "Documenten.json"
+  },
+  {
+    "ListName": "DocumentLibraryTest",
+    "ViewName": "Alle documenten",
+    "DefaultView": false,
+    "ViewFields": [
+      "DocIcon",
+      "LinkFilename",
+      "Modified",
+      "Editor"
+    ],
+    "RowLimit": 30,
+    "ListScope": "DefaultValue",
+    "JsonFormatterFile": "DocumentLibraryTest.json"
+  },
+  {
+    "ListName": "DocumentLibraryTest",
+    "ViewName": "Documenten samenvoegen",
+    "DefaultView": false,
+    "ViewFields": [
+      "DocIcon",
+      "LinkFilename",
+      "Combine",
+      "Modified",
+      "Editor"
+    ],
+    "RowLimit": 30,
+    "ListScope": "DefaultValue",
+    "JsonFormatterFile": "DocumentLibraryTest.json"
+  },
+  {
+    "ListName": "DocumentLibraryTest",
+    "ViewName": "Documenten opnieuw koppelen",
+    "DefaultView": false,
+    "ViewFields": [
+      "DocIcon",
+      "LinkFilenameNoMenu",
+      "RepairDocument",
+      "Modified",
+      "Editor",
+      "ContentType",
+      "TemplateUrl"
+    ],
+    "RowLimit": 30,
+    "ListScope": "DefaultValue",
+    "JsonFormatterFile": "DocumentLibraryTest.json"
+  },
+  {
+    "ListName": "DocumentLibraryTest",
+    "ViewName": "assetLibTemp",
+    "DefaultView": false,
+    "ViewFields": [
+      "LinkFilename"
+    ],
+    "RowLimit": 20,
+    "ListScope": "DefaultValue",
+    "JsonFormatterFile": "DocumentLibraryTest.json"
+  },
+  {
+    "ListName": "DocumentLibraryTest",
+    "ViewName": "DefaultVieuw",
+    "DefaultView": true,
+    "ViewFields": [
+      "DocIcon",
+      "LinkFilename",
+      "Modified",
+      "Editor",
+      "TestColumn"
+    ],
+    "RowLimit": 30,
+    "ListScope": "DefaultValue",
+    "JsonFormatterFile": "DocumentLibraryTest.json"
+  },
+  {
+    "ListName": "Formuliersjablonen",
+    "ViewName": "Alle documenten",
+    "DefaultView": false,
+    "ViewFields": [
+      "DocIcon",
+      "LinkFilename",
+      "Modified",
+      "Editor"
+    ],
+    "RowLimit": 30,
+    "ListScope": "DefaultValue",
+    "JsonFormatterFile": "Formuliersjablonen.json"
+  },
+  {
+    "ListName": "Formuliersjablonen",
+    "ViewName": "Documenten samenvoegen",
+    "DefaultView": false,
+    "ViewFields": [
+      "DocIcon",
+      "LinkFilename",
+      "Combine",
+      "Modified",
+      "Editor"
+    ],
+    "RowLimit": 30,
+    "ListScope": "DefaultValue",
+    "JsonFormatterFile": "Formuliersjablonen.json"
+  },
+  {
+    "ListName": "Formuliersjablonen",
+    "ViewName": "Documenten opnieuw koppelen",
+    "DefaultView": false,
+    "ViewFields": [
+      "DocIcon",
+      "LinkFilenameNoMenu",
+      "RepairDocument",
+      "Modified",
+      "Editor",
+      "ContentType",
+      "TemplateUrl"
+    ],
+    "RowLimit": 30,
+    "ListScope": "DefaultValue",
+    "JsonFormatterFile": "Formuliersjablonen.json"
+  },
+  {
+    "ListName": "Formuliersjablonen",
+    "ViewName": "assetLibTemp",
+    "DefaultView": false,
+    "ViewFields": [
+      "LinkFilename"
+    ],
+    "RowLimit": 20,
+    "ListScope": "DefaultValue",
+    "JsonFormatterFile": "Formuliersjablonen.json"
+  },
+  {
+    "ListName": "Formuliersjablonen",
+    "ViewName": "Alle formulieren",
+    "DefaultView": true,
+    "ViewFields": [
+      "DocIcon",
+      "LinkFilename",
+      "FormName",
+      "FormDescription"
+    ],
+    "RowLimit": 30,
+    "ListScope": "DefaultValue",
+    "JsonFormatterFile": "Formuliersjablonen.json"
+  },
+  {
+    "ListName": "Gebeurtenissen",
+    "ViewName": "Alle gebeurtenissen",
+    "DefaultView": false,
+    "ViewFields": [
+      "fRecurrence",
+      "WorkspaceLink",
+      "LinkTitle",
+      "Location",
+      "EventDate",
+      "EndDate",
+      "fAllDayEvent"
+    ],
+    "RowLimit": 30,
+    "ListScope": "DefaultValue",
+    "JsonFormatterFile": "Gebeurtenissen.json"
+  },
+  {
+    "ListName": "Gebeurtenissen",
+    "ViewName": "Agenda",
+    "DefaultView": true,
+    "ViewFields": [
+      "EventDate",
+      "EndDate",
+      "fRecurrence",
+      "EventType",
+      "WorkspaceLink",
+      "Title",
+      "Location",
+      "Description",
+      "Workspace",
+      "MasterSeriesItemID",
+      "fAllDayEvent"
+    ],
+    "RowLimit": 30,
+    "ListScope": "DefaultValue",
+    "JsonFormatterFile": "Gebeurtenissen.json"
+  },
+  {
+    "ListName": "Gebeurtenissen",
+    "ViewName": "Huidige gebeurtenissen",
+    "DefaultView": false,
+    "ViewFields": [
+      "fRecurrence",
+      "WorkspaceLink",
+      "LinkTitle",
+      "Location",
+      "EventDate",
+      "EndDate",
+      "fAllDayEvent"
+    ],
+    "RowLimit": 30,
+    "ListScope": "DefaultValue",
+    "JsonFormatterFile": "Gebeurtenissen.json"
+  },
+  {
+    "ListName": "Siteactiva",
+    "ViewName": "Alle documenten",
+    "DefaultView": true,
+    "ViewFields": [
+      "DocIcon",
+      "LinkFilename",
+      "Modified",
+      "Editor"
+    ],
+    "RowLimit": 30,
+    "ListScope": "DefaultValue",
+    "JsonFormatterFile": "Siteactiva.json"
+  },
+  {
+    "ListName": "Siteactiva",
+    "ViewName": "Documenten samenvoegen",
+    "DefaultView": false,
+    "ViewFields": [
+      "DocIcon",
+      "LinkFilename",
+      "Combine",
+      "Modified",
+      "Editor"
+    ],
+    "RowLimit": 30,
+    "ListScope": "DefaultValue",
+    "JsonFormatterFile": "Siteactiva.json"
+  },
+  {
+    "ListName": "Siteactiva",
+    "ViewName": "Documenten opnieuw koppelen",
+    "DefaultView": false,
+    "ViewFields": [
+      "DocIcon",
+      "LinkFilenameNoMenu",
+      "RepairDocument",
+      "Modified",
+      "Editor",
+      "ContentType",
+      "TemplateUrl"
+    ],
+    "RowLimit": 30,
+    "ListScope": "DefaultValue",
+    "JsonFormatterFile": "Siteactiva.json"
+  },
+  {
+    "ListName": "Siteactiva",
+    "ViewName": "assetLibTemp",
+    "DefaultView": false,
+    "ViewFields": [
+      "LinkFilename"
+    ],
+    "RowLimit": 20,
+    "ListScope": "DefaultValue",
+    "JsonFormatterFile": "Siteactiva.json"
+  },
+  {
+    "ListName": "Sitepagina's",
+    "ViewName": "Op auteur",
+    "DefaultView": true,
+    "ViewFields": [
+      "DocIcon",
+      "LinkFilename",
+      "Editor",
+      "Modified",
+      "Created"
+    ],
+    "RowLimit": 30,
+    "ListScope": "DefaultValue",
+    "JsonFormatterFile": "Sitepagina's.json"
+  },
+  {
+    "ListName": "Sitepagina's",
+    "ViewName": "Alle pagina's",
+    "DefaultView": false,
+    "ViewFields": [
+      "DocIcon",
+      "LinkFilename",
+      "Editor",
+      "Modified",
+      "Author",
+      "Created"
+    ],
+    "RowLimit": 30,
+    "ListScope": "DefaultValue",
+    "JsonFormatterFile": "Sitepagina's.json"
+  },
+  {
+    "ListName": "Sitepagina's",
+    "ViewName": "Door editor",
+    "DefaultView": false,
+    "ViewFields": [
+      "DocIcon",
+      "LinkFilename",
+      "Editor",
+      "Modified",
+      "Author",
+      "Created"
+    ],
+    "RowLimit": 30,
+    "ListScope": "DefaultValue",
+    "JsonFormatterFile": "Sitepagina's.json"
+  },
+  {
+    "ListName": "Sitepagina's",
+    "ViewName": "Recente wijzigingen",
+    "DefaultView": false,
+    "ViewFields": [
+      "DocIcon",
+      "LinkFilename",
+      "Editor",
+      "Modified",
+      "Author",
+      "Created"
+    ],
+    "RowLimit": 30,
+    "ListScope": "DefaultValue",
+    "JsonFormatterFile": "Sitepagina's.json"
+  },
+  {
+    "ListName": "Sitepagina's",
+    "ViewName": "Gemaakt door mij",
+    "DefaultView": false,
+    "ViewFields": [
+      "DocIcon",
+      "LinkFilename",
+      "Editor",
+      "Modified",
+      "Author",
+      "Created"
+    ],
+    "RowLimit": 30,
+    "ListScope": "DefaultValue",
+    "JsonFormatterFile": "Sitepagina's.json"
+  },
+  {
+    "ListName": "Sitepagina's",
+    "ViewName": "",
+    "DefaultView": false,
+    "ViewFields": [
+      "DocIcon",
+      "LinkFilename",
+      "Editor",
+      "Modified",
+      "Created"
+    ],
+    "RowLimit": 30,
+    "ListScope": "DefaultValue",
+    "JsonFormatterFile": "Sitepagina's.json"
+  },
+  {
+    "ListName": "Stijlbibliotheek",
+    "ViewName": "Alle documenten",
+    "DefaultView": true,
+    "ViewFields": [
+      "DocIcon",
+      "LinkFilename",
+      "Modified",
+      "Editor"
+    ],
+    "RowLimit": 30,
+    "ListScope": "DefaultValue",
+    "JsonFormatterFile": "Stijlbibliotheek.json"
+  },
+  {
+    "ListName": "Stijlbibliotheek",
+    "ViewName": "Documenten opnieuw koppelen",
+    "DefaultView": false,
+    "ViewFields": [
+      "DocIcon",
+      "LinkFilenameNoMenu",
+      "RepairDocument",
+      "Modified",
+      "Editor",
+      "ContentType",
+      "TemplateUrl"
+    ],
+    "RowLimit": 30,
+    "ListScope": "DefaultValue",
+    "JsonFormatterFile": "Stijlbibliotheek.json"
+  },
+  {
+    "ListName": "Stijlbibliotheek",
+    "ViewName": "assetLibTemp",
+    "DefaultView": false,
+    "ViewFields": [
+      "LinkFilename"
+    ],
+    "RowLimit": 20,
+    "ListScope": "DefaultValue",
+    "JsonFormatterFile": "Stijlbibliotheek.json"
+  },
+  {
+    "ListName": "Stijlbibliotheek",
+    "ViewName": "Documenten samenvoegen",
+    "DefaultView": false,
+    "ViewFields": [
+      "DocIcon",
+      "LinkFilename",
+      "Combine",
+      "Modified",
+      "Editor"
+    ],
+    "RowLimit": 30,
+    "ListScope": "DefaultValue",
+    "JsonFormatterFile": "Stijlbibliotheek.json"
+  },
+  {
+    "ListName": "TestList",
+    "ViewName": "All Items",
+    "DefaultView": true,
+    "ViewFields": [
+      "LinkTitle",
+      "name",
+      "taxonomy"
+    ],
+    "RowLimit": 30,
+    "ListScope": "DefaultValue",
+    "JsonFormatterFile": "TestList.json"
+  }
+]

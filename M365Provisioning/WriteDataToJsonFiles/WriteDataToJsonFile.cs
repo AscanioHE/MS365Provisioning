@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Dynamic;
+using System.Reflection;
 using Newtonsoft.Json;
 using File = System.IO.File;
 
@@ -27,8 +28,11 @@ namespace WriteDataToJsonFiles
         {
             try
             {
+                Directory.SetCurrentDirectory(@"C:\Projects\Repos\MS365 Provisioning Engine\M365Provisioning\M365Provisioning");
+                string jsonFile = JsonFilePath;
+                JsonFilePath += $"{jsonFile}";
                 string json = JsonConvert.SerializeObject(DtoFile, Formatting.Indented);
-                File.WriteAllText(JsonFilePath, json + Environment.NewLine);
+                File.WriteAllText(jsonFile, json + Environment.NewLine);
                 return json;
             }
             catch (Exception ex)

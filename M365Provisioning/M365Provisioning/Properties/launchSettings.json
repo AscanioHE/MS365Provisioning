@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "M365Provisioning": {
+      "commandName": "Project",
+      "workingDirectory": "C:\\Projects\\Repos\\MS365 Provisioning Engine\\M365Provisioning\\M365Provisioning"
+    }
+  }
+}
