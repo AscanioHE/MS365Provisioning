@@ -51,7 +51,7 @@ namespace M365Provisioning.SharePoint.Functions
 
             try
             {
-                WriteDataToJsonFile writeDataToJson = new (jsonFilePath)
+                WriteDataToJsonFile writeDataToJson = new ()
                 {
                     DtoFile = webTemplatesDto,
                     JsonFilePath = jsonFilePath
@@ -143,7 +143,7 @@ namespace M365Provisioning.SharePoint.Functions
                     Guid enterpriseKeywordsValue;
                     try
                     {
-                        enterpriseKeywordsValue = GetEnterpriseKeywordsValue(list, context);
+                        enterpriseKeywordsValue = GetEnterpriseKeywordsValue(context);
                     }catch (Exception ex)
                     {
                         Console.WriteLine($"Error collecting EnterpriseKeywordsValue : {ex.Message}");
@@ -217,7 +217,7 @@ namespace M365Provisioning.SharePoint.Functions
             return quickLaunchHeaders;
         }
 
-        private Guid GetEnterpriseKeywordsValue(List list, ClientContext context)
+        private Guid GetEnterpriseKeywordsValue(ClientContext context)
         {
             Guid enterpriseKeywordsValue = Guid.Empty;
 

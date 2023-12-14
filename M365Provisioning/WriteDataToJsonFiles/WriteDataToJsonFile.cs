@@ -12,10 +12,8 @@ namespace WriteDataToJsonFiles
         public string JsonFilePath { get; set; }
         public string JsonString { get; set; }
 
-        public WriteDataToJsonFile(string jsonFilePath)
+        public WriteDataToJsonFile()
         {
-            
-            JsonFilePath = jsonFilePath;
             JsonString = ConvertDtoToString();
         }
 
