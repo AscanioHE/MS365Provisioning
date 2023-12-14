@@ -38,6 +38,16 @@ namespace M365Provisioning.Test
             Assert.NotEmpty(listDtos);
             Assert.IsType<List<ListsSettingsDto>>(listDtos);
         }
+
+        [Fact]
+        public void Try_ListViews_Expect_DTO()
+        {
+            //Act
+            List<ListViewDto> ListViewDtos = SharePointFunctions.LoadListViews();
+            //Assert
+            Assert.NotEmpty(ListViewDtos);
+            Assert.IsType<ListViewDto>(ListViewDtos);
+        }
     }
 
 }

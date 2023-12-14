@@ -14,6 +14,8 @@ using Field = Microsoft.SharePoint.Client.Field;
 using NavigationNode = Microsoft.SharePoint.Client.NavigationNode;
 using RoleAssignment = Microsoft.SharePoint.Client.RoleAssignment;
 using RoleDefinition = Microsoft.SharePoint.Client.RoleDefinition;
+using View = Microsoft.SharePoint.Client.View;
+using ViewCollection = Microsoft.SharePoint.Client.ViewCollection;
 
 namespace M365Provisioning.SharePoint
 {
@@ -322,21 +324,59 @@ namespace M365Provisioning.SharePoint
         }
 
         /*______________________________________________________________________________________________
-         Collect Site Settings information
+         Collect Listview information
          _______________________________________________________________________________________________*/
         public List<ListViewDto> LoadListViews()
         {
-            List<ListViewDto> listViewDtos = new();
+            List<ListViewDto> listViewDtos = new(); 
+            ClientContext context = new SharePointServices().GetClientContext();
             try
             {
-
+                ListCollection listViewlists = context.Web.Lists;
+                context.Load(listViewlists,
+                    lc => lc.Where(
+                        l => l.Hidden == false));
+                context.ExecuteQuery();
+                foreach (List list in listViewlists)
+                {
+                    
+                }
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"Error loading ClientContext : {ex.Message}");
                 throw;
             }
+            finally
+            {
+                context.Dispose();
+            }
             return listViewDtos;
+        }
+
+        private List<ListViewDto> GetListViews(ClientContext context, List list)
+        {
+            List<ListViewDto> listViewDtos = new();
+            ViewCollection listViews = list.Views;
+            context.Load(listViews);
+            try
+            {
+                foreach (View listView in listViews)
+                {
+                    context.Load(listView,
+                                    lv => lv.Title,
+                                    lv =>lv.DefaultView,
+                                    lv=>lv.RowLimit,
+                                    lv => lv.RowLimit,
+                                    lv=> lv.Scope);
+                }
+                return listViewDtos;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error loading Listviews : {ex.Message}");
+                throw;
+            }
         }
     }
 }

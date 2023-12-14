@@ -8,7 +8,7 @@ namespace WriteDataToJsonFiles
     public class WriteDataToJsonFile : IWriteDataToJson
     {
         public object DtoFile { get; set; } = new();
-        public string JsonFilePath { get; set; } = String.Empty;
+        public string JsonFilePath { get; set; } = "TempJsonFile";
 
         public string ConvertDtoToString()
         {

@@ -8,5 +8,5 @@ public interface ISharePointFunctions
 {
    List<SiteSettingsDto> LoadSiteSettings();
    List<ListsSettingsDto> LoadListsSettings();
-
+   List<ListViewDto> LoadListViews();
 }
