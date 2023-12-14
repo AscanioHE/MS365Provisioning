@@ -24,7 +24,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="SharePoint\SharePointSettingsDTO.cs">
+    <Compile Update="SharePoint\ListsSettingsDTO.cs">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Compile>
+    <Compile Update="SharePoint\SiteSettingsDTO.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
     <Compile Update="SharePoint\SharePointFunctions.cs">
