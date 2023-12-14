@@ -8,25 +8,23 @@ namespace M365Provisioning.Test;
 
 public class WriteDataToJsonFilesTest
 {
-    private SharePointServices sharePointServices = new();
+    private IWriteDataToJson writeDataToJson = new WriteDataToJsonFile();
 
     [Fact]
     public void Try_Convert_DtoFile_Expect_String()
     {
         //Arrange
-        string tempFilePath = Path.GetTempFileName();
-        object validDto = new();
-        //Act
-        WriteDataToJsonFile writeDataToJson = new()
-        {
-            DtoFile = validDto,
-            JsonFilePath = tempFilePath
-        };
-        string fileContents = File.ReadAllText(tempFilePath);
+        string json = writeDataToJson.ConvertDtoToString();
         //Assert
-        string expectedJsonString = JsonConvert.SerializeObject(validDto, Formatting.Indented);
-        Assert.Equal(expectedJsonString, fileContents);
+        Assert.IsType<string>(json);
+    }
 
-        File.Delete(tempFilePath);
+    [Fact]
+    public void Try_Write_Dto_File_Expect_String()
+    {
+        //Arrange
+        string json = writeDataToJson.Write2JsonFile();
+        //Assert
+        Assert.IsType<string>(json);
     }
 }

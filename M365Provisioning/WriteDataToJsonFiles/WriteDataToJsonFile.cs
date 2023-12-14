@@ -23,12 +23,13 @@ namespace WriteDataToJsonFiles
             
             return jsonString;
         }
-        public void Write2JsonFile()
+        public string Write2JsonFile()
         {
             try
             {
                 string json = JsonConvert.SerializeObject(DtoFile, Formatting.Indented);
                 File.WriteAllText(JsonFilePath, json + Environment.NewLine);
+                return json;
             }
             catch (Exception ex)
             {
