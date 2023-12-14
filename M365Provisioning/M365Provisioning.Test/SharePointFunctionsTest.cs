@@ -1,13 +1,13 @@
 using M365Provisioning.SharePoint;
 using Microsoft.SharePoint.Client;
 using System.Collections.Generic;
-using WriteDataToJsonFiles;
+using Xunit;
 
 namespace M365Provisioning.Test
 {
     public class SharePointFunctionsTest
     {
-        private ISharePointFunctions SharePointFunctions { get; } = new SharePointFunctions();
+        private ISharePointFunctions SharePointFunctions { get; set; } = new SharePointFunctions();
 
         [Fact]
         public void Try_GetClientContext_Expect_ClientContext()

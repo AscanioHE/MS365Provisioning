@@ -3,12 +3,9 @@ using System.Diagnostics;
 using WriteDataToJsonFiles;
 using Microsoft.SharePoint.Client;
 using System.Text;
-using M365Provisioning.SharePoint;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection.Metadata.Ecma335;
-using PnP.Framework.Provisioning.Model;
 using ContentType = Microsoft.SharePoint.Client.ContentType;
 using Field = Microsoft.SharePoint.Client.Field;
 using NavigationNode = Microsoft.SharePoint.Client.NavigationNode;
@@ -16,16 +13,15 @@ using RoleAssignment = Microsoft.SharePoint.Client.RoleAssignment;
 using RoleDefinition = Microsoft.SharePoint.Client.RoleDefinition;
 using View = Microsoft.SharePoint.Client.View;
 using ViewCollection = Microsoft.SharePoint.Client.ViewCollection;
-using Microsoft.Graph;
 using FieldCollection = Microsoft.SharePoint.Client.FieldCollection;
 using List = Microsoft.SharePoint.Client.List;
-using Site = Microsoft.Graph.Site;
 
 namespace M365Provisioning.SharePoint
 {
     public class SharePointFunctions : ISharePointFunctions
     {
         private ISharePointServices SharePointServices { get; } = new SharePointServices();
+        private ClientContext Context { get; set; } = new SharePointServices().Context;
 
         /*______________________________________________________________________________________________
          Collect Site Settings information
@@ -33,16 +29,16 @@ namespace M365Provisioning.SharePoint
         public List<SiteSettingsDto> LoadSiteSettings()
         {
             List<SiteSettingsDto> webTemplatesDto = new();
-            ClientContext context = SharePointServices.GetClientContext();
-            Web web = context.Web;
-            context.Load(web);
+            Context = SharePointServices.GetClientContext();
+            Web web = Context.Web;
+            Context.Load(web);
             try
             {
-                context.ExecuteQuery();
+                Context.ExecuteQuery();
 
                 WebTemplateCollection webTemplateCollection = web.GetAvailableWebTemplates(1033, true);
-                context.Load(webTemplateCollection);
-                context.ExecuteQuery();
+                Context.Load(webTemplateCollection);
+                Context.ExecuteQuery();
 
 
                 foreach (WebTemplate template in webTemplateCollection)
@@ -62,7 +58,7 @@ namespace M365Provisioning.SharePoint
             }
             finally
             {
-                context.Dispose();
+                Context.Dispose();
             }
 
             try
@@ -88,28 +84,27 @@ namespace M365Provisioning.SharePoint
         public List<ListsSettingsDto> LoadListsSettings()
         {
             List<ListsSettingsDto> listDtos = new();
-            ClientContext context;
             try
             {
-                context = SharePointServices.GetClientContext();
+                Context = SharePointServices.GetClientContext();
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"Error fetching ClientContext {ex.Message}");
                 throw;
             }
-            ListCollection listCollection = context.Web.Lists;
-            context.Load(context.Web.Navigation,
+            ListCollection listCollection = Context.Web.Lists;
+            Context.Load(Context.Web.Navigation,
                         n => n.QuickLaunch);
-            context.Load(listCollection,
+            Context.Load(listCollection,
                          lc => lc.Where(
                                                                     l => l.Hidden == false));
             try
             {
-                context.ExecuteQuery();
+                Context.ExecuteQuery();
                 foreach (List list in listCollection)
                 {
-                    context.Load
+                    Context.Load
                     (
                         list,
                         l => l.Title,
@@ -123,10 +118,10 @@ namespace M365Provisioning.SharePoint
                             f => f.Title
                         )
                     );
-                    context.Load(list.Fields);
+                    Context.Load(list.Fields);
                     try
                     {
-                        context.ExecuteQuery();
+                        Context.ExecuteQuery();
                     }
                     catch (Exception ex)
                     {
@@ -152,7 +147,7 @@ namespace M365Provisioning.SharePoint
                         IQueryable<RoleAssignment> queryForList = list.RoleAssignments.Include(
                             roleAsg => roleAsg.Member,
                             roleAsg => roleAsg.RoleDefinitionBindings.Include(roleDef => roleDef.Name));
-                        listPermissions = GetPermissionDetails(context, queryForList);
+                        listPermissions = GetPermissionDetails(Context, queryForList);
                     }
                     catch (Exception ex)
                     {
@@ -163,7 +158,7 @@ namespace M365Provisioning.SharePoint
                     Guid enterpriseKeywordsValue;
                     try
                     {
-                        enterpriseKeywordsValue = GetEnterpriseKeywordsValue(context);
+                        enterpriseKeywordsValue = GetEnterpriseKeywordsValue();
                     }
                     catch (Exception ex)
                     {
@@ -171,7 +166,7 @@ namespace M365Provisioning.SharePoint
                         throw;
                     }
 
-                    List<string> quickLaunchHeaders = GetQuickLaunchHeaders(context);
+                    List<string> quickLaunchHeaders = GetQuickLaunchHeaders();
                     try
                     {
                         listDtos.Add(new ListsSettingsDto
@@ -206,25 +201,25 @@ namespace M365Provisioning.SharePoint
             }
             finally
             {
-                context.Dispose();
+                Context.Dispose();
             }
 
             return listDtos;
         }
 
-        private List<string> GetQuickLaunchHeaders(ClientContext context)
+        private List<string> GetQuickLaunchHeaders()
         {
             List<string> quickLaunchHeaders = new();
-            foreach (NavigationNode navigationNode in context.Web.Navigation.QuickLaunch)
+            foreach (NavigationNode navigationNode in Context.Web.Navigation.QuickLaunch)
             {
-                context.Load
+                Context.Load
                 (
                     navigationNode,
                     n => n.Children
                 );
                 try
                 {
-                    context.ExecuteQuery();
+                    Context.ExecuteQuery();
                     foreach (NavigationNode childNode in navigationNode.Children)
                     {
                         quickLaunchHeaders.Add(childNode.Title);
@@ -240,18 +235,18 @@ namespace M365Provisioning.SharePoint
             return quickLaunchHeaders;
         }
 
-        private Guid GetEnterpriseKeywordsValue(ClientContext context)
+        private Guid GetEnterpriseKeywordsValue()
         {
             Guid enterpriseKeywordsValue = Guid.Empty;
 
             try
             {
-                Field enterpriseKeywords = context.Web.Fields.GetByInternalNameOrTitle("EnterpriseKeywords");
+                Field enterpriseKeywords = Context.Web.Fields.GetByInternalNameOrTitle("EnterpriseKeywords");
 
                 if (enterpriseKeywords != null)
                 {
-                    context.Load(enterpriseKeywords);
-                    context.ExecuteQuery();
+                    Context.Load(enterpriseKeywords);
+                    Context.ExecuteQuery();
                     enterpriseKeywordsValue = enterpriseKeywords.Id;
                 }
             }
@@ -399,7 +394,7 @@ namespace M365Provisioning.SharePoint
          _______________________________________________________________________________________________*/
         public List<SiteColumnsDto> LoadSiteColumnsDtos()
         {
-            List<SiteColumnsDto> siteColumnsDtos = new List<SiteColumnsDto>();
+            List<SiteColumnsDto> siteColumnsDtos = new();
             ClientContext context = SharePointServices.GetClientContext();
             try
             {
@@ -430,7 +425,7 @@ namespace M365Provisioning.SharePoint
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Error fetching ContextClient");
+                Debug.WriteLine($"Error fetching ContextClient :  {ex.Message}");
                 throw;
             }
             finally

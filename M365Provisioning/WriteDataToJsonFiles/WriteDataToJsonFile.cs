@@ -1,6 +1,8 @@
 ﻿using System.Diagnostics;
 using System.Dynamic;
 using System.Reflection;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration.Json;
 using Newtonsoft.Json;
 using File = System.IO.File;
 
@@ -8,8 +10,19 @@ namespace WriteDataToJsonFiles
 {
     public class WriteDataToJsonFile : IWriteDataToJson
     {
+        public WriteDataToJsonFile()
+        {
+            string appSettingsPath = "appsettings.json";
+            IConfigurationRoot configuration = new ConfigurationBuilder()
+                .AddJsonFile(appSettingsPath, optional: false, reloadOnChange: true)
+                .Build();
+            WorkingDirectory = configuration["SharePoint:WorkingDirectoryPath"]!;
+            Directory.SetCurrentDirectory(WorkingDirectory);
+        }
+
         public object DtoFile { get; set; } = new();
         public string JsonFilePath { get; set; } = "TempJsonFile";
+        public string WorkingDirectory { get; set; }
 
         public string ConvertDtoToString()
         {
@@ -28,7 +41,6 @@ namespace WriteDataToJsonFiles
         {
             try
             {
-                Directory.SetCurrentDirectory(@"C:\Projects\Repos\MS365 Provisioning Engine\M365Provisioning\M365Provisioning");
                 string jsonFile = JsonFilePath;
                 JsonFilePath += $"{jsonFile}";
                 string json = JsonConvert.SerializeObject(DtoFile, Formatting.Indented);
