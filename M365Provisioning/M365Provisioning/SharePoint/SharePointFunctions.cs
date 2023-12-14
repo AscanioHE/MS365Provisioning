@@ -434,6 +434,46 @@ namespace M365Provisioning.SharePoint
             }
         }
         /*______________________________________________________________________________________________
+         Flect contenttypes
+         _______________________________________________________________________________________________*/
+        public List<ContentTypesDto> LoadContentTypes()
+        {
+            List<ContentTypesDto> contentTypesDtos = new();
+            try
+            {
+                ListCollection listCollection = Context.Web.Lists;
+                Context.Load(listCollection,
+                             lc =>lc.Include(
+                                                                        l=> l.Hidden == false,
+                                                                        l=> l.ContentTypes,
+                                                                        l=> l.ContentTypes.Include(
+                                                                                                        ct => ct.Name,
+                                                                                                        ct=> ct.Parent,
+                                                                                                        ct=>ct.Required
+                                                                                                        )));
+                Context.ExecuteQuery();
+                foreach (List list in listCollection)
+                {
+                    foreach (ContentType contentType in list.ContentTypes)
+                    {
+                        contentTypesDtos.Add(new(
+                        {
+                            FieldTitle = contentType.Name,
+                            ParentCt = contentType.Parent.ToString(),
+                            Required = contentType
+
+                        }));
+                    }
+                }
+                return contentTypesDtos;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error fetching ContentTypes : {ex.Message}");
+                throw;
+            }
+        }
+        /*______________________________________________________________________________________________
          Write all data to json file
          _______________________________________________________________________________________________*/
         private void WriteDataToJsonFile(string filePath, object jsonFile)
