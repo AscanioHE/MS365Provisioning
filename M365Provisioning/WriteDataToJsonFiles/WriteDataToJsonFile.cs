@@ -19,22 +19,39 @@ namespace WriteDataToJsonFiles
 
         public string ConvertDtoToString()
         {
-            string jsonString = JsonConvert.SerializeObject(DtoFile, Formatting.Indented);
-            
-            return jsonString;
+            try
+            {
+                string jsonString = JsonConvert.SerializeObject(DtoFile, Formatting.Indented);
+                return jsonString;
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error creating Json String : {ex.Message}");
+                throw;
+            }
         }
         public string Write2JsonFile()
         {
             try
             {
                 string json = JsonConvert.SerializeObject(DtoFile, Formatting.Indented);
-                File.WriteAllText(JsonFilePath, json + Environment.NewLine);
-                return json;
+                try
+                {
+                    File.WriteAllText(JsonFilePath, json + Environment.NewLine);
+                    return json;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error Writing Json String to file : {ex.Message}");
+                    throw;
+                }
             }
             catch (Exception ex)
             {
                 // Log or print the exception details for debugging
-                Debug.WriteLine($"Error serializing WebTemplate : {ex.Message}");
+                Debug.WriteLine($"Error creating Json String : {ex.Message}");
+                return string.Empty;
             }
         }
     }
