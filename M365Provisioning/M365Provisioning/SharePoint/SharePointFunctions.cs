@@ -6,6 +6,7 @@ using System.Text;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using MS365Provisioning.SharePoint.Model;
 using ContentType = Microsoft.SharePoint.Client.ContentType;
 using Field = Microsoft.SharePoint.Client.Field;
 using NavigationNode = Microsoft.SharePoint.Client.NavigationNode;
@@ -358,8 +359,8 @@ namespace M365Provisioning.SharePoint
                         Context.ExecuteQuery();
 
                         listViewsDtos.Add(new ListViewDto(
-                            list.Title,listView.Title,listView.DefaultView,listView.ViewFields,listView.RowLimit,
-                            listView.Scope.ToString(),$"{list.Title}.json"));
+                            list.Title,listView.Title,listView.DefaultView,new List<string>(),listView.RowLimit,
+                            listView.Scope.ToString(),$"{list.Title}.json"));//listView.ViewFields
                     }
                     catch (Exception ex)
                     {

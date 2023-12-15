@@ -2,6 +2,7 @@
 using Microsoft.SharePoint.Client;
 using PnP.Framework.Provisioning.Model;
 using System.Collections.Generic;
+using MS365Provisioning.SharePoint.Model;
 
 namespace M365Provisioning.SharePoint;
 

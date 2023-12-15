@@ -1,8 +1,4 @@
-﻿using Microsoft.SharePoint.Client;
-using System;
-using System.Collections.Generic;
-
-namespace M365Provisioning.SharePoint
+﻿namespace MS365Provisioning.SharePoint.Model
 {
     public class FolderStructureDto
     {

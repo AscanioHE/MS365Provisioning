@@ -1,4 +1,4 @@
-﻿namespace M365Provisioning.SharePoint;
+﻿namespace MS365Provisioning.SharePoint.Model;
 
 public class ContentTypesDto
 {
