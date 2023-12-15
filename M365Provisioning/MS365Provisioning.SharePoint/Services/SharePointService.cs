@@ -11,7 +11,7 @@ namespace MS365Provisioning.SharePoint.Services
     {
         private readonly ISharePointSettingsService _sharePointSettingsService;
         private readonly ILogger _logger;
-        private ClientContext? _clientContext;
+        private readonly ClientContext? _clientContext;
 
         public SharePointService(ISharePointSettingsService sharePointSettingsService, ILogger logger, string siteUrl)
         {
@@ -107,7 +107,7 @@ namespace MS365Provisioning.SharePoint.Services
             }
         }*/
 
-        private X509Certificate2 GetCertificateByThumbprint(string thumbprint)
+        private X509Certificate2 GetCertificateByThumbprint(string? thumbprint)
         {
             try
             {

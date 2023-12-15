@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace MS365Provisioning.Common.Services
+﻿namespace MS365Provisioning.Common.Settings
 {
-    internal interface IMS365ProvisioningSettings
+    public interface IMS365ProvisioningSettings
     {
+        string? GetSetting(string key);
     }
 }

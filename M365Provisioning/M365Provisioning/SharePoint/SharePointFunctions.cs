@@ -360,8 +360,8 @@ namespace M365Provisioning.SharePoint
                         context.ExecuteQuery();
 
                         listViewsDtos.Add(new ListViewDto(
-                            list.Title,listView.Title,listView.DefaultView,listView.ViewFields,listView.RowLimit,
-                            listView.Scope.ToString(),$"{list.Title}.json"));
+                            list.Title,listView.Title,listView.DefaultView,new List<string>(),listView.RowLimit,
+                            listView.Scope.ToString(),$"{list.Title}.json"));//listView.ViewFields
                     }
                     catch (Exception ex)
                     {
