@@ -277,10 +277,10 @@ namespace M365Provisioning.SharePoint
 
         Dictionary<string, string> GetPermissionDetails(ClientContext context, IQueryable<RoleAssignment> queryString)
         {
-            IEnumerable roles = context.LoadQuery(queryString);
+            IEnumerable roles = Context.LoadQuery(queryString);
             try
             {
-                context.ExecuteQuery();
+                Context.ExecuteQuery();
 
                 Dictionary<string, string> permissionDetails = new();
                 foreach (RoleAssignment ra in roles)
@@ -311,17 +311,16 @@ namespace M365Provisioning.SharePoint
         public List<ListViewDto> LoadListViews()
         {
             List<ListViewDto> listViewsDtos = new(); 
-            ClientContext context = new SharePointServices().GetClientContext();
             try
             {
-                ListCollection listViewslists = context.Web.Lists;
-                context.Load(listViewslists,
+                ListCollection listViewslists = Context.Web.Lists;
+                Context.Load(listViewslists,
                     lc => lc.Where(
                         l => l.Hidden == false));
-                context.ExecuteQuery();
+                Context.ExecuteQuery();
                 foreach (List list in listViewslists)
                 {
-                    List<ListViewDto> listViewDtos = GetListViews(context,list);
+                    List<ListViewDto> listViewDtos = GetListViews(Context, list);
                     listViewsDtos.AddRange(listViewDtos);
                 }
                 WriteDataToJsonFile(SharePointServices.ListViewsFilePath, listViewsDtos);
@@ -333,7 +332,7 @@ namespace M365Provisioning.SharePoint
             }
             finally
             {
-                context.Dispose();
+                Context.Dispose();
             }
             return listViewsDtos;
         }
@@ -342,21 +341,21 @@ namespace M365Provisioning.SharePoint
         {
             List<ListViewDto> listViewsDtos = new();
             ViewCollection listViews = list.Views;
-            context.Load(listViews);
+            Context.Load(listViews);
             try
             {
-                context.ExecuteQuery();
+                Context.ExecuteQuery();
                 foreach (View listView in listViews)
                 {
                     try
                     {
-                        context.Load(listView,
+                        Context.Load(listView,
                             lv => lv.Title,
                             lv => lv.DefaultView,
                             lv => lv.RowLimit,
                             lv => lv.ViewFields,
                             lv => lv.Scope);
-                        context.ExecuteQuery();
+                        Context.ExecuteQuery();
 
                         listViewsDtos.Add(new ListViewDto(
                             list.Title,listView.Title,listView.DefaultView,listView.ViewFields,listView.RowLimit,
@@ -386,8 +385,8 @@ namespace M365Provisioning.SharePoint
             ClientContext context = SharePointServices.GetClientContext();
             try
             {
-                FieldCollection siteColumns = context.Web.Fields;
-                context.Load(siteColumns,
+                FieldCollection siteColumns = Context.Web.Fields;
+                Context.Load(siteColumns,
                              scc => scc.Include(
                                                                             sc=>sc.Hidden,
                                                                             sc=>sc.InternalName,
@@ -395,7 +394,7 @@ namespace M365Provisioning.SharePoint
                                                                             sc=>sc.DefaultValue));
                 try
                 {
-                    context.ExecuteQuery();
+                    Context.ExecuteQuery();
                     foreach (Field siteColumn in siteColumns)
                     {
                         siteColumnsDtos.Add(new SiteColumnsDto(
@@ -418,7 +417,7 @@ namespace M365Provisioning.SharePoint
             }
             finally
             {
-                context.Dispose();
+                Context.Dispose();
             }
         }
         /*______________________________________________________________________________________________
