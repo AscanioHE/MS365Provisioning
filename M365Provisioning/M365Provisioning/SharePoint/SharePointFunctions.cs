@@ -22,14 +22,12 @@ namespace M365Provisioning.SharePoint
     {
         private ISharePointServices SharePointServices { get; } = new SharePointServices();
         private ClientContext Context { get; set; } = new SharePointServices().Context;
-
         /*______________________________________________________________________________________________
          Collect Site Settings information
          _______________________________________________________________________________________________*/
         public List<SiteSettingsDto> LoadSiteSettings()
         {
             List<SiteSettingsDto> webTemplatesDto = new();
-            Context = SharePointServices.GetClientContext();
             Web web = Context.Web;
             Context.Load(web);
             try
@@ -84,21 +82,11 @@ namespace M365Provisioning.SharePoint
         public List<ListsSettingsDto> LoadListsSettings()
         {
             List<ListsSettingsDto> listDtos = new();
-            try
-            {
-                Context = SharePointServices.GetClientContext();
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"Error fetching ClientContext {ex.Message}");
-                throw;
-            }
             ListCollection listCollection = Context.Web.Lists;
             Context.Load(Context.Web.Navigation,
                         n => n.QuickLaunch);
             Context.Load(listCollection,
-                         lc => lc.Where(
-                                                                    l => l.Hidden == false));
+                         lc => lc.Where(l => l.Hidden == false));
             try
             {
                 Context.ExecuteQuery();
