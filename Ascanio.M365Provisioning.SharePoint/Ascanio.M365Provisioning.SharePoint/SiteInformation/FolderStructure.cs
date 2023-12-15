@@ -7,7 +7,7 @@ namespace Ascanio.M365Provisioning.SharePoint.SiteInformation
 {
     public class FolderStructure
     {
-        public List<FolderStructureDTO> lead_FolderStructureDTO { get; set; } = new List<FolderStructureDTO>();
+        public List<FolderStructureDto> lead_FolderStructureDTO { get; set; } = new List<FolderStructureDto>();
 
         public FolderStructure()
         {
@@ -22,7 +22,7 @@ namespace Ascanio.M365Provisioning.SharePoint.SiteInformation
                 ListCollection lists = context.Web.Lists;
                 context.Load(context.Web.Lists);
                 context.ExecuteQuery();
-                List<FolderStructureDTO> lead_FolderStructureDTOs = new();
+                List<FolderStructureDto> lead_FolderStructureDTOs = new();
                 foreach (List list in lists)
                 {
                     context.Load
@@ -42,8 +42,8 @@ namespace Ascanio.M365Provisioning.SharePoint.SiteInformation
                         foreach (Folder map in folders)
                         {
 
-                            List<FolderStructureDTO> subFolders = GetSubFolders(context, map, list);
-                            lead_FolderStructureDTO.Add(new FolderStructureDTO
+                            List<FolderStructureDto> subFolders = GetSubFolders(context, map, list);
+                            lead_FolderStructureDTO.Add(new FolderStructureDto
                             {
                                 ListName = list.Title,
                                 FolderName = map.Name,
@@ -58,9 +58,9 @@ namespace Ascanio.M365Provisioning.SharePoint.SiteInformation
             }
         }
 
-        private List<FolderStructureDTO> GetSubFolders(ClientContext context, Folder folder, List list)
+        private List<FolderStructureDto> GetSubFolders(ClientContext context, Folder folder, List list)
         {
-            List<FolderStructureDTO> subFolders = new();
+            List<FolderStructureDto> subFolders = new();
             context.Load
                 (
                 folder, 
@@ -72,7 +72,7 @@ namespace Ascanio.M365Provisioning.SharePoint.SiteInformation
             {
             foreach (Folder subFolder in folder.Folders)
             {
-                    subFolders.Add(new FolderStructureDTO
+                    subFolders.Add(new FolderStructureDto
                 {
                     ListName = list.Title,
                     FolderName = subFolder.Name,

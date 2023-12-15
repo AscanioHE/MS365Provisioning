@@ -10,19 +10,16 @@ namespace WriteDataToJsonFiles
 {
     public class WriteDataToJsonFile : IWriteDataToJson
     {
+
+            public object DtoFile { get; set; } = new();
+            public string JsonFilePath { get; set; } = "TempJsonFile";
         public WriteDataToJsonFile()
         {
             string appSettingsPath = "appsettings.json";
             IConfigurationRoot configuration = new ConfigurationBuilder()
                 .AddJsonFile(appSettingsPath, optional: false, reloadOnChange: true)
                 .Build();
-            WorkingDirectory = configuration["SharePoint:WorkingDirectoryPath"]!;
-            Directory.SetCurrentDirectory(WorkingDirectory);
         }
-
-        public object DtoFile { get; set; } = new();
-        public string JsonFilePath { get; set; } = "TempJsonFile";
-        public string WorkingDirectory { get; set; }
 
         public string ConvertDtoToString()
         {

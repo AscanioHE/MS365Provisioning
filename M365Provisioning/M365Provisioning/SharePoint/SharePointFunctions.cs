@@ -448,21 +448,15 @@ namespace M365Provisioning.SharePoint
                                                                         l=> l.ContentTypes,
                                                                         l=> l.ContentTypes.Include(
                                                                                                         ct => ct.Name,
-                                                                                                        ct=> ct.Parent,
-                                                                                                        ct=>ct.Required
+                                                                                                        ct=> ct.Parent
                                                                                                         )));
                 Context.ExecuteQuery();
                 foreach (List list in listCollection)
                 {
                     foreach (ContentType contentType in list.ContentTypes)
                     {
-                        contentTypesDtos.Add(new(
-                        {
-                            FieldTitle = contentType.Name,
-                            ParentCt = contentType.Parent.ToString(),
-                            Required = contentType
-
-                        }));
+                        //ToDo: contenttype required?
+                        contentTypesDtos.Add(new(contentType.Name, contentType.Parent.ToString(), "test", false));
                     }
                 }
                 return contentTypesDtos;
