@@ -6,6 +6,7 @@ using System.Text;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using MS365Provisioning.SharePoint.Model;
 using ContentType = Microsoft.SharePoint.Client.ContentType;
 using Field = Microsoft.SharePoint.Client.Field;
 using NavigationNode = Microsoft.SharePoint.Client.NavigationNode;

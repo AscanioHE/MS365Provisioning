@@ -24,6 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\MS365Provisioning.SharePoint\MS365Provisioning.SharePoint.csproj" />
     <ProjectReference Include="..\WriteDataToJsonFiles\WriteDataToJsonFiles.csproj" />
   </ItemGroup>
 
@@ -32,15 +33,6 @@
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-    <Compile Update="SharePoint\ListsSettingsDTO.cs">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Compile>
-    <Compile Update="SharePoint\SiteColumnsDTO.cs">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Compile>
-    <Compile Update="SharePoint\SiteSettingsDTO.cs">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
     <Compile Update="SharePoint\SharePointFunctions.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
