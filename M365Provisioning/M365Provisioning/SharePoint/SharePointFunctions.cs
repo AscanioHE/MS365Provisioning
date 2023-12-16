@@ -276,7 +276,7 @@ namespace M365Provisioning.SharePoint
         }
 
 
-        Dictionary<string, string> GetPermissionDetails(ClientContext context, IQueryable<RoleAssignment> queryString)
+        Dictionary<string, string> GetPermissionDetails(IQueryable<RoleAssignment> queryString)
         {
             IEnumerable roles = Context.LoadQuery(queryString);
             try
@@ -338,7 +338,7 @@ namespace M365Provisioning.SharePoint
             return listViewsDtos;
         }
 
-        private List<ListViewDto> GetListViews(ClientContext context, List list)
+        private List<ListViewDto> GetListViews(List list)
         {
             List<ListViewDto> listViewsDtos = new();
             ViewCollection listViews = list.Views;

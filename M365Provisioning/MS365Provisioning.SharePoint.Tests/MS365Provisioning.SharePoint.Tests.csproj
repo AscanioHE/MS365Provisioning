@@ -30,4 +30,10 @@
     <ProjectReference Include="..\MS365Provisioning.SharePoint\MS365Provisioning.SharePoint.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="dev.settings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

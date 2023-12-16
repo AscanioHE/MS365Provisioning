@@ -11,7 +11,7 @@ namespace MS365Provisioning.SharePoint.Services
     {
         private readonly ISharePointSettingsService _sharePointSettingsService;
         private readonly ILogger _logger;
-        private readonly ClientContext? _clientContext;
+        private readonly ClientContext _clientContext;
 
         public SharePointService(ISharePointSettingsService sharePointSettingsService, ILogger logger, string siteUrl)
         {
@@ -22,7 +22,7 @@ namespace MS365Provisioning.SharePoint.Services
 
         private ClientContext? GetClientContext(string siteUrl)
         {
-            _logger?.LogInformation($"GetClientContext for site {siteUrl}...");
+            _logger?.LogInformation($"{nameof(GetClientContext)} for site {siteUrl}...");
 
             SharePointSettings sharePointSettings = _sharePointSettingsService.GetSharePointSettings();
 
@@ -32,11 +32,11 @@ namespace MS365Provisioning.SharePoint.Services
             try
             {
                 PnP.Framework.AuthenticationManager authManager = new(sharePointSettings.ClientId, certificate, sharePointSettings.TenantId);
-                ctx = authManager.GetContext(siteUrl);
+                ctx = authManager.GetContext(sharePointSettings.SiteUrl);
             }
             catch (Exception ex)
             {
-                _logger?.LogError($"Error creating the ClientContext : {ex.Message}");
+                _logger?.LogError($"Error fetching the ClientContext : {ex.Message}");
             }
 
             return ctx;
@@ -44,6 +44,23 @@ namespace MS365Provisioning.SharePoint.Services
 
         public List<SiteSettingsDto> LoadSiteSettings()
         {
+            ListCollection lists = _clientContext.Web.Lists;
+            _clientContext.Load(lists,lc=> lc.Include(
+                l=> l.Hidden)
+            );
+            try
+            {
+                _clientContext.ExecuteQuery();
+                foreach (List list in lists)
+                {
+                    
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogError($"Error fetching the ClientContext Lists: {ex.Message}");
+            }
+
             throw new NotImplementedException();
         }
 
@@ -62,51 +79,7 @@ namespace MS365Provisioning.SharePoint.Services
             throw new NotImplementedException();
         }
 
-        /*public ClientContext GetClientContext()
-        {
-            try
-            {
-
-                try
-                {
-                    string appSettingsPath = "appsettings.json";
-                    IConfigurationRoot configuration = new ConfigurationBuilder()
-                        .AddJsonFile(appSettingsPath, optional: false, reloadOnChange: true)
-                        .Build();
-                    ClientId = configuration["SharePoint:ClientID"]!;
-                    SiteUrl = configuration["SharePoint:SiteUrl"]!;
-                    DirectoryId = configuration["SharePoint:DirectoryId"]!;
-                    ThumbPrint = configuration["SharePoint:ThumbPrint"]!;
-                }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine($"Error reading AppSetting file : {ex.Message}");
-                    throw;
-                }
-
-
-                X509Certificate2 certificate = GetCertificateByThumbprint(ThumbPrint);
-
-                try
-                {
-                    PnP.Framework.AuthenticationManager authManager = new(ClientId, certificate, DirectoryId);
-                    Context = authManager.GetContext(SiteUrl);
-                }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine($"Error creating the ClientContext : {ex.Message}");
-                    throw;
-                }
-                return Context;
-            }
-            catch (InvalidOperationException ex)
-            {
-                // Handle the exception here
-                Debug.WriteLine($"Certificate with thumbprint {ThumbPrint} not found!", ex.Message);
-                throw;
-            }
-        }*/
-
+      
         private X509Certificate2 GetCertificateByThumbprint(string? thumbprint)
         {
             try

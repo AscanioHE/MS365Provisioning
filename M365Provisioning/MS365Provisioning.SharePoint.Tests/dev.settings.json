@@ -1,4 +1,5 @@
 {
+  "AllowedHosts": "*",
   "Logging": {
     "LogLevel": {
       "Default": "Information",
@@ -7,7 +8,7 @@
   },
   "SharePoint": {
     "ClientId": "ed0eb438-d94a-4a1c-ae0b-2a07dbe8dd41",
-    "DirectoryId": "a569fa15-6e55-43dc-a47f-b4f38239e020",
+    "TenantId": "a569fa15-6e55-43dc-a47f-b4f38239e020",
     "FolderStructureFilepath": "SharePoint/jsonfiles/FolderStructure.json",
     "ListsFilePath": "SharePoint/jsonfiles/Lists.json",
     "ListViewsFilepath": "SharePoint/jsonfiles/ListViews.json",
@@ -15,7 +16,6 @@
     "SiteSettingsFilePath": "SharePoint/SiteSettings.json",
     "SiteUrl": "https://23m2yz.sharepoint.com/sites/TestSite1/",
     "TestFilePath": "SharePoint/jsonfiles/TestFile.json",
-    "Thumbprint": "7a1abd6f8a5ee0d7c13d8faf0455630693ba7e51"
-  },
-  "AllowedHosts": "*"
+    "ThumbPrint": "7a1abd6f8a5ee0d7c13d8faf0455630693ba7e51"
+  }
 }
