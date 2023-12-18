@@ -12,21 +12,18 @@ namespace MS365Provisioning.SharePoint.Services
 {
     public class SharePointService : ISharePointService
     {
-        private readonly ISharePointSettingsService _sharePointSettingsService;
-        private readonly ILogger _logger;
+        private readonly ISharePointSettingsService? _sharePointSettingsService;
+        private readonly ILogger? _logger;
         private readonly ClientContext _clientContext;
-        private readonly ListCollection _lists;
-
-        public SharePointService(ISharePointSettingsService sharePointSettingsService, ILogger logger, string siteUrl)
+        private readonly ListCollection? _lists;
+        public SharePointService(ISharePointSettingsService? sharePointSettingsService, ILogger? logger, string siteUrl)
         {
             _sharePointSettingsService = sharePointSettingsService;
             _logger = logger;
             _clientContext = GetClientContext(siteUrl)!; 
             _lists = _clientContext.Web.Lists;
-
         }
-
-        public SharePointService(ClientContext? clientContext)
+        public SharePointService(ClientContext clientContext)
         {
             _clientContext = clientContext;
         }
@@ -35,24 +32,34 @@ namespace MS365Provisioning.SharePoint.Services
         ________________________________________________________________________________________________________________*/
         private ClientContext? GetClientContext(string siteUrl)
         {
-            _logger?.LogInformation($"{nameof(GetClientContext)} for site {siteUrl}...");
-
-            SharePointSettings sharePointSettings = _sharePointSettingsService.GetSharePointSettings();
-
-            X509Certificate2 certificate = GetCertificateByThumbprint(sharePointSettings.ThumbPrint);
-            ClientContext? ctx = null;
-
-            try
+            string message = $"{nameof(GetClientContext)} for site {siteUrl}...";
+            _logger?.LogInformation(message: message);
+            if (_sharePointSettingsService != null)
             {
-                PnP.Framework.AuthenticationManager authManager = new(sharePointSettings.ClientId, certificate, sharePointSettings.TenantId);
-                ctx = authManager.GetContext(sharePointSettings.SiteUrl);
-            }
-            catch (Exception ex)
-            {
-                _logger?.LogError($"Error fetching the ClientContext : {ex.Message}");
-            }
+                SharePointSettings? sharePointSettings = _sharePointSettingsService.GetSharePointSettings();
 
-            return ctx;
+                ClientContext? ctx;
+                using (X509Certificate2? certificate = GetCertificateByThumbprint(sharePointSettings.ThumbPrint))
+                {
+                    ctx = null;
+                    try
+                    {
+                        PnP.Framework.AuthenticationManager authManager = new(sharePointSettings.ClientId, certificate,
+                            sharePointSettings.TenantId);
+                        ctx = authManager.GetContext(sharePointSettings.SiteUrl);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger?.LogError(message: $"Error fetching the ClientContext : {ex.Message}");
+                        return new ClientContext("");
+                    }
+                }
+                return ctx;
+            }
+            else
+            {
+                return new ClientContext("");
+            }
         }
 
         /*______________________________________________________________________________________________________________
@@ -75,11 +82,10 @@ namespace MS365Provisioning.SharePoint.Services
                         Value = webTemplate.Lcid
                     });
                 }
-
             }
             catch (Exception ex)
             {
-                _logger?.LogError($"Error fetching the Webtemplates : {ex.Message}");
+                _logger?.LogError(message: $"Error fetching the Webtemplates : {ex.Message}");
             }
             finally
             {
@@ -94,12 +100,14 @@ namespace MS365Provisioning.SharePoint.Services
         public List<ListsSettingsDto> LoadListsSettings()
         {
             List<ListsSettingsDto> listsSettingsDto = new();
+            bool breakRoleAssignment = false;
             _clientContext.Load(_lists, lc => lc.Include(
                 l => l.Hidden)
             );
             try
             {
                 _clientContext.ExecuteQuery();
+                if (_lists == null || _lists.Count <= 0) return listsSettingsDto;
                 foreach (List list in _lists)
                 {
                     if (!list.Hidden)
@@ -112,9 +120,11 @@ namespace MS365Provisioning.SharePoint.Services
                             l => l.ContentTypes,
                             l => l.OnQuickLaunch,
                             l => l.HasUniqueRoleAssignments,
+                            l=> l.EnableFolderCreation,
+                            l=>l.RoleAssignments,
                             l => l.Fields.Include(
                                 f=> f.InternalName,
-                                f=> f.Title));
+                                f=> f.Title)); 
                         try
                         {
                             _clientContext.ExecuteQuery();
@@ -122,6 +132,11 @@ namespace MS365Provisioning.SharePoint.Services
                             Dictionary<string, string> listPermissions = GetPermissionDetails(list);
                             Guid enterpiseKeywordsValue = GetEnterpriseKeywordsValue();
                             List<string> quickLaunchHeaders = GetQuickLaunchHeaders();
+                            RoleAssignmentCollection roleAssignmentCollection = list.RoleAssignments;
+                            foreach (RoleAssignment roleAssignment in roleAssignmentCollection)
+                            {
+                                breakRoleAssignment = roleAssignment.RoleDefinitionBindings.AreItemsAvailable;
+                            }
                             try
                             {
                                 listsSettingsDto.Add(new
@@ -134,31 +149,31 @@ namespace MS365Provisioning.SharePoint.Services
                                     quickLaunchHeaders,
                                     list.EnableFolderCreation,
                                     enterpiseKeywordsValue,
-                                    true,
+                                    breakRoleAssignment,
                                     listPermissions
                                 ));
                             }
                             catch (Exception ex)
                             {
-                                _logger.LogInformation(
+                                _logger?.LogInformation(
                                     $"Unable to create the List Data Transfer Object : {ex.Message}");
                             }
                         }
                         catch (Exception ex)
                         {
-                            _logger.LogInformation($"Error Fetching list properties : {ex.Message}");
+                            _logger?.LogInformation(message: $"Error Fetching list properties : {ex.Message}");
                         }
-
                     }
-                    return listsSettingsDto;
                 }
+                return listsSettingsDto;
             }
             catch (Exception ex)
             {
                 _logger?.LogError($"Error fetching the ClientContext Lists: {ex.Message}");
+                return new List<ListsSettingsDto>();
             }
-            throw new NotImplementedException();
         }
+        
         private List<string> GetQuickLaunchHeaders()
         {
             List<string> quickLaunchHeaders = new();
@@ -183,14 +198,14 @@ namespace MS365Provisioning.SharePoint.Services
                     }
                     catch (Exception ex)
                     {
-                        //_logger?.LogInformation($"Error fetching ClientContext: {ex}");
-                        throw;
+                        _logger?.LogInformation($"Error fetching Web Navigation QuickLaunch: {ex}");
+                        
                     }
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogInformation($"Error fetching List QuickLaunchHeader : {ex.Message}");
+                _logger?.LogInformation($"Error fetching List QuickLaunchHeader : {ex.Message}");
             }
 
             return quickLaunchHeaders;
@@ -199,11 +214,9 @@ namespace MS365Provisioning.SharePoint.Services
         private Guid GetEnterpriseKeywordsValue()
         {
             Guid enterpriseKeywordsValue = Guid.Empty;
-
             try
             {
                 Field enterpriseKeywords = _clientContext.Web.Fields.GetByInternalNameOrTitle("EnterpriseKeywords");
-
                 if (enterpriseKeywords != null)
                 {
                     _clientContext.Load(enterpriseKeywords);
@@ -214,13 +227,11 @@ namespace MS365Provisioning.SharePoint.Services
             catch (Exception ex)
             {
                 // Log the exception
-                _logger?.LogInformation($"Error fetching Enterprise Keywords value: {ex.Message}");
+                _logger?.LogInformation(message: $"Error fetching Enterprise Keywords value: {ex.Message}");
                 enterpriseKeywordsValue = Guid.Empty;
             }
-
             return enterpriseKeywordsValue;
         }
-
         Dictionary<string, string> GetPermissionDetails(List list)
         {
             IQueryable<RoleAssignment> queryForList = list.RoleAssignments.Include(
@@ -249,11 +260,10 @@ namespace MS365Provisioning.SharePoint.Services
             }
             catch (Exception ex)
             {
-                _logger?.LogInformation($"Error fetching permissions : {ex}");
+                _logger?.LogInformation(message: $"Error fetching permissions : {ex}");
                 return new Dictionary<string, string>();
             }
         }
-
         /*______________________________________________________________________________________________________________
          Fetch Lists List Views
         ________________________________________________________________________________________________________________*/
@@ -261,19 +271,17 @@ namespace MS365Provisioning.SharePoint.Services
         {
             throw new NotImplementedException();
         }
-
         public List<SiteColumnsDto> LoadSiteColumnsDtos()
         {
             throw new NotImplementedException();
         }
-
-      
-        private X509Certificate2 GetCertificateByThumbprint(string? thumbprint)
+        private X509Certificate2? GetCertificateByThumbprint(string? thumbprint)
         {
             try
             {
                 using X509Store store = new(StoreName.My, StoreLocation.CurrentUser);
                 store.Open(OpenFlags.ReadOnly);
+                Debug.Assert(thumbprint != null, nameof(thumbprint) + " != null");
                 var certificates = store.Certificates.Find(X509FindType.FindByThumbprint, thumbprint, false);
                 if (certificates.Count > 0)
                 {
@@ -288,22 +296,20 @@ namespace MS365Provisioning.SharePoint.Services
             catch (Exception ex)
             {
                 _logger?.LogInformation($"Error creating a Certificate : {ex}");
-                throw;
+                return null;
             }
         }
         private List<string> GetListContentTypes(List list)
         {
             List<string> contentTypes = new();
-
             try
             {
                 _clientContext.Load(list.ContentTypes);
                 _clientContext.ExecuteQuery();
                 if (list.ContentTypes.Count == 0)
                 {
-                    return contentTypes; // No ContentTypes to return
+                    return contentTypes;
                 }
-
                 foreach (ContentType contentType in list.ContentTypes)
                 {
                     contentTypes.Add(contentType.Name);
@@ -314,8 +320,12 @@ namespace MS365Provisioning.SharePoint.Services
                 _logger?.LogInformation($"Error fetching ContentTypes: {ex.Message}");
                 contentTypes.Clear();
             }
-
             return contentTypes;
         }
+    }
+
+    public class ExportFunctions
+    {
+
     }
 }

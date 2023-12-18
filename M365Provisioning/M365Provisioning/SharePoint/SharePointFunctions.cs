@@ -6,6 +6,7 @@ using System.Text;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 using MS365Provisioning.SharePoint.Model;
 using ContentType = Microsoft.SharePoint.Client.ContentType;
 using Field = Microsoft.SharePoint.Client.Field;
@@ -23,6 +24,14 @@ namespace M365Provisioning.SharePoint
     {
         private ISharePointServices SharePointServices { get; } = new SharePointServices();
         private ClientContext Context { get; set; } = new SharePointServices().Context;
+
+        public ILogger _logger;
+
+        public SharePointFunctions(ILogger logger)
+        {
+            _logger = logger;
+        }
+
         /*______________________________________________________________________________________________
          Collect Site Settings information
          _______________________________________________________________________________________________*/
@@ -52,7 +61,7 @@ namespace M365Provisioning.SharePoint
             }
             catch (Exception ex)
             {
-                //_logger?.LogInformation($"Error executing query: {ex.Message}");
+                _logger?.LogInformation($"Error executing query: {ex.Message}");
                 return new List<SiteSettingsDto>();
             }
             finally
@@ -72,7 +81,7 @@ namespace M365Provisioning.SharePoint
             }
             catch (Exception ex)
             {
-                //_logger?.LogInformation($"Error writing data to Json file : {ex.Message}");
+                _logger?.LogInformation($"Error writing data to Json file : {ex.Message}");
             }
             return webTemplatesDto;
         }
@@ -114,23 +123,23 @@ namespace M365Provisioning.SharePoint
                     }
                     catch (Exception ex)
                     {
-                        //_logger?.LogInformation($"Error fetching ListSettings : {ex.Message}");
-                        throw;
+                        _logger?.LogInformation($"Error fetching ListSettings : {ex.Message}");
+                        
                     }
 
-                    List<string> contentTypes;
-                    try
-                    {
-                        contentTypes = GetListContentTypes(list);
-                    }
-                    catch (Exception ex)
-                    {
-                        //_logger?.LogInformation($"Error fetching ContentTypes : {ex.Message}");
-                        throw;
-                    }
+                    //List<string> contentTypes;
+                    //try
+                    //{
+                    //    contentTypes = GetListContentTypes(list);
+                    //}
+                    //catch (Exception ex)
+                    //{
+                    //    _logger?.LogInformation($"Error fetching ContentTypes : {ex.Message}");
+                        
+                    //}
 
 
-                    Dictionary<string, string> listPermissions;
+                    //Dictionary<string, string> listPermissions;
                     try
                     {
                         IQueryable<RoleAssignment> queryForList = list.RoleAssignments.Include(
@@ -140,44 +149,44 @@ namespace M365Provisioning.SharePoint
                     }
                     catch (Exception ex)
                     {
-                       // _logger?.LogInformation($"Error fetching Permissions : {ex.Message}");
-                        throw;
+                       _logger?.LogInformation($"Error fetching Permissions : {ex.Message}");
+                        
                     }
 
-                    Guid enterpriseKeywordsValue;
-                    try
-                    {
-                        enterpriseKeywordsValue = GetEnterpriseKeywordsValue();
-                    }
-                    catch (Exception ex)
-                    {
-                        //_logger?.LogInformation($"Error fetching EnterpriseKeywordsValue : {ex.Message}");
-                        throw;
-                    }
+                    //Guid enterpriseKeywordsValue;
+                    //try
+                    //{
+                    //    //enterpriseKeywordsValue = GetEnterpriseKeywordsValue();
+                    //}
+                    //catch (Exception ex)
+                    //{
+                    //    _logger?.LogInformation($"Error fetching EnterpriseKeywordsValue : {ex.Message}");
+                        
+                    //}
 
                     List<string> quickLaunchHeaders = GetQuickLaunchHeaders();
                     try
                     {
-                        listDtos.Add(new ListsSettingsDto
-                                        (
-                                            list.Title,
-                                            list.DefaultViewUrl,
-                                            list.BaseType.ToString(),
-                                            contentTypes,
-                                            list.OnQuickLaunch,
-                                            quickLaunchHeaders,
-                                            list.EnableFolderCreation,
-                                            enterpriseKeywordsValue,
-                                            // TODO: Unique Role Assignments
-                                            breakRoleInheritance: true,
-                                            null
-                                        )
-                        );
+                        //listDtos.Add(new ListsSettingsDto
+                        //                (
+                        //                    list.Title,
+                        //                    list.DefaultViewUrl,
+                        //                    list.BaseType.ToString(),
+                        //                    contentTypes,
+                        //                    list.OnQuickLaunch,
+                        //                    quickLaunchHeaders,
+                        //                    list.EnableFolderCreation,
+                        //                    enterpriseKeywordsValue,
+                        //                    // TODO: Unique Role Assignments
+                        //                    breakRoleInheritance: true,
+                        //                    null
+                        //                )
+                        //);
                     }
                     catch (Exception ex)
                     {
-                        //_logger?.LogInformation($"Error writing to DTO File :{ex.Message}");
-                        throw;
+                        _logger?.LogInformation($"Error writing to DTO File :{ex.Message}");
+                        
                     }
                 }
 
@@ -185,8 +194,8 @@ namespace M365Provisioning.SharePoint
             }
             catch (Exception ex)
             {
-                //_logger?.LogInformation($"Error fetching ListCollection : {ex.Message}");
-                throw;
+                _logger?.LogInformation($"Error fetching ListCollection : {ex.Message}");
+                
             }
             finally
             {
@@ -216,8 +225,8 @@ namespace M365Provisioning.SharePoint
                 }
                 catch (Exception ex)
                 {
-                    //_logger?.LogInformation($"Error fetching ClientContext: {ex}");
-                    throw;
+                    _logger?.LogInformation($"Error fetching ClientContext: {ex}");
+                    
                 }
             }
 
@@ -242,7 +251,7 @@ namespace M365Provisioning.SharePoint
             catch (Exception ex)
             {
                 // Log the exception
-                //_logger?.LogInformation($"Error fetching Enterprise Keywords value: {ex.Message}");
+                _logger?.LogInformation($"Error fetching Enterprise Keywords value: {ex.Message}");
             }
 
             return enterpriseKeywordsValue;
@@ -266,7 +275,7 @@ namespace M365Provisioning.SharePoint
             }
             catch (Exception ex)
             {
-                //_logger?.LogInformation($"Error fetching ContentTypes: {ex.Message}");
+                _logger?.LogInformation($"Error fetching ContentTypes: {ex.Message}");
 
                 // Return an empty list
                 contentTypes.Clear();
@@ -301,7 +310,7 @@ namespace M365Provisioning.SharePoint
             }
             catch (Exception ex)
             {
-                //_logger?.LogInformation($"Error fetching permissions : {ex}");
+                _logger?.LogInformation($"Error fetching permissions : {ex}");
                 return new Dictionary<string, string>();
             }
         }
@@ -319,17 +328,12 @@ namespace M365Provisioning.SharePoint
                     lc => lc.Where(
                         l => l.Hidden == false));
                 Context.ExecuteQuery();
-                foreach (List list in listViewslists)
-                {
-                    //List<ListViewDto> listViewDtos = GetListViews(Context, list);
-                    //listViewsDtos.AddRange(listViewDtos);
-                }
                 WriteDataToJsonFile(SharePointServices.ListViewsFilePath, listViewsDtos);
             }
             catch (Exception ex)
             {
-                //_logger?.LogInformation($"Error fetching ClientContext : {ex.Message}");
-                throw;
+                _logger?.LogInformation($"Error fetching ClientContext : {ex.Message}");
+                
             }
             finally
             {
@@ -364,15 +368,14 @@ namespace M365Provisioning.SharePoint
                     }
                     catch (Exception ex)
                     {
-                        //_logger?.LogInformation($"Error fetching listview properties : {ex.Message}");
-                        throw;
+                        _logger?.LogInformation($"Error fetching listview properties : {ex.Message}");
+                        
                     }
                 }
             }
             catch (Exception ex)
             {
-                //_logger?.LogInformation($"Error fetching Listviews : {ex.Message}");
-                throw;
+                _logger?.LogInformation($"Error fetching Listviews : {ex.Message}");
             }
             return listViewsDtos;
         }
@@ -407,19 +410,14 @@ namespace M365Provisioning.SharePoint
                 }
                 catch (Exception ex)
                 {
-                    //_logger?.LogInformation($"Error fetching Site Column settings : {ex.Message}");
-                    throw;
+                    _logger?.LogInformation($"Error fetching Site Column settings : {ex.Message}");
                 }
             }
             catch (Exception ex)
             {
-                //_logger?.LogInformation($"Error fetching ContextClient :  {ex.Message}");
-                throw;
+                _logger?.LogInformation($"Error fetching ContextClient :  {ex.Message}");
             }
-            finally
-            {
-                Context.Dispose();
-            }
+            return siteColumnsDtos;
         }
         /*______________________________________________________________________________________________
          Flect contenttypes
@@ -451,9 +449,9 @@ namespace M365Provisioning.SharePoint
             }
             catch (Exception ex)
             {
-                //_logger?.LogInformation($"Error fetching ContentTypes : {ex.Message}");
-                throw;
+                _logger?.LogInformation($"Error fetching ContentTypes : {ex.Message}");
             }
+            return contentTypesDtos;
         }
         /*______________________________________________________________________________________________
          Write all data to json file

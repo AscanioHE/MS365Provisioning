@@ -7,6 +7,7 @@ using Microsoft.Graph;
 using Newtonsoft.Json;
 using System;
 using System.Diagnostics;
+using Microsoft.Extensions.Logging;
 
 namespace M365Provisioning.SharePoint
 {
@@ -22,6 +23,8 @@ namespace M365Provisioning.SharePoint
         public string SiteUrl { get; set; } = string.Empty;
         public string DirectoryId { get; set; } = string.Empty;
         public string ThumbPrint { get; set; } = string.Empty;
+
+        private readonly ILogger _logger = null;
 
         public SharePointServices()
         {
@@ -43,7 +46,7 @@ namespace M365Provisioning.SharePoint
             catch (Exception ex)
             {
                 _logger?.LogInformation($"Error reading AppSettingsFile : {ex.Message}");
-                throw;
+                
             }
 
         }
@@ -51,7 +54,6 @@ namespace M365Provisioning.SharePoint
         {
             try
             {
-
                 try
                 {
                     string appSettingsPath = "appsettings.json";
@@ -66,7 +68,7 @@ namespace M365Provisioning.SharePoint
                 catch (Exception ex)
                 {
                     _logger?.LogInformation($"Error reading AppSetting file : {ex.Message}");
-                    throw;
+                    return new ClientContext("");
                 }
 
 
@@ -80,7 +82,7 @@ namespace M365Provisioning.SharePoint
                 catch (Exception ex)
                 {
                     _logger?.LogInformation($"Error creating the ClientContext : {ex.Message}");
-                    throw;
+                    return new ClientContext("");
                 }
                 return Context;
             }
@@ -88,7 +90,7 @@ namespace M365Provisioning.SharePoint
             {
                 // Handle the exception here
                 _logger?.LogInformation($"Certificate with thumbprint {ThumbPrint} not found!", ex.Message);
-                throw;
+                return new ClientContext("");
             }
         }
         private static X509Certificate2 GetCertificateByThumbprint(string thumbprint)
@@ -100,7 +102,6 @@ namespace M365Provisioning.SharePoint
                 var certificates = store.Certificates.Find(X509FindType.FindByThumbprint, thumbprint, false);
                 if (certificates.Count > 0)
                 {
-                    _logger?.LogInformation("Authenticated and connected to SharePoint!");
                     return certificates[0];
                 }
                 else
@@ -110,8 +111,8 @@ namespace M365Provisioning.SharePoint
             }
             catch (Exception ex)
             {
-                _logger?.LogInformation($"Error creating a Certificate : {ex}");
-                throw;
+                Debug.WriteLine($"Error creating a Certificate : {ex}");
+                return new X509Certificate2();
             }
         }
     }
