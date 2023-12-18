@@ -42,7 +42,7 @@ namespace M365Provisioning.SharePoint
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Error reading AppSettingsFile : {ex.Message}");
+                _logger?.LogInformation($"Error reading AppSettingsFile : {ex.Message}");
                 throw;
             }
 
@@ -65,7 +65,7 @@ namespace M365Provisioning.SharePoint
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"Error reading AppSetting file : {ex.Message}");
+                    _logger?.LogInformation($"Error reading AppSetting file : {ex.Message}");
                     throw;
                 }
 
@@ -79,7 +79,7 @@ namespace M365Provisioning.SharePoint
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"Error creating the ClientContext : {ex.Message}");
+                    _logger?.LogInformation($"Error creating the ClientContext : {ex.Message}");
                     throw;
                 }
                 return Context;
@@ -87,7 +87,7 @@ namespace M365Provisioning.SharePoint
             catch (InvalidOperationException ex)
             {
                 // Handle the exception here
-                Debug.WriteLine($"Certificate with thumbprint {ThumbPrint} not found!", ex.Message);
+                _logger?.LogInformation($"Certificate with thumbprint {ThumbPrint} not found!", ex.Message);
                 throw;
             }
         }
@@ -100,7 +100,7 @@ namespace M365Provisioning.SharePoint
                 var certificates = store.Certificates.Find(X509FindType.FindByThumbprint, thumbprint, false);
                 if (certificates.Count > 0)
                 {
-                    Debug.WriteLine("Authenticated and connected to SharePoint!");
+                    _logger?.LogInformation("Authenticated and connected to SharePoint!");
                     return certificates[0];
                 }
                 else
@@ -110,7 +110,7 @@ namespace M365Provisioning.SharePoint
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Error creating a Certificate : {ex}");
+                _logger?.LogInformation($"Error creating a Certificate : {ex}");
                 throw;
             }
         }

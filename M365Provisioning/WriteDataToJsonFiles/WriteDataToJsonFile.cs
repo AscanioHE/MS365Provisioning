@@ -30,7 +30,7 @@ namespace WriteDataToJsonFiles
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Error creating Json String : {ex.Message}");
+                //_logger?.LogInformation($"Error creating Json String : {ex.Message}");
                 throw;
             }
         }
@@ -46,7 +46,7 @@ namespace WriteDataToJsonFiles
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Error Writing Json String to file : {ex.Message}");
+                //_logger?.LogInformation($"Error Writing Json String to file : {ex.Message}");
                 throw;
             }
         }

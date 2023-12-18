@@ -52,7 +52,7 @@ namespace M365Provisioning.SharePoint
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Error executing query: {ex.Message}");
+                //_logger?.LogInformation($"Error executing query: {ex.Message}");
                 return new List<SiteSettingsDto>();
             }
             finally
@@ -72,7 +72,7 @@ namespace M365Provisioning.SharePoint
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Error writing data to Json file : {ex.Message}");
+                //_logger?.LogInformation($"Error writing data to Json file : {ex.Message}");
             }
             return webTemplatesDto;
         }
@@ -114,7 +114,7 @@ namespace M365Provisioning.SharePoint
                     }
                     catch (Exception ex)
                     {
-                        Debug.WriteLine($"Error fetching ListSettings : {ex.Message}");
+                        //_logger?.LogInformation($"Error fetching ListSettings : {ex.Message}");
                         throw;
                     }
 
@@ -125,7 +125,7 @@ namespace M365Provisioning.SharePoint
                     }
                     catch (Exception ex)
                     {
-                        Debug.WriteLine($"Error fetching ContentTypes : {ex.Message}");
+                        //_logger?.LogInformation($"Error fetching ContentTypes : {ex.Message}");
                         throw;
                     }
 
@@ -136,11 +136,11 @@ namespace M365Provisioning.SharePoint
                         IQueryable<RoleAssignment> queryForList = list.RoleAssignments.Include(
                             roleAsg => roleAsg.Member,
                             roleAsg => roleAsg.RoleDefinitionBindings.Include(roleDef => roleDef.Name));
-                        listPermissions = GetPermissionDetails(Context, queryForList);
+                        //listPermissions = GetPermissionDetails(Context, queryForList);
                     }
                     catch (Exception ex)
                     {
-                        Debug.WriteLine($"Error fetching Permissions : {ex.Message}");
+                       // _logger?.LogInformation($"Error fetching Permissions : {ex.Message}");
                         throw;
                     }
 
@@ -151,7 +151,7 @@ namespace M365Provisioning.SharePoint
                     }
                     catch (Exception ex)
                     {
-                        Debug.WriteLine($"Error fetching EnterpriseKeywordsValue : {ex.Message}");
+                        //_logger?.LogInformation($"Error fetching EnterpriseKeywordsValue : {ex.Message}");
                         throw;
                     }
 
@@ -170,13 +170,13 @@ namespace M365Provisioning.SharePoint
                                             enterpriseKeywordsValue,
                                             // TODO: Unique Role Assignments
                                             breakRoleInheritance: true,
-                                            listPermissions
+                                            null
                                         )
                         );
                     }
                     catch (Exception ex)
                     {
-                        Debug.WriteLine($"Error writing to DTO File :{ex.Message}");
+                        //_logger?.LogInformation($"Error writing to DTO File :{ex.Message}");
                         throw;
                     }
                 }
@@ -185,7 +185,7 @@ namespace M365Provisioning.SharePoint
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Error fetching ListCollection : {ex.Message}");
+                //_logger?.LogInformation($"Error fetching ListCollection : {ex.Message}");
                 throw;
             }
             finally
@@ -216,7 +216,7 @@ namespace M365Provisioning.SharePoint
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"Error fetching ClientContext: {ex}");
+                    //_logger?.LogInformation($"Error fetching ClientContext: {ex}");
                     throw;
                 }
             }
@@ -242,7 +242,7 @@ namespace M365Provisioning.SharePoint
             catch (Exception ex)
             {
                 // Log the exception
-                Debug.WriteLine($"Error fetching Enterprise Keywords value: {ex.Message}");
+                //_logger?.LogInformation($"Error fetching Enterprise Keywords value: {ex.Message}");
             }
 
             return enterpriseKeywordsValue;
@@ -266,7 +266,7 @@ namespace M365Provisioning.SharePoint
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Error fetching ContentTypes: {ex.Message}");
+                //_logger?.LogInformation($"Error fetching ContentTypes: {ex.Message}");
 
                 // Return an empty list
                 contentTypes.Clear();
@@ -301,7 +301,7 @@ namespace M365Provisioning.SharePoint
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Error fetching permissions : {ex}");
+                //_logger?.LogInformation($"Error fetching permissions : {ex}");
                 return new Dictionary<string, string>();
             }
         }
@@ -321,14 +321,14 @@ namespace M365Provisioning.SharePoint
                 Context.ExecuteQuery();
                 foreach (List list in listViewslists)
                 {
-                    List<ListViewDto> listViewDtos = GetListViews(Context, list);
-                    listViewsDtos.AddRange(listViewDtos);
+                    //List<ListViewDto> listViewDtos = GetListViews(Context, list);
+                    //listViewsDtos.AddRange(listViewDtos);
                 }
                 WriteDataToJsonFile(SharePointServices.ListViewsFilePath, listViewsDtos);
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Error fetching ClientContext : {ex.Message}");
+                //_logger?.LogInformation($"Error fetching ClientContext : {ex.Message}");
                 throw;
             }
             finally
@@ -364,14 +364,14 @@ namespace M365Provisioning.SharePoint
                     }
                     catch (Exception ex)
                     {
-                        Debug.WriteLine($"Error fetching listview properties : {ex.Message}");
+                        //_logger?.LogInformation($"Error fetching listview properties : {ex.Message}");
                         throw;
                     }
                 }
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Error fetching Listviews : {ex.Message}");
+                //_logger?.LogInformation($"Error fetching Listviews : {ex.Message}");
                 throw;
             }
             return listViewsDtos;
@@ -407,13 +407,13 @@ namespace M365Provisioning.SharePoint
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"Error fetching Site Column settings : {ex.Message}");
+                    //_logger?.LogInformation($"Error fetching Site Column settings : {ex.Message}");
                     throw;
                 }
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Error fetching ContextClient :  {ex.Message}");
+                //_logger?.LogInformation($"Error fetching ContextClient :  {ex.Message}");
                 throw;
             }
             finally
@@ -451,7 +451,7 @@ namespace M365Provisioning.SharePoint
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Error fetching ContentTypes : {ex.Message}");
+                //_logger?.LogInformation($"Error fetching ContentTypes : {ex.Message}");
                 throw;
             }
         }

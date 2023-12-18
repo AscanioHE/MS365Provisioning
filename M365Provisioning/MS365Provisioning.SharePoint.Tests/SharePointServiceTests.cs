@@ -22,14 +22,7 @@ namespace MS365Provisioning.SharePoint.Tests
                 .AddJsonFile("dev.settings.json")
                 .Build();
             ILogger logger = output.BuildLogger();
-            _sharePointService = new SharePointService(this, logger,sharePointSettings.SiteUrl, sharePointSettings.ThumbPrint);
-        }
-
-
-        [Fact]
-        public void Try_GetClientContext_Expect_ClientContext()
-        {
-            //Act;
+            _sharePointService = new SharePointService(this, logger,sharePointSettings.SiteUrl);
         }
 
         public string? GetSetting(string key)
@@ -47,5 +40,16 @@ namespace MS365Provisioning.SharePoint.Tests
                 SiteUrl = GetSetting("SharePoint:SiteUrl")
             };
         }
+        [Fact]
+
+        public void Try_SiteSettings_Expect_DTO()
+        {
+            //Act
+            List<SiteSettingsDto> siteSettingsDtos = _sharePointService.LoadSiteSettings();
+            //Assert
+            Assert.NotEmpty(siteSettingsDtos);
+            Assert.IsType<List<SiteSettingsDto>>(siteSettingsDtos);
+        }
+
     }
 }
