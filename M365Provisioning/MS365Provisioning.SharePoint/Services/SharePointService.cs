@@ -92,6 +92,7 @@ namespace MS365Provisioning.SharePoint.Services
                 _clientContext.Dispose();
             }
             return siteSettingsDto;
+
         }
 
         /*______________________________________________________________________________________________________________
@@ -322,10 +323,5 @@ namespace MS365Provisioning.SharePoint.Services
             }
             return contentTypes;
         }
-    }
-
-    public class ExportFunctions
-    {
-
     }
 }

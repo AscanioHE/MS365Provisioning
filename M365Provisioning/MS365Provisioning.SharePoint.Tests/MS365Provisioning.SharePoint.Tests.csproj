@@ -26,7 +26,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\MS365Provisioning.Common\MS365Provisioning.Common.csproj" />
     <ProjectReference Include="..\MS365Provisioning.SharePoint\MS365Provisioning.SharePoint.csproj" />
   </ItemGroup>
 
