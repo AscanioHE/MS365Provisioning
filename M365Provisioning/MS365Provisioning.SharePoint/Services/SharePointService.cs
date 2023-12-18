@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.SharePoint.Client;
 using MS365Provisioning.SharePoint.Model;
 using MS365Provisioning.SharePoint.Settings;
+using PnP.Core.Model.SharePoint;
 
 namespace MS365Provisioning.SharePoint.Services
 {
@@ -29,7 +30,9 @@ namespace MS365Provisioning.SharePoint.Services
         {
             _clientContext = clientContext;
         }
-
+        /*______________________________________________________________________________________________________________
+         Create ClientContext
+        ________________________________________________________________________________________________________________*/
         private ClientContext? GetClientContext(string siteUrl)
         {
             _logger?.LogInformation($"{nameof(GetClientContext)} for site {siteUrl}...");
@@ -51,6 +54,10 @@ namespace MS365Provisioning.SharePoint.Services
 
             return ctx;
         }
+
+        /*______________________________________________________________________________________________________________
+         Fetch SiteSettings
+        ________________________________________________________________________________________________________________*/
 
         public List<SiteSettingsDto> LoadSiteSettings()
         {
@@ -81,14 +88,70 @@ namespace MS365Provisioning.SharePoint.Services
             return siteSettingsDto;
         }
 
+        /*______________________________________________________________________________________________________________
+         Fetch Lists Settings
+        ________________________________________________________________________________________________________________*/
         public List<ListsSettingsDto> LoadListsSettings()
         {
+            List<ListsSettingsDto> listsSettingsDto = new();
             _clientContext.Load(_lists, lc => lc.Include(
                 l => l.Hidden)
             );
             try
             {
                 _clientContext.ExecuteQuery();
+                foreach (List list in _lists)
+                {
+                    if (!list.Hidden)
+                    {
+                        _clientContext.Load(
+                            list,
+                            l=>l.Title,
+                            l => l.DefaultViewUrl,
+                            l => l.BaseType,
+                            l => l.ContentTypes,
+                            l => l.OnQuickLaunch,
+                            l => l.HasUniqueRoleAssignments,
+                            l => l.Fields.Include(
+                                f=> f.InternalName,
+                                f=> f.Title));
+                        try
+                        {
+                            _clientContext.ExecuteQuery();
+                            List<string> contentTypes = GetListContentTypes(list);
+                            Dictionary<string, string> listPermissions = GetPermissionDetails(list);
+                            Guid enterpiseKeywordsValue = GetEnterpriseKeywordsValue();
+                            List<string> quickLaunchHeaders = GetQuickLaunchHeaders();
+                            try
+                            {
+                                listsSettingsDto.Add(new
+                                (
+                                    list.Title,
+                                    list.DefaultViewUrl,
+                                    list.BaseType.ToString(),
+                                    contentTypes,
+                                    list.OnQuickLaunch,
+                                    quickLaunchHeaders,
+                                    list.EnableFolderCreation,
+                                    enterpiseKeywordsValue,
+                                    true,
+                                    listPermissions
+                                ));
+                            }
+                            catch (Exception ex)
+                            {
+                                _logger.LogInformation(
+                                    $"Unable to create the List Data Transfer Object : {ex.Message}");
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogInformation($"Error Fetching list properties : {ex.Message}");
+                        }
+
+                    }
+                    return listsSettingsDto;
+                }
             }
             catch (Exception ex)
             {
@@ -96,7 +159,104 @@ namespace MS365Provisioning.SharePoint.Services
             }
             throw new NotImplementedException();
         }
+        private List<string> GetQuickLaunchHeaders()
+        {
+            List<string> quickLaunchHeaders = new();
+            try
+            {
+                _clientContext.Load(_clientContext.Web.Navigation.QuickLaunch);
+                _clientContext.ExecuteQuery();
+                foreach (NavigationNode navigationNode in _clientContext.Web.Navigation.QuickLaunch)
+                {
+                    _clientContext.Load
+                    (
+                        navigationNode,
+                        n => n.Children
+                    );
+                    try
+                    {
+                        _clientContext.ExecuteQuery();
+                        foreach (NavigationNode childNode in navigationNode.Children)
+                        {
+                            quickLaunchHeaders.Add(childNode.Title);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        //_logger?.LogInformation($"Error fetching ClientContext: {ex}");
+                        throw;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation($"Error fetching List QuickLaunchHeader : {ex.Message}");
+            }
 
+            return quickLaunchHeaders;
+        }
+
+        private Guid GetEnterpriseKeywordsValue()
+        {
+            Guid enterpriseKeywordsValue = Guid.Empty;
+
+            try
+            {
+                Field enterpriseKeywords = _clientContext.Web.Fields.GetByInternalNameOrTitle("EnterpriseKeywords");
+
+                if (enterpriseKeywords != null)
+                {
+                    _clientContext.Load(enterpriseKeywords);
+                    _clientContext.ExecuteQuery();
+                    enterpriseKeywordsValue = enterpriseKeywords.Id;
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log the exception
+                _logger?.LogInformation($"Error fetching Enterprise Keywords value: {ex.Message}");
+                enterpriseKeywordsValue = Guid.Empty;
+            }
+
+            return enterpriseKeywordsValue;
+        }
+
+        Dictionary<string, string> GetPermissionDetails(List list)
+        {
+            IQueryable<RoleAssignment> queryForList = list.RoleAssignments.Include(
+                roleAsg => roleAsg.Member,
+                roleAsg => roleAsg.RoleDefinitionBindings.Include(roleDef => roleDef.Name));
+            IEnumerable roles = _clientContext.LoadQuery(queryForList);
+            try
+            {
+                _clientContext.ExecuteQuery();
+
+                Dictionary<string, string> permissionDetails = new();
+                foreach (RoleAssignment ra in roles)
+                {
+                    RoleDefinitionBindingCollection rdc = ra.RoleDefinitionBindings;
+                    StringBuilder permissionBuilder = new();
+                    foreach (RoleDefinition rd in rdc)
+                    {
+                        permissionBuilder.Append(rd.Name + ", ");
+                    }
+                    string permission = permissionBuilder.ToString();
+                    permissionBuilder.Clear();
+
+                    permissionDetails.Add(permission, ra.Member.Title);
+                }
+                return permissionDetails;
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogInformation($"Error fetching permissions : {ex}");
+                return new Dictionary<string, string>();
+            }
+        }
+
+        /*______________________________________________________________________________________________________________
+         Fetch Lists List Views
+        ________________________________________________________________________________________________________________*/
         public List<ListViewDto> LoadListViews()
         {
             throw new NotImplementedException();
@@ -137,6 +297,8 @@ namespace MS365Provisioning.SharePoint.Services
 
             try
             {
+                _clientContext.Load(list.ContentTypes);
+                _clientContext.ExecuteQuery();
                 if (list.ContentTypes.Count == 0)
                 {
                     return contentTypes; // No ContentTypes to return
@@ -154,88 +316,6 @@ namespace MS365Provisioning.SharePoint.Services
             }
 
             return contentTypes;
-        }
-        private List<string> GetQuickLaunchHeaders()
-        {
-            List<string> quickLaunchHeaders = new();
-            foreach (NavigationNode navigationNode in _clientContext.Web.Navigation.QuickLaunch)
-            {
-                _clientContext.Load
-                (
-                    navigationNode,
-                    n => n.Children
-                );
-                try
-                {
-                    _clientContext.ExecuteQuery();
-                    foreach (NavigationNode childNode in navigationNode.Children)
-                    {
-                        quickLaunchHeaders.Add(childNode.Title);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    //_logger?.LogInformation($"Error fetching ClientContext: {ex}");
-                    throw;
-                }
-            }
-
-            return quickLaunchHeaders;
-        }
-
-        private Guid GetEnterpriseKeywordsValue()
-        {
-            Guid enterpriseKeywordsValue = Guid.Empty;
-
-            try
-            {
-                Field enterpriseKeywords = _clientContext.Web.Fields.GetByInternalNameOrTitle("EnterpriseKeywords");
-
-                if (enterpriseKeywords != null)
-                {
-                    _clientContext.Load(enterpriseKeywords);
-                    _clientContext.ExecuteQuery();
-                    enterpriseKeywordsValue = enterpriseKeywords.Id;
-                }
-            }
-            catch (Exception ex)
-            {
-                // Log the exception
-                //_logger?.LogInformation($"Error fetching Enterprise Keywords value: {ex.Message}");
-            }
-
-            return enterpriseKeywordsValue;
-        }
-        Dictionary<string, string> GetPermissionDetails(ClientContext _clientContext, IQueryable<RoleAssignment> queryString)
-        {
-            {
-                IEnumerable roles = _clientContext.LoadQuery(queryString);
-                try
-                {
-                    _clientContext.ExecuteQuery();
-
-                    Dictionary<string, string> permissionDetails = new();
-                    foreach (RoleAssignment ra in roles)
-                    {
-                        RoleDefinitionBindingCollection rdc = ra.RoleDefinitionBindings;
-                        StringBuilder permissionBuilder = new();
-                        foreach (RoleDefinition rd in rdc)
-                        {
-                            permissionBuilder.Append(rd.Name + ", ");
-                        }
-                        string permission = permissionBuilder.ToString();
-                        permissionBuilder.Clear();
-
-                        permissionDetails.Add(permission, ra.Member.Title);
-                    }
-                    return permissionDetails;
-                }
-                catch (Exception ex)
-                {
-                    _logger?.LogInformation($"Error fetching permissions : {ex}");
-                    return new Dictionary<string, string>();
-                }
-            }
         }
     }
 }

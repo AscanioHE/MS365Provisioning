@@ -51,5 +51,13 @@ namespace MS365Provisioning.SharePoint.Tests
             Assert.IsType<List<SiteSettingsDto>>(siteSettingsDtos);
         }
 
+        [Fact]
+        public void Try_ListSettings_Expect_DTO()
+        {
+            //Act
+            List<ListsSettingsDto> listsSettingsDtos = _sharePointService.LoadListsSettings();
+            //Assert
+            Assert.IsType<List<ListsSettingsDto>>(listsSettingsDtos);
+        }
     }
 }
