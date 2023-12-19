@@ -5,6 +5,7 @@ using MS365Provisioning.SharePoint.Settings;
 using System.Collections;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using ILogger = Microsoft.Extensions.Logging.ILogger;
 using List = Microsoft.SharePoint.Client.List;
 
 namespace MS365Provisioning.SharePoint.Services
@@ -124,10 +125,117 @@ namespace MS365Provisioning.SharePoint.Services
         ________________________________________________________________________________________________________________*/
         public List<ListsSettingsDto> LoadListsSettings()
         {
-            List<ListsSettingsDto> list = new List<ListsSettingsDto>();
-            return list;
+            List<ListsSettingsDto> listsSettingsDto = new();
+            bool breakRoleAssignment = false;
+            _clientContext.Load(_lists, lc => lc.Include(
+                l => l.Hidden)
+                      );
+            try
+            {
+                _clientContext.ExecuteQuery();
+                if (_lists == null || _lists.Count <= 0) return listsSettingsDto;
+                foreach (List list in _lists)
+                {
+                    if (!list.Hidden)
+                    {
+                        _clientContext.Load(
+                            list,
+                            l => l.Title,
+                            l => l.DefaultViewUrl,
+                            l => l.BaseType,
+                            l => l.ContentTypes,
+                            l => l.OnQuickLaunch,
+                            l => l.HasUniqueRoleAssignments,
+                            l => l.EnableFolderCreation,
+                            l => l.RoleAssignments,
+                            l => l.Fields.Include(
+                                f => f.InternalName,
+                                f => f.Title));
+                        try
+                        {
+                            _clientContext.ExecuteQuery();
+                            List<string> contentTypes = GetListContentTypes(list);
+                            Dictionary<string, string> listPermissions = GetPermissionDetails(list);
+                            Guid enterpiseKeywordsValue = GetEnterpriseKeywordsValue();
+                            List<string> quickLaunchHeaders = GetQuickLaunchHeaders();
+                            RoleAssignmentCollection roleAssignmentCollection = list.RoleAssignments;
+                            foreach (RoleAssignment roleAssignment in roleAssignmentCollection)
+                            {
+                                breakRoleAssignment = roleAssignment.RoleDefinitionBindings.AreItemsAvailable;
+                            }
+                            try
+                            {
+                                listsSettingsDto.Add(new
+                                (
+                                    list.Title,
+                                    list.DefaultViewUrl,
+                                    list.BaseType.ToString(),
+                                    contentTypes,
+                                    list.OnQuickLaunch,
+                                    quickLaunchHeaders,
+                                    list.EnableFolderCreation,
+                                    enterpiseKeywordsValue,
+                                    breakRoleAssignment,
+                                    listPermissions
+                                ));
+                            }
+                            catch (Exception ex)
+                            {
+                                _logger?.LogInformation(
+                                    $"Unable to create the List Data Transfer Object : {ex.Message}");
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogInformation($"Error Fetching list properties : {ex.Message}");
+                        }
+
+                    }
+                }
+                return listsSettingsDto;
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogError($"Error fetching the ClientContext Lists: {ex.Message}");
+                return new List<ListsSettingsDto>();
+            }
         }
 
+        private List<string> GetQuickLaunchHeaders()
+        {
+            List<string> quickLaunchHeaders = new();
+            try
+            {
+                _clientContext.Load(_clientContext.Web.Navigation.QuickLaunch);
+                _clientContext.ExecuteQuery();
+                foreach (NavigationNode navigationNode in _clientContext.Web.Navigation.QuickLaunch)
+                {
+                    _clientContext.Load
+                    (
+                        navigationNode,
+                        n => n.Children
+                    );
+                    try
+                    {
+                        _clientContext.ExecuteQuery();
+                        foreach (NavigationNode childNode in navigationNode.Children)
+                        {
+                            quickLaunchHeaders.Add(childNode.Title);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger?.LogInformation($"Error fetching ClientContext: {ex}");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogInformation($"Error fetching List QuickLaunchHeader : {ex.Message}");
+            }
+
+            return quickLaunchHeaders;
+        }
         private Guid GetEnterpriseKeywordsValue()
         {
             Guid enterpriseKeywordsValue = Guid.Empty;
@@ -245,6 +353,30 @@ namespace MS365Provisioning.SharePoint.Services
         {
             List<SiteColumnsDto> list = new List<SiteColumnsDto>();
             return list;
+        }
+
+        private List<string> GetListContentTypes(List list)
+        {
+            List<string> contentTypes = new();
+            try
+            {
+                _clientContext.Load(list.ContentTypes);
+                _clientContext.ExecuteQuery();
+                if (list.ContentTypes.Count == 0)
+                {
+                    return contentTypes;
+                }
+                foreach (ContentType contentType in list.ContentTypes)
+                {
+                    contentTypes.Add(contentType.Name);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogInformation($"Error fetching ContentTypes: {ex.Message}");
+                contentTypes.Clear();
+            }
+            return contentTypes;
         }
     }
 }

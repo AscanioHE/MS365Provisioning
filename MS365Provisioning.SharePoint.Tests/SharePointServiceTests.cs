@@ -13,16 +13,17 @@ namespace MS365Provisioning.SharePoint.Tests
         private readonly ISharePointService _sharePointService;
         private readonly IConfigurationRoot _config;
 
-        public SharePointServiceTests(ITestOutputHelper output, ISharePointService sharePointService)
+        public SharePointServiceTests(ITestOutputHelper output)
         {
-            _sharePointService = sharePointService;
-            SharePointSettings sharePointSettings = GetSharePointSettings();
+
             _config = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("dev.settings.json")
                 .Build();
+            SharePointSettings sharePointSettings = new();
             ILogger? logger = output.BuildLogger();
             string? siteUrl = sharePointSettings.SiteUrl;
+            _sharePointService = new SharePointService(this,logger,siteUrl);
             if (siteUrl != null) _sharePointService = new SharePointService(this, logger, siteUrl);
         }
 
