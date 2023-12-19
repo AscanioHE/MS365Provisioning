@@ -23,11 +23,7 @@ namespace MS365Provisioning.SharePoint.Tests
                 .Build();
             ILogger? logger = output.BuildLogger();
             string? siteUrl = sharePointSettings.SiteUrl;
-<<<<<<< HEAD
-            //if (siteUrl != null) _sharePointService = new SharePointService(this, logger, siteUrl);
-=======
             if (siteUrl != null) _sharePointService = new SharePointService(this, logger, siteUrl);
->>>>>>> 14656b83264f8a3fb49302460943b25d03c91287
         }
 
         public string? GetSetting(string key)
