@@ -10,9 +10,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Divergic.Logging.Xunit" Version="4.3.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.3.2" />
     <PackageReference Include="xunit" Version="2.4.2" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.5">
@@ -28,12 +25,6 @@
   <ItemGroup>
     <ProjectReference Include="..\MS365Provisioning.Common\MS365Provisioning.Common.csproj" />
     <ProjectReference Include="..\MS365Provisioning.SharePoint\MS365Provisioning.SharePoint.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Update="dev.settings.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
 
 </Project>
