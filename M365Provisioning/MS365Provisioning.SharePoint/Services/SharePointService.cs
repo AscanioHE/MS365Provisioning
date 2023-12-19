@@ -1,12 +1,11 @@
-﻿using System.Collections;
-using System.Diagnostics;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Microsoft.SharePoint.Client;
 using MS365Provisioning.SharePoint.Model;
 using MS365Provisioning.SharePoint.Settings;
-using PnP.Core.Model.SharePoint;
+using System.Collections;
+using System.Security.Cryptography.X509Certificates;
+using System.Text;
+using List = Microsoft.SharePoint.Client.List;
 
 namespace MS365Provisioning.SharePoint.Services
 {
@@ -21,7 +20,7 @@ namespace MS365Provisioning.SharePoint.Services
         {
             _sharePointSettingsService = sharePointSettingsService;
             _logger = logger;
-            _clientContext = GetClientContext(siteUrl)!; 
+            _clientContext = GetClientContext(siteUrl)!;
             _lists = _clientContext.Web.Lists;
 
         }
@@ -106,15 +105,15 @@ namespace MS365Provisioning.SharePoint.Services
                     {
                         _clientContext.Load(
                             list,
-                            l=>l.Title,
+                            l => l.Title,
                             l => l.DefaultViewUrl,
                             l => l.BaseType,
                             l => l.ContentTypes,
                             l => l.OnQuickLaunch,
                             l => l.HasUniqueRoleAssignments,
                             l => l.Fields.Include(
-                                f=> f.InternalName,
-                                f=> f.Title));
+                                f => f.InternalName,
+                                f => f.Title));
                         try
                         {
                             _clientContext.ExecuteQuery();
@@ -150,8 +149,8 @@ namespace MS365Provisioning.SharePoint.Services
                         }
 
                     }
-                    return listsSettingsDto;
                 }
+                return listsSettingsDto;
             }
             catch (Exception ex)
             {
@@ -183,8 +182,7 @@ namespace MS365Provisioning.SharePoint.Services
                     }
                     catch (Exception ex)
                     {
-                        //_logger?.LogInformation($"Error fetching ClientContext: {ex}");
-                        throw;
+                        _logger?.LogInformation($"Error fetching ClientContext: {ex}");
                     }
                 }
             }
@@ -213,7 +211,6 @@ namespace MS365Provisioning.SharePoint.Services
             }
             catch (Exception ex)
             {
-                // Log the exception
                 _logger?.LogInformation($"Error fetching Enterprise Keywords value: {ex.Message}");
                 enterpriseKeywordsValue = Guid.Empty;
             }
@@ -259,15 +256,97 @@ namespace MS365Provisioning.SharePoint.Services
         ________________________________________________________________________________________________________________*/
         public List<ListViewDto> LoadListViews()
         {
-            throw new NotImplementedException();
+            List<ListViewDto> listsSettingsDto = new();
+            _clientContext.Load(_lists, lc => lc.Include(
+                l => l.Hidden)
+            );
+            try
+            {
+                _clientContext.ExecuteQuery();
+                foreach (List list in _lists)
+                {
+                    if (!list.Hidden)
+                    {
+                        listsSettingsDto = GetListViews(list);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation($"Error Fetching Lists : {ex.Message}");
+            }
+            return listsSettingsDto;
         }
-
+        private List<ListViewDto> GetListViews(List list)
+        {
+            List<ListViewDto> listviewDto = new();
+            ViewCollection listViews = list.Views;
+            _clientContext.Load(listViews);
+            try
+            {
+                _clientContext.ExecuteQuery();
+                foreach (View listView in listViews)
+                {
+                    List<string> viewFields = new List<string>();
+                    foreach (string field in listView.ViewFields)
+                    {
+                        viewFields.Add(field);
+                    }
+                    listviewDto.Add(new(
+                        list.Title,
+                        listView.Title,
+                        listView.DefaultView,
+                        viewFields,
+                        listView.RowLimit,
+                        listView.Scope.ToString(),
+                        $"{list.Title}"
+                        ));
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation($"Error fetching Listviews : {ex.Message}");
+            }
+            return listviewDto;
+        }
+        /*______________________________________________________________________________________________________________
+         Fetch Lists SiteColumns
+        ________________________________________________________________________________________________________________*/
         public List<SiteColumnsDto> LoadSiteColumnsDtos()
         {
-            throw new NotImplementedException();
+            List<SiteColumnsDto> siteColumnsDtos = new List<SiteColumnsDto>();
+            Web web = _clientContext.Web;
+            try
+            {
+                _clientContext.ExecuteQuery();
+                foreach (Field column in web.Fields)
+                {
+                    _clientContext.Load(column,
+                        c => c.Title,
+                        c => c.SchemaXml,
+                        c => c.DefaultValue);
+                    try
+                    {
+                        _clientContext.ExecuteQuery();
+
+                    }
+                    catch(Exception ex)
+                    {
+                        _logger.LogInformation($"Error fetching SiteColumns : {ex.Message}");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation($"Error fetching ClientContext Web : {ex.Message}");
+            }
+            return siteColumnsDtos;
         }
 
-      
+
+        /*______________________________________________________________________________________________________________
+         Config SharePoint settings
+        ________________________________________________________________________________________________________________*/
         private X509Certificate2 GetCertificateByThumbprint(string? thumbprint)
         {
             try
