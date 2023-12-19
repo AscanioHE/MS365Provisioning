@@ -3,9 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.7.34221.43
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MS365Provisioning.SharePoint", "MS365Provisioning.SharePoint\MS365Provisioning.SharePoint.csproj", "{DA8088EC-50CB-4B68-B775-22F11081C67C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MS365Provisioning.SharePoint", "MS365Provisioning.SharePoint.csproj", "{816DF181-8409-434E-9146-5192A9E0D1CA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MS365Provisioning.SharePoint.Test", "MS365Provisioning.SharePoint.Test\MS365Provisioning.SharePoint.Test.csproj", "{96ADC498-F708-41C1-B53F-54B654C35ED0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MS365Provisioning.Common.Tests", "..\MS365Provisioning.Common.Tests\MS365Provisioning.Common.Tests.csproj", "{ABF6B4AC-7E55-4A94-BEFC-3AF09432CBFC}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MS365Provisioning.Common", "..\MS365Provisioning.Common\MS365Provisioning.Common.csproj", "{DE4283F2-4294-4908-AFA4-D2845B703E4B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MS365Provisioning.SharePoint.Tests", "..\MS365Provisioning.SharePoint.Tests\MS365Provisioning.SharePoint.Tests.csproj", "{31F28051-ADCD-4532-B914-40679DE33F1D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -13,14 +17,22 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{DA8088EC-50CB-4B68-B775-22F11081C67C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DA8088EC-50CB-4B68-B775-22F11081C67C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DA8088EC-50CB-4B68-B775-22F11081C67C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DA8088EC-50CB-4B68-B775-22F11081C67C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{96ADC498-F708-41C1-B53F-54B654C35ED0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{96ADC498-F708-41C1-B53F-54B654C35ED0}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{96ADC498-F708-41C1-B53F-54B654C35ED0}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{96ADC498-F708-41C1-B53F-54B654C35ED0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{816DF181-8409-434E-9146-5192A9E0D1CA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{816DF181-8409-434E-9146-5192A9E0D1CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{816DF181-8409-434E-9146-5192A9E0D1CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{816DF181-8409-434E-9146-5192A9E0D1CA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ABF6B4AC-7E55-4A94-BEFC-3AF09432CBFC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ABF6B4AC-7E55-4A94-BEFC-3AF09432CBFC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ABF6B4AC-7E55-4A94-BEFC-3AF09432CBFC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ABF6B4AC-7E55-4A94-BEFC-3AF09432CBFC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DE4283F2-4294-4908-AFA4-D2845B703E4B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DE4283F2-4294-4908-AFA4-D2845B703E4B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DE4283F2-4294-4908-AFA4-D2845B703E4B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DE4283F2-4294-4908-AFA4-D2845B703E4B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{31F28051-ADCD-4532-B914-40679DE33F1D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{31F28051-ADCD-4532-B914-40679DE33F1D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{31F28051-ADCD-4532-B914-40679DE33F1D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{31F28051-ADCD-4532-B914-40679DE33F1D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
