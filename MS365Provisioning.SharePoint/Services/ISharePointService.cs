@@ -12,6 +12,5 @@ namespace MS365Provisioning.SharePoint.Services
         List<SiteSettingsDto> LoadSiteSettings();
         List<ListsSettingsDto> LoadListsSettings();
         List<ListViewDto> LoadListViews();
-        List<SiteColumnsDto> LoadSiteColumnsDtos();
     }
 }

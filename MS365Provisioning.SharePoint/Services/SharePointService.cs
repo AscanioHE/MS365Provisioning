@@ -60,7 +60,32 @@ namespace MS365Provisioning.SharePoint.Services
                 return new ClientContext("");
             }
         }
-
+        /*______________________________________________________________________________________________________________
+         Config SharePoint settings
+        ________________________________________________________________________________________________________________*/
+        private X509Certificate2 GetCertificateByThumbprint(string? thumbprint)
+        {
+            try
+            {
+                using X509Store store = new(StoreName.My, StoreLocation.CurrentUser);
+                store.Open(OpenFlags.ReadOnly);
+                var certificates = store.Certificates.Find(X509FindType.FindByThumbprint, thumbprint, false);
+                if (certificates.Count > 0)
+                {
+                    _logger?.LogInformation("Authenticated and connected to SharePoint!");
+                    return certificates[0];
+                }
+                else
+                {
+                    throw new InvalidOperationException($"Certificate with thumbprint {thumbprint} not found!");
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogInformation($"Error creating a Certificate : {ex}");
+                return null;
+            }
+        }
         /*______________________________________________________________________________________________________________
          Fetch SiteSettings
         ________________________________________________________________________________________________________________*/
@@ -101,15 +126,6 @@ namespace MS365Provisioning.SharePoint.Services
         {
             List<ListsSettingsDto> list = new List<ListsSettingsDto>();
             return list;
-        }
-        
-        public List<ListViewDto> LoadListViews()
-            {
-            List<ListViewDto> list = new List<ListViewDto>();
-            return list;
-            }
-
-            return quickLaunchHeaders;
         }
 
         private Guid GetEnterpriseKeywordsValue()
@@ -228,12 +244,6 @@ namespace MS365Provisioning.SharePoint.Services
         public List<SiteColumnsDto> LoadSiteColumnsDtos()
         {
             List<SiteColumnsDto> list = new List<SiteColumnsDto>();
-            return list;
-        }
-
-        public List<SiteSettingsDto> LoadSiteSettings()
-            {
-            List<SiteSettingsDto> list = new List<SiteSettingsDto>();
             return list;
         }
     }

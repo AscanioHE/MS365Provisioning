@@ -16,7 +16,7 @@ namespace MS365Provisioning.SharePoint.Tests
         public SharePointServiceTests(ITestOutputHelper output, ISharePointService sharePointService)
         {
             _sharePointService = sharePointService;
-            SharePointSettings sharePointSettings = new ();
+            SharePointSettings sharePointSettings = GetSharePointSettings();
             _config = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("dev.settings.json")
