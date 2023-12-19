@@ -5,7 +5,6 @@
         public string ListName { get; set; }
         public string ViewName { get; set; }
         public bool DefaultView { get; set; } = false;
-        //public ViewFieldCollection ViewFields {  get; set; } 
         public List<string> ViewFields { get; set; }
         public uint RowLimit { get; set; }
         public string ListScope { get; set; }

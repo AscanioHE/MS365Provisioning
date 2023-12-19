@@ -3,6 +3,7 @@ using System.Dynamic;
 using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.Json;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using File = System.IO.File;
 
@@ -13,12 +14,14 @@ namespace WriteDataToJsonFiles
 
             public object DtoFile { get; set; } = new();
             public string JsonFilePath { get; set; } = "TempJsonFile";
-        public WriteDataToJsonFile()
+            public ILogger _logger;
+        public WriteDataToJsonFile(ILogger logger)
         {
             string appSettingsPath = "appsettings.json";
             IConfigurationRoot configuration = new ConfigurationBuilder()
                 .AddJsonFile(appSettingsPath, optional: false, reloadOnChange: true)
                 .Build();
+            _logger = logger;
         }
 
         public string ConvertDtoToString()
@@ -30,8 +33,8 @@ namespace WriteDataToJsonFiles
             }
             catch (Exception ex)
             {
-                //_logger?.LogInformation($"Error creating Json String : {ex.Message}");
-                throw;
+                _logger?.LogInformation($"Error creating Json String : {ex.Message}");
+                return String.Empty;
             }
         }
         public string Write2JsonFile()
@@ -46,11 +49,9 @@ namespace WriteDataToJsonFiles
             }
             catch (Exception ex)
             {
-                //_logger?.LogInformation($"Error Writing Json String to file : {ex.Message}");
-                throw;
+                _logger?.LogInformation($"Error Writing Json String to file : {ex.Message}");
+                return String.Empty;
             }
         }
-
-
     }
 }
