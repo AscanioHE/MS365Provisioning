@@ -11,7 +11,7 @@ namespace MS365Provisioning.SharePoint.Services
 {
     public class SharePointService : ISharePointService
     {
-        private readonly ISharePointSettingsService? _sharePointSettingsService;
+        private readonly ISharePointSettingsService _sharePointSettingsService;
         private readonly ILogger? _logger;
         private readonly ClientContext _clientContext;
         private readonly ListCollection? _lists;
@@ -365,7 +365,6 @@ namespace MS365Provisioning.SharePoint.Services
             {
                 using X509Store store = new(StoreName.My, StoreLocation.CurrentUser);
                 store.Open(OpenFlags.ReadOnly);
-                Debug.Assert(thumbprint != null, nameof(thumbprint) + " != null");
                 var certificates = store.Certificates.Find(X509FindType.FindByThumbprint, thumbprint, false);
                 if (certificates.Count > 0)
                 {
