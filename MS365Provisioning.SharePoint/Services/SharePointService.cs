@@ -2,7 +2,6 @@
 using Microsoft.SharePoint.Client;
 using MS365Provisioning.SharePoint.Model;
 using MS365Provisioning.SharePoint.Settings;
-using Newtonsoft.Json;
 using System.Collections;
 using System.Diagnostics;
 using System.Security.Cryptography.X509Certificates;
@@ -328,7 +327,7 @@ namespace MS365Provisioning.SharePoint.Services
             List<ListViewDto> listviewDto = new();
             ViewCollection listViews = list.Views;
             _clientContext.Load(list,
-                l=> l.Title);
+                l => l.Title);
             _clientContext.Load(listViews);
             try
             {
@@ -361,7 +360,7 @@ namespace MS365Provisioning.SharePoint.Services
                             $"{list.Title}"
                             ));
                     }
-                    catch(Exception ex)
+                    catch (Exception ex)
                     {
                         _logger?.LogInformation($"Error fetching ListView : {ex.Message}");
                     }
@@ -428,20 +427,20 @@ namespace MS365Provisioning.SharePoint.Services
                 try
                 {
                     _clientContext.ExecuteQuery();
-                    foreach(List list in _lists)
+                    foreach (List list in _lists)
                     {
                         if (!list.Hidden)
                         {
                             ContentTypeCollection contentTypes = list.ContentTypes;
                             _clientContext.Load(
-                                contentTypes, cts=>cts.Include(
-                                    ct=>ct.Name,
-                                    ct=>ct.Parent,
+                                contentTypes, cts => cts.Include(
+                                    ct => ct.Name,
+                                    ct => ct.Parent,
                                     //ToDo: check required (field.Required?) 
-                                    ct=>ct.Fields.Include(
-                                        f=> f.InternalName)));
+                                    ct => ct.Fields.Include(
+                                        f => f.InternalName)));
                             _clientContext.ExecuteQuery();
-                            List<string> contentTypeFields = new ();
+                            List<string> contentTypeFields = new();
                             if (list.ContentTypes.Count == 0)
                             {
                                 return contentTypesDto;
@@ -449,14 +448,14 @@ namespace MS365Provisioning.SharePoint.Services
                             foreach (ContentType contentType in contentTypes)
                             {
                                 //ToDo: check if all fields must be added
-                                foreach(Field field in contentType.Fields)
+                                foreach (Field field in contentType.Fields)
                                 {
                                     string fieldName = field.InternalName;
                                     contentTypeFields.Add(fieldName);
                                 }
                                 string contentTypeName = contentType.Name;
                                 string contentTypeParent = contentType.Parent.Name;
-                                
+
                                 contentTypesDto.Add(new ContentTypesDto(
                                     contentTypeName, contentTypeParent, contentTypeFields, true));
                             }
@@ -468,13 +467,13 @@ namespace MS365Provisioning.SharePoint.Services
                     _logger?.LogInformation($"Error fetching Content Types : {ex.Message}");
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger?.LogInformation($"Error fetching Lists types : {ex.Message}");
             }
             finally
             {
-                _clientContext.Dispose(); 
+                _clientContext.Dispose();
             }
             return contentTypesDto;
         }
@@ -487,39 +486,43 @@ namespace MS365Provisioning.SharePoint.Services
             {
                 _clientContext.ExecuteQuery();
 
-                foreach(List list in _lists)
+                foreach (List list in _lists)
                 {
-                    _clientContext.Load(
-                        list,
-                        l=>l.Title,
-                        l=> l.Fields);
-                    try
+                    if (!list.Hidden)
                     {
-                        _clientContext.ExecuteQuery();
-                        List<string> subFields = new List<string>();
-                        foreach (Field field in  list.Fields)
+                        _clientContext.Load(
+                            list,
+                            l => l.Title,
+                            l => l.Fields);
+                        try
                         {
-                            _clientContext.Load(field,
-                                f => f.Title);
-                            try
+                            _clientContext.ExecuteQuery();
+                            List<string> subFields = new List<string>();
+                            foreach (Field field in list.Fields)
                             {
-                                _clientContext.ExecuteQuery();
-                                subFields.Add(field.Title);
+                                _clientContext.Load(field,
+                                    f => f.Title);
+                                try
+                                {
+                                    _clientContext.ExecuteQuery();
+                                    subFields.Add(field.Title);
+                                }
+                                catch (Exception ex)
+                                {
+                                    _logger?.LogInformation($"Error fetching SubFolders : {ex.ToString()}");
+                                }
+                                folderStructureDtos.Add(new(
+                                    list.Title,
+                                    field.Title,
+                                    subFields
+                                    ));
                             }
-                            catch (Exception ex)
-                            {
-                                _logger?.LogInformation($"Error fetching SubFolders : {ex.ToString()}");
-                            }
-                        folderStructureDtos.Add(new(
-                            list.Title,
-                            field.Title,
-                            subFields
-                            ));
                         }
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger?.LogInformation($"Error fetching list Fields : {ex.Message}");
+                        catch (Exception ex)
+                        {
+                            _logger?.LogInformation($"Error fetching list Fields : {ex.Message}");
+                        }
+
                     }
                 }
             }
@@ -532,6 +535,17 @@ namespace MS365Provisioning.SharePoint.Services
                 _clientContext.Dispose();
             }
             return folderStructureDtos;
+        }
+
+        public List<SitePermissionsDto> LoadSitePermissions()
+        {
+            List<SitePermissionsDto> sitePermissionsDtos = new(); 
+            IEnumerable roles = _clientContext.LoadQuery(_clientContext.Web.RoleAssignments.Include(roleAsg => roleAsg.Member,
+                                                                      roleAsg => roleAsg.RoleDefinitionBindings.Include(roleDef => roleDef.Name)));
+            _clientContext.ExecuteQuery();
+
+            Dictionary<string, string> permisionDetails = new Dictionary<string, string>();
+            return sitePermissionsDtos;
         }
         private List<string> GetListContentTypes(List list)
         {

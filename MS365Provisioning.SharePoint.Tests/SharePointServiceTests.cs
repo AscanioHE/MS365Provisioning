@@ -89,5 +89,14 @@ namespace MS365Provisioning.SharePoint.Tests
             Assert.NotEmpty(siteColumnsDto);
             Assert.IsType<List<SiteColumnsDto>>(siteColumnsDto);
         }
+        [Fact]
+        public void Try_FolderStructure_Expect_DTO()
+        {
+            //Act
+            List<FolderStructureDto> folderStructureDto = _sharePointService.GetFolderStructures();
+            //Assert
+            Assert.NotEmpty(folderStructureDto);
+            Assert.IsType<List<FolderStructureDto>>(folderStructureDto);
+        }
     }
 }
