@@ -39,7 +39,15 @@ namespace MS365Provisioning.SharePoint.Tests
                 ClientId = GetSetting("SharePoint:ClientId"),
                 TenantId = GetSetting("SharePoint:TenantId"),
                 ThumbPrint = GetSetting("SharePoint:ThumbPrint"),
-                SiteUrl = GetSetting("SharePoint:SiteUrl")
+                SiteUrl = GetSetting("SharePoint:SiteUrl"),
+                FolderStructureFilePath = GetSetting("SharePoint:SiteSettingsFilePath"),
+                ListsFilePath = GetSetting("SharePoint:SiteSettingsFilePath"),
+                ListViewsFilePath = GetSetting("SharePoint:SiteSettingsFilePath"),
+                SiteColumnsFilePath = GetSetting("SharePoint:SiteSettingsFilePath"),
+                SiteSettingsFilePath = GetSetting("SharePoint:SiteSettingsFilePath"),
+                SitePermissionsFilePath = GetSetting("SharePoint:SiteSettingsFilePath"),
+                WebPartsFilePath = GetSetting("SharePoint:SiteSettingsFilePath"),
+                ContentTypesFilePath = GetSetting("SharePoint:ContentTypesFilePath")
             };
         }
         [Fact]

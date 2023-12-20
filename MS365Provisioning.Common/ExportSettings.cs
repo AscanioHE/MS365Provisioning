@@ -7,16 +7,14 @@ namespace MS365Provisioning.Common
     public class ExportSettings : IExportSettings
     {
         public object DtoFile { get; set; }
-        public string FilePath { get; set; }
         public string FileName { get; set; }
 
         private readonly ILogger _logger;
 
-        public ExportSettings(object dto, ILogger logger, string fileName, string file)
+        public ExportSettings(object dto, string fileName, ILogger logger)
         {
             DtoFile = dto;
-            FilePath = fileName;
-            FileName = file;
+            FileName = fileName;
             _logger = logger;
         }
         public string ConvertToJsonString()
@@ -29,10 +27,8 @@ namespace MS365Provisioning.Common
         {
             try
             {
-                
-                FilePath += $"{FileName}";
                 string json = JsonConvert.SerializeObject(DtoFile, Formatting.Indented);
-                File.WriteAllText(FilePath, json + Environment.NewLine);
+                File.WriteAllText(FileName, json + Environment.NewLine);
                 return true;
             }
             catch (Exception ex)

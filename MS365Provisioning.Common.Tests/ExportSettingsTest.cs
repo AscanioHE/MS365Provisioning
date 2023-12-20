@@ -1,12 +1,18 @@
+using Microsoft.Extensions.Logging;
 using MS365Provisioning.SharePoint.Model;
 
 namespace MS365Provisioning.Common.Tests
 {
     public class ExportSettingsTest : IExportSettings
     {
-        public object DtoFile { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public string FilePath { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public string FileName { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public object DtoFile { get; set; }
+        public string FileName {  get; set; }
+        public ILogger _logger;
+
+        public ExportSettingsTest(object dtoFile, string fileName,ILogger logger)
+        {
+            _logger = logger;
+        }
 
         public string ConvertToJsonString()
         {

@@ -1,27 +1,13 @@
 ﻿using Microsoft.Extensions.Logging;
-using Microsoft.Graph;
 using Microsoft.SharePoint.Client;
 using Microsoft.SharePoint.Client.Utilities;
 using MS365Provisioning.SharePoint.Model;
 using MS365Provisioning.SharePoint.Settings;
-using PnP.Framework.Provisioning.Model;
 using System.Collections;
-using System.Diagnostics;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
-using ContentType = Microsoft.SharePoint.Client.ContentType;
-using ContentTypeCollection = Microsoft.SharePoint.Client.ContentTypeCollection;
-using Field = Microsoft.SharePoint.Client.Field;
-using FieldCollection = Microsoft.SharePoint.Client.FieldCollection;
-using Group = Microsoft.SharePoint.Client.Group;
-using ILogger = Microsoft.Extensions.Logging.ILogger;
-using List = Microsoft.SharePoint.Client.List;
-using NavigationNode = Microsoft.SharePoint.Client.NavigationNode;
-using RoleAssignment = Microsoft.SharePoint.Client.RoleAssignment;
-using RoleAssignmentCollection = Microsoft.SharePoint.Client.RoleAssignmentCollection;
-using RoleDefinition = Microsoft.SharePoint.Client.RoleDefinition;
-using User = Microsoft.SharePoint.Client.User;
-using View = Microsoft.SharePoint.Client.View;
+using MS365Provisioning.Common;
+
 
 namespace MS365Provisioning.SharePoint.Services
 {
@@ -31,6 +17,8 @@ namespace MS365Provisioning.SharePoint.Services
         private readonly ILogger? _logger;
         private readonly ClientContext _clientContext;
         private readonly ListCollection? _lists;
+        private SharePointSettings sharePointSettings;
+        private string FileName {  get; set; }
         public SharePointService(ISharePointSettingsService? sharePointSettingsService, ILogger? logger, string siteUrl)
         {
             _sharePointSettingsService = sharePointSettingsService;
@@ -47,7 +35,7 @@ namespace MS365Provisioning.SharePoint.Services
             _logger?.LogInformation(message: message);
             if (_sharePointSettingsService != null)
             {
-                SharePointSettings? sharePointSettings = _sharePointSettingsService.GetSharePointSettings();
+                sharePointSettings = _sharePointSettingsService.GetSharePointSettings();
 
                 ClientContext? ctx;
                 using (X509Certificate2? certificate = GetCertificateByThumbprint(sharePointSettings.ThumbPrint))
@@ -106,6 +94,7 @@ namespace MS365Provisioning.SharePoint.Services
         public List<SiteSettingsDto> LoadSiteSettings()
         {
             List<SiteSettingsDto> siteSettingsDto = new();
+            FileName = sharePointSettings.SiteSettingsFilePath;
             try
             {
                 WebTemplateCollection webTemplateCollection = _clientContext.Web.GetAvailableWebTemplates(1033, true);
@@ -138,6 +127,7 @@ namespace MS365Provisioning.SharePoint.Services
         public List<ListsSettingsDto> LoadListsSettings()
         {
             List<ListsSettingsDto> listsSettingsDto = new();
+            FileName = sharePointSettings.ListsFilePath;
             bool breakRoleAssignment = false;
             _clientContext.Load(_lists, lc => lc.Include(
                 l => l.Hidden)
@@ -312,6 +302,7 @@ namespace MS365Provisioning.SharePoint.Services
         public List<ListViewDto> LoadListViews()
         {
             List<ListViewDto> listsSettingsDto = new();
+            FileName = sharePointSettings.ListViewsFilePath;
             _clientContext.Load(_lists, lc => lc.Include(
                 l => l.Hidden)
             );
@@ -396,6 +387,7 @@ namespace MS365Provisioning.SharePoint.Services
         public List<SiteColumnsDto> LoadSiteColumns()
         {
             List<SiteColumnsDto> siteColumnsDtos = new List<SiteColumnsDto>();
+            FileName = sharePointSettings.SiteColumnsFilePath;
             try
             {
                 FieldCollection siteColumns = _clientContext.Web.Fields;
@@ -433,6 +425,7 @@ namespace MS365Provisioning.SharePoint.Services
         public List<ContentTypesDto> LoadContentTypes()
         {
             List<ContentTypesDto> contentTypesDto = new List<ContentTypesDto>();
+            FileName = sharePointSettings.ContentTypesFilePath;
             try
             {
                 _clientContext.Load(_lists);
@@ -493,6 +486,7 @@ namespace MS365Provisioning.SharePoint.Services
         public List<FolderStructureDto> GetFolderStructures()
         {
             List<FolderStructureDto> folderStructureDtos = new List<FolderStructureDto>();
+            FileName = sharePointSettings.FolderStructureFilePath;
             _clientContext.Load(_lists);
             try
             {
@@ -552,6 +546,7 @@ namespace MS365Provisioning.SharePoint.Services
         public List<SitePermissionsDto> LoadSitePermissions()
         {
             List<SitePermissionsDto> sitePermissionsDtos = new();
+            FileName = sharePointSettings.SitePermissionsFilePath;
             Web rootWeb = _clientContext.Site.RootWeb;
             try
             {

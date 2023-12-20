@@ -13,6 +13,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\MS365Provisioning.Common\MS365Provisioning.Common.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Update="Model\ListsSettingsDTO.cs">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
