@@ -3,6 +3,7 @@ using Microsoft.SharePoint.Client;
 using MS365Provisioning.SharePoint.Model;
 using MS365Provisioning.SharePoint.Settings;
 using System.Collections;
+using System.Diagnostics;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
@@ -349,12 +350,46 @@ namespace MS365Provisioning.SharePoint.Services
         /*______________________________________________________________________________________________________________
          Fetch Lists SiteColumns
         ________________________________________________________________________________________________________________*/
-        public List<SiteColumnsDto> LoadSiteColumnsDtos()
+        public List<SiteColumnsDto> LoadSiteColumns()
         {
-            List<SiteColumnsDto> list = new List<SiteColumnsDto>();
-            return list;
-        }
+            List<SiteColumnsDto> siteColumnsDtos = new List<SiteColumnsDto>();
+            try
+            {
+                FieldCollection siteColumns = _clientContext.Web.Fields;
+                _clientContext.Load(siteColumns,
+                             scc => scc.Include(
+                                                                            sc => sc.Hidden,
+                                                                            sc => sc.InternalName,
+                                                                            sc => sc.SchemaXml,
+                                                                            sc => sc.DefaultValue));
+                try
+                {
+                    _clientContext.ExecuteQuery();
+                    foreach (Field siteColumn in siteColumns)
+                    {
+                        siteColumnsDtos.Add(new SiteColumnsDto(
+                            siteColumn.InternalName, siteColumn.SchemaXml, siteColumn.DefaultValue));
+                    }
 
+                    return siteColumnsDtos;
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"Error fetching Site Column settings : {ex.Message}");
+                    throw;
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error fetching ContextClient :  {ex.Message}");
+                throw;
+            }
+            finally
+            {
+                _clientContext.Dispose();
+            }
+            return siteColumnsDtos;
+        }
         private List<string> GetListContentTypes(List list)
         {
             List<string> contentTypes = new();

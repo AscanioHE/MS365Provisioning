@@ -69,5 +69,13 @@ namespace MS365Provisioning.SharePoint.Tests
             //Assert
             Assert.IsType<List<ListViewDto>>(listViewDtos);
         }
+        [Fact]
+        public void Try_SiteColumns_Expect_DTO()
+        {
+            //Act
+            List<SiteColumnsDto> siteColumnsDto = _sharePointService.LoadSiteColumns();
+            //Assert
+            Assert.IsType<List<SiteColumnsDto>>(siteColumnsDto);
+        }
     }
 }
