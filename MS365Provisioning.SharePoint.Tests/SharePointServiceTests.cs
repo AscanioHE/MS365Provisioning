@@ -98,5 +98,14 @@ namespace MS365Provisioning.SharePoint.Tests
             Assert.NotEmpty(folderStructureDto);
             Assert.IsType<List<FolderStructureDto>>(folderStructureDto);
         }
+        [Fact]
+        public void Try_LoadSitePermissions_Expect_DTO()
+        {
+            //Act
+            List<SitePermissionsDto> sitePermissions = _sharePointService.LoadSitePermissions();
+            //Assert
+            //Assert.NotEmpty(sitePermissions);
+            Assert.IsType<List<SitePermissionsDto>>(sitePermissions);
+        }
     }
 }

@@ -15,5 +15,6 @@ namespace MS365Provisioning.SharePoint.Services
         List<SiteColumnsDto> LoadSiteColumns();
         List<ContentTypesDto> LoadContentTypes();
         List<FolderStructureDto> GetFolderStructures();
+        List<SitePermissionsDto> LoadSitePermissions();
     }
 }

@@ -1,13 +1,27 @@
 ﻿using Microsoft.Extensions.Logging;
+using Microsoft.Graph;
 using Microsoft.SharePoint.Client;
+using Microsoft.SharePoint.Client.Utilities;
 using MS365Provisioning.SharePoint.Model;
 using MS365Provisioning.SharePoint.Settings;
+using PnP.Framework.Provisioning.Model;
 using System.Collections;
 using System.Diagnostics;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using ContentType = Microsoft.SharePoint.Client.ContentType;
+using ContentTypeCollection = Microsoft.SharePoint.Client.ContentTypeCollection;
+using Field = Microsoft.SharePoint.Client.Field;
+using FieldCollection = Microsoft.SharePoint.Client.FieldCollection;
+using Group = Microsoft.SharePoint.Client.Group;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 using List = Microsoft.SharePoint.Client.List;
+using NavigationNode = Microsoft.SharePoint.Client.NavigationNode;
+using RoleAssignment = Microsoft.SharePoint.Client.RoleAssignment;
+using RoleAssignmentCollection = Microsoft.SharePoint.Client.RoleAssignmentCollection;
+using RoleDefinition = Microsoft.SharePoint.Client.RoleDefinition;
+using User = Microsoft.SharePoint.Client.User;
+using View = Microsoft.SharePoint.Client.View;
 
 namespace MS365Provisioning.SharePoint.Services
 {
@@ -325,7 +339,7 @@ namespace MS365Provisioning.SharePoint.Services
         private List<ListViewDto> GetListViews(List list)
         {
             List<ListViewDto> listviewDto = new();
-            ViewCollection listViews = list.Views;
+            Microsoft.SharePoint.Client.ViewCollection listViews = list.Views;
             _clientContext.Load(list,
                 l => l.Title);
             _clientContext.Load(listViews);
@@ -402,14 +416,12 @@ namespace MS365Provisioning.SharePoint.Services
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"Error fetching Site Column settings : {ex.Message}");
-                    throw;
+                    _logger?.LogInformation($"Error fetching Site Column settings : {ex.Message}");                    
                 }
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Error fetching ContextClient :  {ex.Message}");
-                throw;
+                _logger?.LogInformation($"Error fetching ContextClient :  {ex.Message}");
             }
             finally
             {
@@ -436,7 +448,7 @@ namespace MS365Provisioning.SharePoint.Services
                                 contentTypes, cts => cts.Include(
                                     ct => ct.Name,
                                     ct => ct.Parent,
-                                    //ToDo: check required (field.Required?) 
+                                    //TODO: check required (field.Required?) 
                                     ct => ct.Fields.Include(
                                         f => f.InternalName)));
                             _clientContext.ExecuteQuery();
@@ -447,7 +459,7 @@ namespace MS365Provisioning.SharePoint.Services
                             }
                             foreach (ContentType contentType in contentTypes)
                             {
-                                //ToDo: check if all fields must be added
+                                //TODO: check if all fields must be added
                                 foreach (Field field in contentType.Fields)
                                 {
                                     string fieldName = field.InternalName;
@@ -539,12 +551,38 @@ namespace MS365Provisioning.SharePoint.Services
 
         public List<SitePermissionsDto> LoadSitePermissions()
         {
-            List<SitePermissionsDto> sitePermissionsDtos = new(); 
-            IEnumerable roles = _clientContext.LoadQuery(_clientContext.Web.RoleAssignments.Include(roleAsg => roleAsg.Member,
-                                                                      roleAsg => roleAsg.RoleDefinitionBindings.Include(roleDef => roleDef.Name)));
-            _clientContext.ExecuteQuery();
+            List<SitePermissionsDto> sitePermissionsDtos = new();
+            Web rootWeb = _clientContext.Site.RootWeb;
+            try
+            {
+                _clientContext.Load(_clientContext.Web,
+                    w => w.Title,
+                    w=>w.SiteGroups.Include(
+                        item => item.Users,
+                        item => item.PrincipalType,
+                        item => item.LoginName,
+                        item => item.Title));
+                _clientContext.ExecuteQuery();
+                string webTitle = _clientContext.Web.Title;
 
-            Dictionary<string, string> permisionDetails = new Dictionary<string, string>();
+                foreach (Group siteGroup in _clientContext.Web.SiteGroups.Where(group => group.Title.Contains(webTitle)))
+                {
+                    List<string> userNames = new List<string>();
+                    foreach (User user in siteGroup.Users)
+                    {
+                        if(!user.IsHiddenInUI && user.PrincipalType == PrincipalType.User)
+                        {
+                            userNames.Add(user.UserPrincipalName);
+                        }
+                    }
+                    sitePermissionsDtos.Add(new SitePermissionsDto
+                        (webTitle, siteGroup.Title, userNames)) ;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogInformation($"Error fetching Site Permissions : {ex.Message}");
+            }
             return sitePermissionsDtos;
         }
         private List<string> GetListContentTypes(List list)
