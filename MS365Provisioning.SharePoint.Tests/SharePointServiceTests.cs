@@ -59,6 +59,7 @@ namespace MS365Provisioning.SharePoint.Tests
             //Act
             List<ListsSettingsDto> listsSettingsDtos = _sharePointService.LoadListsSettings();
             //Assert
+            Assert.NotEmpty(listsSettingsDtos);
             Assert.IsType<List<ListsSettingsDto>>(listsSettingsDtos);
         }
         [Fact]
@@ -67,7 +68,17 @@ namespace MS365Provisioning.SharePoint.Tests
             //Act
             List<ListViewDto> listViewDtos = _sharePointService.LoadListViews();
             //Assert
+            Assert.NotEmpty(listViewDtos);
             Assert.IsType<List<ListViewDto>>(listViewDtos);
+        }
+        [Fact]
+        public void Try_LoadContentTypes_Expect_DTO()
+        {
+            //Act
+            List<ContentTypesDto> contentTypesDto = _sharePointService.LoadContentTypes();
+            //Assert
+            Assert.NotEmpty(contentTypesDto);
+            Assert.IsType<List<ContentTypesDto>>(contentTypesDto);
         }
         [Fact]
         public void Try_SiteColumns_Expect_DTO()
@@ -75,6 +86,7 @@ namespace MS365Provisioning.SharePoint.Tests
             //Act
             List<SiteColumnsDto> siteColumnsDto = _sharePointService.LoadSiteColumns();
             //Assert
+            Assert.NotEmpty(siteColumnsDto);
             Assert.IsType<List<SiteColumnsDto>>(siteColumnsDto);
         }
     }

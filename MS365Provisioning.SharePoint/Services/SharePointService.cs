@@ -2,6 +2,7 @@
 using Microsoft.SharePoint.Client;
 using MS365Provisioning.SharePoint.Model;
 using MS365Provisioning.SharePoint.Settings;
+using Newtonsoft.Json;
 using System.Collections;
 using System.Diagnostics;
 using System.Security.Cryptography.X509Certificates;
@@ -23,10 +24,6 @@ namespace MS365Provisioning.SharePoint.Services
             _logger = logger;
             _clientContext = GetClientContext(siteUrl)!;
             _lists = _clientContext.Web.Lists;
-        }
-        public SharePointService(ClientContext clientContext)
-        {
-            _clientContext = clientContext;
         }
         /*______________________________________________________________________________________________________________
          Create ClientContext
@@ -67,15 +64,16 @@ namespace MS365Provisioning.SharePoint.Services
         ________________________________________________________________________________________________________________*/
         private X509Certificate2 GetCertificateByThumbprint(string? thumbprint)
         {
+            X509Certificate2 x509Certificate = new();
             try
             {
                 using X509Store store = new(StoreName.My, StoreLocation.CurrentUser);
                 store.Open(OpenFlags.ReadOnly);
-                var certificates = store.Certificates.Find(X509FindType.FindByThumbprint, thumbprint, false);
+                X509Certificate2Collection certificates = store.Certificates.Find(X509FindType.FindByThumbprint, thumbprint, false);
                 if (certificates.Count > 0)
                 {
                     _logger?.LogInformation("Authenticated and connected to SharePoint!");
-                    return certificates[0];
+                    x509Certificate = certificates[0];
                 }
                 else
                 {
@@ -85,8 +83,8 @@ namespace MS365Provisioning.SharePoint.Services
             catch (Exception ex)
             {
                 _logger?.LogInformation($"Error creating a Certificate : {ex}");
-                return null;
             }
+            return x509Certificate;
         }
         /*______________________________________________________________________________________________________________
          Fetch SiteSettings
@@ -188,18 +186,21 @@ namespace MS365Provisioning.SharePoint.Services
                         }
                         catch (Exception ex)
                         {
-                            _logger.LogInformation($"Error Fetching list properties : {ex.Message}");
+                            _logger?.LogInformation($"Error Fetching list properties : {ex.Message}");
                         }
 
                     }
                 }
-                return listsSettingsDto;
             }
             catch (Exception ex)
             {
                 _logger?.LogError($"Error fetching the ClientContext Lists: {ex.Message}");
-                return new List<ListsSettingsDto>();
             }
+            finally
+            {
+                _clientContext.Dispose();
+            }
+            return listsSettingsDto;
         }
 
         private List<string> GetQuickLaunchHeaders()
@@ -263,11 +264,11 @@ namespace MS365Provisioning.SharePoint.Services
                 roleAsg => roleAsg.Member,
                 roleAsg => roleAsg.RoleDefinitionBindings.Include(roleDef => roleDef.Name));
             IEnumerable roles = _clientContext.LoadQuery(queryForList);
+            Dictionary<string, string> permissionDetails = new();
             try
             {
                 _clientContext.ExecuteQuery();
 
-                Dictionary<string, string> permissionDetails = new();
                 foreach (RoleAssignment ra in roles)
                 {
                     RoleDefinitionBindingCollection rdc = ra.RoleDefinitionBindings;
@@ -281,13 +282,16 @@ namespace MS365Provisioning.SharePoint.Services
 
                     permissionDetails.Add(permission, ra.Member.Title);
                 }
-                return permissionDetails;
             }
             catch (Exception ex)
             {
                 _logger?.LogInformation(message: $"Error fetching permissions : {ex}");
-                return new Dictionary<string, string>();
             }
+            finally
+            {
+                _clientContext.Dispose();
+            }
+            return permissionDetails;
         }
         /*______________________________________________________________________________________________________________
          Fetch Lists List Views
@@ -311,7 +315,11 @@ namespace MS365Provisioning.SharePoint.Services
             }
             catch (Exception ex)
             {
-                _logger.LogInformation($"Error Fetching Lists : {ex.Message}");
+                _logger?.LogInformation($"Error Fetching Lists : {ex.Message}");
+            }
+            finally
+            {
+                _clientContext.Dispose();
             }
             return listsSettingsDto;
         }
@@ -319,31 +327,53 @@ namespace MS365Provisioning.SharePoint.Services
         {
             List<ListViewDto> listviewDto = new();
             ViewCollection listViews = list.Views;
+            _clientContext.Load(list,
+                l=> l.Title);
             _clientContext.Load(listViews);
             try
             {
                 _clientContext.ExecuteQuery();
                 foreach (View listView in listViews)
                 {
-                    List<string> viewFields = new List<string>();
-                    foreach (string field in listView.ViewFields)
+                    _clientContext.Load(listView);
+                    _clientContext.Load(
+                        listView,
+                            lv => lv.ViewFields,
+                            lv => lv.Title,
+                            lv => lv.DefaultView,
+                            lv => lv.RowLimit,
+                            lv => lv.Scope);
+                    try
                     {
-                        viewFields.Add(field);
+                        _clientContext.ExecuteQuery();
+                        List<string> viewFields = new List<string>();
+                        foreach (string field in listView.ViewFields)
+                        {
+                            viewFields.Add(field);
+                        }
+                        listviewDto.Add(new(
+                            list.Title,
+                            listView.Title,
+                            listView.DefaultView,
+                            viewFields,
+                            listView.RowLimit,
+                            listView.Scope.ToString(),
+                            $"{list.Title}"
+                            ));
                     }
-                    listviewDto.Add(new(
-                        list.Title,
-                        listView.Title,
-                        listView.DefaultView,
-                        viewFields,
-                        listView.RowLimit,
-                        listView.Scope.ToString(),
-                        $"{list.Title}"
-                        ));
+                    catch(Exception ex)
+                    {
+                        _logger?.LogInformation($"Error fetching ListView : {ex.Message}");
+                    }
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogInformation($"Error fetching Listviews : {ex.Message}");
+                _logger?.LogInformation($"Error fetching Listviews : {ex.Message}");
+            }
+            finally
+            {
+                _clientContext.Dispose();
             }
             return listviewDto;
         }
@@ -358,10 +388,10 @@ namespace MS365Provisioning.SharePoint.Services
                 FieldCollection siteColumns = _clientContext.Web.Fields;
                 _clientContext.Load(siteColumns,
                              scc => scc.Include(
-                                                                            sc => sc.Hidden,
-                                                                            sc => sc.InternalName,
-                                                                            sc => sc.SchemaXml,
-                                                                            sc => sc.DefaultValue));
+                                    sc => sc.Hidden,
+                                    sc => sc.InternalName,
+                                    sc => sc.SchemaXml,
+                                    sc => sc.DefaultValue));
                 try
                 {
                     _clientContext.ExecuteQuery();
@@ -370,8 +400,6 @@ namespace MS365Provisioning.SharePoint.Services
                         siteColumnsDtos.Add(new SiteColumnsDto(
                             siteColumn.InternalName, siteColumn.SchemaXml, siteColumn.DefaultValue));
                     }
-
-                    return siteColumnsDtos;
                 }
                 catch (Exception ex)
                 {
@@ -389,6 +417,121 @@ namespace MS365Provisioning.SharePoint.Services
                 _clientContext.Dispose();
             }
             return siteColumnsDtos;
+        }
+
+        public List<ContentTypesDto> LoadContentTypes()
+        {
+            List<ContentTypesDto> contentTypesDto = new List<ContentTypesDto>();
+            try
+            {
+                _clientContext.Load(_lists);
+                try
+                {
+                    _clientContext.ExecuteQuery();
+                    foreach(List list in _lists)
+                    {
+                        if (!list.Hidden)
+                        {
+                            ContentTypeCollection contentTypes = list.ContentTypes;
+                            _clientContext.Load(
+                                contentTypes, cts=>cts.Include(
+                                    ct=>ct.Name,
+                                    ct=>ct.Parent,
+                                    //ToDo: check required (field.Required?) 
+                                    ct=>ct.Fields.Include(
+                                        f=> f.InternalName)));
+                            _clientContext.ExecuteQuery();
+                            List<string> contentTypeFields = new ();
+                            if (list.ContentTypes.Count == 0)
+                            {
+                                return contentTypesDto;
+                            }
+                            foreach (ContentType contentType in contentTypes)
+                            {
+                                //ToDo: check if all fields must be added
+                                foreach(Field field in contentType.Fields)
+                                {
+                                    string fieldName = field.InternalName;
+                                    contentTypeFields.Add(fieldName);
+                                }
+                                string contentTypeName = contentType.Name;
+                                string contentTypeParent = contentType.Parent.Name;
+                                
+                                contentTypesDto.Add(new ContentTypesDto(
+                                    contentTypeName, contentTypeParent, contentTypeFields, true));
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger?.LogInformation($"Error fetching Content Types : {ex.Message}");
+                }
+            }
+            catch(Exception ex)
+            {
+                _logger?.LogInformation($"Error fetching Lists types : {ex.Message}");
+            }
+            finally
+            {
+                _clientContext.Dispose(); 
+            }
+            return contentTypesDto;
+        }
+
+        public List<FolderStructureDto> GetFolderStructures()
+        {
+            List<FolderStructureDto> folderStructureDtos = new List<FolderStructureDto>();
+            _clientContext.Load(_lists);
+            try
+            {
+                _clientContext.ExecuteQuery();
+
+                foreach(List list in _lists)
+                {
+                    _clientContext.Load(
+                        list,
+                        l=>l.Title,
+                        l=> l.Fields);
+                    try
+                    {
+                        _clientContext.ExecuteQuery();
+                        List<string> subFields = new List<string>();
+                        foreach (Field field in  list.Fields)
+                        {
+                            _clientContext.Load(field,
+                                f => f.Title);
+                            try
+                            {
+                                _clientContext.ExecuteQuery();
+                                subFields.Add(field.Title);
+                            }
+                            catch (Exception ex)
+                            {
+                                _logger?.LogInformation($"Error fetching SubFolders : {ex.ToString()}");
+                            }
+                        folderStructureDtos.Add(new(
+                            list.Title,
+                            field.Title,
+                            subFields
+                            ));
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger?.LogInformation($"Error fetching list Fields : {ex.Message}");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogInformation($"Error fetching context Lists : {ex.Message}");
+            }
+            finally
+            {
+                _clientContext.Dispose();
+            }
+            return folderStructureDtos;
         }
         private List<string> GetListContentTypes(List list)
         {

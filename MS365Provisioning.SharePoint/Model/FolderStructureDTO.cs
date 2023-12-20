@@ -4,8 +4,8 @@
     {
         public string ListName { get; set; } = string.Empty;
         public string FolderName { get; set; } = string.Empty;
-        public List<FolderStructureDto> SubFolders { get; set; } = new List<FolderStructureDto>();
-        public FolderStructureDto(string listName, string folderName, List<FolderStructureDto> subfolders)
+        public List<string> SubFolders { get; set; } = new List<string>();
+        public FolderStructureDto(string listName, string folderName, List<string> subfolders)
         {
             ListName = listName;
             FolderName = folderName;
