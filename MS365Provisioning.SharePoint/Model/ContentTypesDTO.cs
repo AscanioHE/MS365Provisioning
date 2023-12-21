@@ -5,14 +5,12 @@ public class ContentTypesDto
     public string Title { get; set; }
     public string ParentCt { get; set; }
     public List<string> FieldTitle { get; set; }
-    public bool Required { get; set; }
 
-    public ContentTypesDto(string columnName, string parentCt, List<string> fieldTitle, bool required)
+    public ContentTypesDto(string columnName, string parentCt, List<string> fieldTitle)
     {
         Title = columnName;
         ParentCt = parentCt;
         FieldTitle = fieldTitle;
-        Required = required;
     }
     
 }

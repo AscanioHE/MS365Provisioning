@@ -1,30 +1,50 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.SharePoint.Client;
 using Microsoft.SharePoint.Client.Utilities;
+using MS365Provisioning.Common;
 using MS365Provisioning.SharePoint.Model;
 using MS365Provisioning.SharePoint.Settings;
 using System.Collections;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
-using MS365Provisioning.Common;
-
 
 namespace MS365Provisioning.SharePoint.Services
 {
     public class SharePointService : ISharePointService
     {
         private readonly ISharePointSettingsService _sharePointSettingsService;
-        private readonly ILogger? _logger;
+        private readonly ILogger _logger;
         private readonly ClientContext _clientContext;
-        private readonly ListCollection? _lists;
-        private SharePointSettings sharePointSettings;
-        private string FileName {  get; set; }
-        public SharePointService(ISharePointSettingsService? sharePointSettingsService, ILogger? logger, string siteUrl)
+        private readonly ListCollection _lists;
+        private readonly SharePointSettings sharePointSettings;
+        private object DtoFile;
+        private string FileName { get; set; }
+        private string ThumbPrint { get; set; }
+
+        public ISharePointSettingsService SharePointSettingsService => _sharePointSettingsService;
+
+        public SharePointService(ISharePointSettingsService sharePointSettingsService,
+                                 ILogger logger,
+                                 string siteUrl)
         {
-            _sharePointSettingsService = sharePointSettingsService;
+            _sharePointSettingsService = sharePointSettingsService!;
+            sharePointSettings = _sharePointSettingsService.GetSharePointSettings();
             _logger = logger;
+            _clientContext= new(string.Empty);
             _clientContext = GetClientContext(siteUrl)!;
             _lists = _clientContext.Web.Lists;
+            DtoFile = new object();
+            try
+            {
+                _clientContext.Load(_lists);
+                _clientContext.ExecuteQuery();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation("Error fetching Lists : {ex.Message}");
+            }
+            FileName = string.Empty;
+            ThumbPrint = sharePointSettings.ThumbPrint!;
         }
         /*______________________________________________________________________________________________________________
          Create ClientContext
@@ -33,37 +53,28 @@ namespace MS365Provisioning.SharePoint.Services
         {
             string message = $"{nameof(GetClientContext)} for site {siteUrl}...";
             _logger?.LogInformation(message: message);
-            if (_sharePointSettingsService != null)
+            ClientContext? ctx;
+            using (X509Certificate2? certificate = GetCertificateByThumbprint(ThumbPrint))
             {
-                sharePointSettings = _sharePointSettingsService.GetSharePointSettings();
-
-                ClientContext? ctx;
-                using (X509Certificate2? certificate = GetCertificateByThumbprint(sharePointSettings.ThumbPrint))
+                ctx = null;
+                try
                 {
-                    ctx = null;
-                    try
-                    {
-                        PnP.Framework.AuthenticationManager authManager = new(sharePointSettings.ClientId, certificate,
-                            sharePointSettings.TenantId);
-                        ctx = authManager.GetContext(sharePointSettings.SiteUrl);
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger?.LogError(message: $"Error fetching the ClientContext : {ex.Message}");
-                        return new ClientContext("");
-                    }
+                    PnP.Framework.AuthenticationManager authManager = new(sharePointSettings.ClientId, certificate,
+                        sharePointSettings.TenantId);
+                    ctx = authManager.GetContext(sharePointSettings.SiteUrl);
                 }
-                return ctx;
+                catch (Exception ex)
+                {
+                    _logger?.LogError(message: $"Error fetching the ClientContext : {ex.Message}");
+                    return new ClientContext("");
+                }
             }
-            else
-            {
-                return new ClientContext("");
-            }
+            return ctx;
         }
         /*______________________________________________________________________________________________________________
          Config SharePoint settings
         ________________________________________________________________________________________________________________*/
-        private X509Certificate2 GetCertificateByThumbprint(string? thumbprint)
+        private X509Certificate2 GetCertificateByThumbprint(string thumbprint)
         {
             X509Certificate2 x509Certificate = new();
             try
@@ -94,7 +105,8 @@ namespace MS365Provisioning.SharePoint.Services
         public List<SiteSettingsDto> LoadSiteSettings()
         {
             List<SiteSettingsDto> siteSettingsDto = new();
-            FileName = sharePointSettings.SiteSettingsFilePath;
+            if (sharePointSettings.SiteSettingsFilePath != null)
+                FileName = sharePointSettings.SiteSettingsFilePath;
             try
             {
                 WebTemplateCollection webTemplateCollection = _clientContext.Web.GetAvailableWebTemplates(1033, true);
@@ -117,6 +129,8 @@ namespace MS365Provisioning.SharePoint.Services
             {
                 _clientContext.Dispose();
             }
+            DtoFile = siteSettingsDto;
+            ExportServices();
             return siteSettingsDto;
         }
 
@@ -126,7 +140,8 @@ namespace MS365Provisioning.SharePoint.Services
         public List<ListsSettingsDto> LoadListsSettings()
         {
             List<ListsSettingsDto> listsSettingsDto = new();
-            FileName = sharePointSettings.ListsFilePath;
+            if (sharePointSettings.ListsFilePath != null)
+                FileName = sharePointSettings.ListsFilePath;
             bool breakRoleAssignment = false;
             _clientContext.Load(_lists, lc => lc.Include(
                 l => l.Hidden)
@@ -202,6 +217,8 @@ namespace MS365Provisioning.SharePoint.Services
             {
                 _clientContext.Dispose();
             }
+            DtoFile = listsSettingsDto;
+            ExportServices();
             return listsSettingsDto;
         }
 
@@ -300,8 +317,9 @@ namespace MS365Provisioning.SharePoint.Services
         ________________________________________________________________________________________________________________*/
         public List<ListViewDto> LoadListViews()
         {
-            List<ListViewDto> listsSettingsDto = new();
-            FileName = sharePointSettings.ListViewsFilePath;
+            List<ListViewDto> listsViewDto = new();
+            if (sharePointSettings.ListViewsFilePath != null)
+                FileName = sharePointSettings.ListViewsFilePath;
             _clientContext.Load(_lists, lc => lc.Include(
                 l => l.Hidden)
             );
@@ -312,7 +330,7 @@ namespace MS365Provisioning.SharePoint.Services
                 {
                     if (!list.Hidden)
                     {
-                        listsSettingsDto = GetListViews(list);
+                        listsViewDto = GetListViews(list);
                     }
                 }
             }
@@ -324,7 +342,9 @@ namespace MS365Provisioning.SharePoint.Services
             {
                 _clientContext.Dispose();
             }
-            return listsSettingsDto;
+            DtoFile = listsViewDto;
+            ExportServices();
+            return listsViewDto;
         }
         private List<ListViewDto> GetListViews(List list)
         {
@@ -386,7 +406,8 @@ namespace MS365Provisioning.SharePoint.Services
         public List<SiteColumnsDto> LoadSiteColumns()
         {
             List<SiteColumnsDto> siteColumnsDtos = new List<SiteColumnsDto>();
-            FileName = sharePointSettings.SiteColumnsFilePath;
+            if (sharePointSettings.SiteColumnsFilePath != null)
+                FileName = sharePointSettings.SiteColumnsFilePath;
             try
             {
                 FieldCollection siteColumns = _clientContext.Web.Fields;
@@ -407,7 +428,7 @@ namespace MS365Provisioning.SharePoint.Services
                 }
                 catch (Exception ex)
                 {
-                    _logger?.LogInformation($"Error fetching Site Column settings : {ex.Message}");                    
+                    _logger?.LogInformation($"Error fetching Site Column settings : {ex.Message}");
                 }
             }
             catch (Exception ex)
@@ -418,13 +439,16 @@ namespace MS365Provisioning.SharePoint.Services
             {
                 _clientContext.Dispose();
             }
+            DtoFile = siteColumnsDtos;
+            ExportServices();
             return siteColumnsDtos;
         }
 
         public List<ContentTypesDto> LoadContentTypes()
         {
             List<ContentTypesDto> contentTypesDto = new List<ContentTypesDto>();
-            FileName = sharePointSettings.ContentTypesFilePath;
+            if (sharePointSettings.ContentTypesFilePath != null)
+                FileName = sharePointSettings.ContentTypesFilePath;
             try
             {
                 _clientContext.Load(_lists);
@@ -440,7 +464,6 @@ namespace MS365Provisioning.SharePoint.Services
                                 contentTypes, cts => cts.Include(
                                     ct => ct.Name,
                                     ct => ct.Parent,
-                                    //TODO: check required (field.Required?) 
                                     ct => ct.Fields.Include(
                                         f => f.InternalName)));
                             _clientContext.ExecuteQuery();
@@ -451,17 +474,15 @@ namespace MS365Provisioning.SharePoint.Services
                             }
                             foreach (ContentType contentType in contentTypes)
                             {
-                                //TODO: check if all fields must be added
-                                foreach (Field field in contentType.Fields)
-                                {
-                                    string fieldName = field.InternalName;
-                                    contentTypeFields.Add(fieldName);
-                                }
+                                contentTypeFields.AddRange(
+                                        from Field field in contentType.Fields
+                                        let fieldName = field.InternalName
+                                        select fieldName);
                                 string contentTypeName = contentType.Name;
                                 string contentTypeParent = contentType.Parent.Name;
 
                                 contentTypesDto.Add(new ContentTypesDto(
-                                    contentTypeName, contentTypeParent, contentTypeFields, true));
+                                    contentTypeName, contentTypeParent, contentTypeFields));
                             }
                         }
                     }
@@ -479,13 +500,16 @@ namespace MS365Provisioning.SharePoint.Services
             {
                 _clientContext.Dispose();
             }
+            DtoFile = contentTypesDto;
+            ExportServices();
             return contentTypesDto;
         }
 
         public List<FolderStructureDto> GetFolderStructures()
         {
             List<FolderStructureDto> folderStructureDtos = new List<FolderStructureDto>();
-            FileName = sharePointSettings.FolderStructureFilePath;
+            if (sharePointSettings.FolderStructureFilePath != null)
+                FileName = sharePointSettings.FolderStructureFilePath;
             _clientContext.Load(_lists);
             try
             {
@@ -539,19 +563,21 @@ namespace MS365Provisioning.SharePoint.Services
             {
                 _clientContext.Dispose();
             }
+            DtoFile = folderStructureDtos;
+            ExportServices();
             return folderStructureDtos;
         }
 
         public List<SitePermissionsDto> LoadSitePermissions()
         {
             List<SitePermissionsDto> sitePermissionsDtos = new();
-            FileName = sharePointSettings.SitePermissionsFilePath;
-            Web rootWeb = _clientContext.Site.RootWeb;
+            if (sharePointSettings.SitePermissionsFilePath != null)
+                FileName = sharePointSettings!.SitePermissionsFilePath;
             try
             {
                 _clientContext.Load(_clientContext.Web,
                     w => w.Title,
-                    w=>w.SiteGroups.Include(
+                    w => w.SiteGroups.Include(
                         item => item.Users,
                         item => item.PrincipalType,
                         item => item.LoginName,
@@ -564,19 +590,21 @@ namespace MS365Provisioning.SharePoint.Services
                     List<string> userNames = new List<string>();
                     foreach (User user in siteGroup.Users)
                     {
-                        if(!user.IsHiddenInUI && user.PrincipalType == PrincipalType.User)
+                        if (!user.IsHiddenInUI && user.PrincipalType == PrincipalType.User)
                         {
                             userNames.Add(user.UserPrincipalName);
                         }
                     }
                     sitePermissionsDtos.Add(new SitePermissionsDto
-                        (webTitle, siteGroup.Title, userNames)) ;
+                        (webTitle, siteGroup.Title, userNames));
                 }
             }
             catch (Exception ex)
             {
                 _logger?.LogInformation($"Error fetching Site Permissions : {ex.Message}");
             }
+            DtoFile = sitePermissionsDtos;
+            ExportServices();
             return sitePermissionsDtos;
         }
         private List<string> GetListContentTypes(List list)
@@ -584,7 +612,7 @@ namespace MS365Provisioning.SharePoint.Services
             List<string> contentTypes = new();
             try
             {
-                _clientContext.Load(list.ContentTypes);
+                _clientContext!.Load(list.ContentTypes);
                 _clientContext.ExecuteQuery();
                 if (list.ContentTypes.Count == 0)
                 {
@@ -601,6 +629,13 @@ namespace MS365Provisioning.SharePoint.Services
                 contentTypes.Clear();
             }
             return contentTypes;
+        }
+        public void ExportServices()
+        {
+            ExportServices exportServices = new();
+            exportServices.DtoFile = DtoFile;
+            exportServices.FileName = exportServices.ConvertToJsonString();
+            exportServices.WriteJsonStringToFile();
         }
     }
 }

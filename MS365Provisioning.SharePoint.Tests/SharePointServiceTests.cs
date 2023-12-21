@@ -4,6 +4,7 @@ using Microsoft.SharePoint.Client;
 using MS365Provisioning.SharePoint.Model;
 using MS365Provisioning.SharePoint.Services;
 using MS365Provisioning.SharePoint.Settings;
+using Xunit;
 using Xunit.Abstractions;
 
 namespace MS365Provisioning.SharePoint.Tests
@@ -22,9 +23,12 @@ namespace MS365Provisioning.SharePoint.Tests
                 .Build();
             SharePointSettings sharePointSettings = new();
             ILogger? logger = output.BuildLogger();
-            string siteUrl = sharePointSettings.SiteUrl!;
-            _sharePointService = new SharePointService(this,logger,siteUrl);
-            if (siteUrl != null) _sharePointService = new SharePointService(this, logger, siteUrl);
+            string siteUrl = string.Empty;
+            if(sharePointSettings.SiteUrl != null)
+            {
+                siteUrl = sharePointSettings.SiteUrl;
+            }
+            _sharePointService = new SharePointService(this, logger, siteUrl);
         }
 
         public string? GetSetting(string key)
