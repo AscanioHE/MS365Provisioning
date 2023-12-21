@@ -22,7 +22,7 @@ namespace MS365Provisioning.SharePoint.Tests
                 .Build();
             SharePointSettings sharePointSettings = new();
             ILogger? logger = output.BuildLogger();
-            string? siteUrl = sharePointSettings.SiteUrl;
+            string siteUrl = sharePointSettings.SiteUrl!;
             _sharePointService = new SharePointService(this,logger,siteUrl);
             if (siteUrl != null) _sharePointService = new SharePointService(this, logger, siteUrl);
         }
@@ -40,13 +40,13 @@ namespace MS365Provisioning.SharePoint.Tests
                 TenantId = GetSetting("SharePoint:TenantId"),
                 ThumbPrint = GetSetting("SharePoint:ThumbPrint"),
                 SiteUrl = GetSetting("SharePoint:SiteUrl"),
-                FolderStructureFilePath = GetSetting("SharePoint:SiteSettingsFilePath"),
-                ListsFilePath = GetSetting("SharePoint:SiteSettingsFilePath"),
-                ListViewsFilePath = GetSetting("SharePoint:SiteSettingsFilePath"),
-                SiteColumnsFilePath = GetSetting("SharePoint:SiteSettingsFilePath"),
+                FolderStructureFilePath = GetSetting("SharePoint:FolderStructureFilePath"),
+                ListsFilePath = GetSetting("SharePoint:ListsFilePath"),
+                ListViewsFilePath = GetSetting("SharePoint:ListViewsFilePath"),
+                SiteColumnsFilePath = GetSetting("SharePoint:SiteColumnsFilePath"),
                 SiteSettingsFilePath = GetSetting("SharePoint:SiteSettingsFilePath"),
-                SitePermissionsFilePath = GetSetting("SharePoint:SiteSettingsFilePath"),
-                WebPartsFilePath = GetSetting("SharePoint:SiteSettingsFilePath"),
+                SitePermissionsFilePath = GetSetting("SharePoint:SitePermissionsFilePath"),
+                WebPartsFilePath = GetSetting("SharePoint:WebPartsFilePath"),
                 ContentTypesFilePath = GetSetting("SharePoint:ContentTypesFilePath")
             };
         }
@@ -112,7 +112,7 @@ namespace MS365Provisioning.SharePoint.Tests
             //Act
             List<SitePermissionsDto> sitePermissions = _sharePointService.LoadSitePermissions();
             //Assert
-            //Assert.NotEmpty(sitePermissions);
+            Assert.NotEmpty(sitePermissions);
             Assert.IsType<List<SitePermissionsDto>>(sitePermissions);
         }
     }

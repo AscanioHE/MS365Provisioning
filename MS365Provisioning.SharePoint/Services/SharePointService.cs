@@ -118,7 +118,6 @@ namespace MS365Provisioning.SharePoint.Services
                 _clientContext.Dispose();
             }
             return siteSettingsDto;
-
         }
 
         /*______________________________________________________________________________________________________________

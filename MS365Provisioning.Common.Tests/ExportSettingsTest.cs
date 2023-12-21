@@ -1,27 +1,42 @@
 using Microsoft.Extensions.Logging;
+using Microsoft.SharePoint.Client;
 using MS365Provisioning.SharePoint.Model;
+using MS365Provisioning.SharePoint.Services;
 
 namespace MS365Provisioning.Common.Tests
 {
-    public class ExportSettingsTest : IExportSettings
+    public class ExportSettingsTest
     {
         public object DtoFile { get; set; }
         public string FileName {  get; set; }
         public ILogger _logger;
 
+        private readonly IExportSettings _exportSettings;
+
         public ExportSettingsTest(object dtoFile, string fileName,ILogger logger)
         {
+            //Arrange
             _logger = logger;
+            FileName = fileName;
+            DtoFile = dtoFile;
+            _exportSettings = new ExportSettings(this, FileName, _logger);
         }
 
-        public string ConvertToJsonString()
+        [Fact]
+        public void Try_ConvertToJsonString_Expect_String()
         {
-            throw new NotImplementedException();
+            //Act
+            string json = _exportSettings.ConvertToJsonString();
+            //Assert
+            Assert.IsType<string>(json);
         }
-
-        public bool WriteJsonStringToFile()
+        [Fact]
+        public void Try_WriteJsonStringToFile_Expect_Bool()
         {
-            throw new NotImplementedException();
+            //Act
+            bool success = _exportSettings.WriteJsonStringToFile();
+            //Assert
+            Assert.IsType<bool>(success);
         }
     }
 }
