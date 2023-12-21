@@ -1,0 +1,23 @@
+[
+  {
+    "GroupName": "TestSite1",
+    "PermissionLevel": "TestSite1 - Bezoekers",
+    "UserNames": [
+      "ascanio_happy-experts.eu#ext#@23m2yz.onmicrosoft.com"
+    ]
+  },
+  {
+    "GroupName": "TestSite1",
+    "PermissionLevel": "TestSite1 - Eigenaars",
+    "UserNames": [
+      "ascanio@23m2yz.onmicrosoft.com"
+    ]
+  },
+  {
+    "GroupName": "TestSite1",
+    "PermissionLevel": "TestSite1 - Leden",
+    "UserNames": [
+      "ascanio_happy-experts.eu#ext#@23m2yz.onmicrosoft.com"
+    ]
+  }
+]

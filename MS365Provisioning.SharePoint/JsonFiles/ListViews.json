@@ -1,0 +1,15 @@
+[
+  {
+    "ListName": "TestList",
+    "ViewName": "All Items",
+    "DefaultView": true,
+    "ViewFields": [
+      "LinkTitle",
+      "name",
+      "taxonomy"
+    ],
+    "RowLimit": 30,
+    "ListScope": "DefaultValue",
+    "JsonFormatterFile": "TestList"
+  }
+]
