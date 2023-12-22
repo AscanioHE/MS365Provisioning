@@ -14,7 +14,7 @@ namespace MS365Provisioning.SharePoint.Services
     {
         private readonly ISharePointSettingsService _sharePointSettingsService;
         private readonly ILogger _logger;
-        private ClientContext _clientContext { get; set; }
+        private ClientContext ClientContext { get; set; }
         private readonly ListCollection _lists;
         private readonly SharePointSettings sharePointSettings;
         private object DtoFile;
@@ -32,18 +32,18 @@ namespace MS365Provisioning.SharePoint.Services
             sharePointSettings= new SharePointSettings();
             SiteUrl = siteUrl;
             SiteUrl = sharePointSettings.SiteUrl!;
-            _clientContext = new ClientContext(sharePointSettings.SiteUrl);
+            ClientContext = new ClientContext(sharePointSettings.SiteUrl);
             _sharePointSettingsService = sharePointSettingsService!;
             sharePointSettings = _sharePointSettingsService.GetSharePointSettings();
             _logger = logger;
             DtoFile = new object();
             FileName = string.Empty;
-            _lists = _clientContext.Web.Lists;
+            _lists = ClientContext.Web.Lists;
             ThumbPrint = sharePointSettings.ThumbPrint!;
-            _clientContext = GetClientContext(siteUrl);
-            _lists = _clientContext!.Web.Lists;
-            _clientContext.Load(_lists);
-            _clientContext.ExecuteQuery();
+            ClientContext = GetClientContext(siteUrl);
+            _lists = ClientContext!.Web.Lists;
+            ClientContext.Load(_lists);
+            ClientContext.ExecuteQuery();
         }
         /*______________________________________________________________________________________________________________
          Create ClientContext
@@ -97,9 +97,9 @@ namespace MS365Provisioning.SharePoint.Services
                 FileName = sharePointSettings.SiteSettingsFilePath;
             try
             {
-                WebTemplateCollection webTemplateCollection = _clientContext.Web.GetAvailableWebTemplates(1033, true);
-                _clientContext.Load(webTemplateCollection);
-                _clientContext.ExecuteQuery();
+                WebTemplateCollection webTemplateCollection = ClientContext.Web.GetAvailableWebTemplates(1033, true);
+                ClientContext.Load(webTemplateCollection);
+                ClientContext.ExecuteQuery();
                 foreach (WebTemplate webTemplate in webTemplateCollection)
                 {
                     siteSettingsDto.Add(new SiteSettingsDto
@@ -115,7 +115,7 @@ namespace MS365Provisioning.SharePoint.Services
             }
             finally
             {
-                _clientContext.Dispose();
+                ClientContext.Dispose();
             }
             DtoFile = siteSettingsDto;
             ExportServices();
@@ -131,18 +131,18 @@ namespace MS365Provisioning.SharePoint.Services
             if (sharePointSettings.ListsFilePath != null)
                 FileName = sharePointSettings.ListsFilePath;
             bool breakRoleAssignment = false;
-            _clientContext.Load(_lists, lc => lc.Include(
+            ClientContext.Load(_lists, lc => lc.Include(
                 l => l.Hidden)
                       );
             try
             {
-                _clientContext.ExecuteQuery();
+                ClientContext.ExecuteQuery();
                 if (_lists == null || _lists.Count <= 0) return listsSettingsDto;
                 foreach (List list in _lists)
                 {
                     if (!list.Hidden)
                     {
-                        _clientContext.Load(
+                        ClientContext.Load(
                             list,
                             l => l.Title,
                             l => l.DefaultViewUrl,
@@ -157,7 +157,7 @@ namespace MS365Provisioning.SharePoint.Services
                                 f => f.Title));
                         try
                         {
-                            _clientContext.ExecuteQuery();
+                            ClientContext.ExecuteQuery();
                             List<string> contentTypes = GetListContentTypes(list);
                             Dictionary<string, string> listPermissions = GetPermissionDetails(list);
                             Guid enterpiseKeywordsValue = GetEnterpriseKeywordsValue();
@@ -203,7 +203,7 @@ namespace MS365Provisioning.SharePoint.Services
             }
             finally
             {
-                _clientContext.Dispose();
+                ClientContext.Dispose();
             }
             DtoFile = listsSettingsDto;
             ExportServices();
@@ -215,18 +215,18 @@ namespace MS365Provisioning.SharePoint.Services
             List<string> quickLaunchHeaders = new();
             try
             {
-                _clientContext.Load(_clientContext.Web.Navigation.QuickLaunch);
-                _clientContext.ExecuteQuery();
-                foreach (NavigationNode navigationNode in _clientContext.Web.Navigation.QuickLaunch)
+                ClientContext.Load(ClientContext.Web.Navigation.QuickLaunch);
+                ClientContext.ExecuteQuery();
+                foreach (NavigationNode navigationNode in ClientContext.Web.Navigation.QuickLaunch)
                 {
-                    _clientContext.Load
+                    ClientContext.Load
                     (
                         navigationNode,
                         n => n.Children
                     );
                     try
                     {
-                        _clientContext.ExecuteQuery();
+                        ClientContext.ExecuteQuery();
                         foreach (NavigationNode childNode in navigationNode.Children)
                         {
                             quickLaunchHeaders.Add(childNode.Title);
@@ -250,11 +250,11 @@ namespace MS365Provisioning.SharePoint.Services
             Guid enterpriseKeywordsValue = Guid.Empty;
             try
             {
-                Field enterpriseKeywords = _clientContext.Web.Fields.GetByInternalNameOrTitle("EnterpriseKeywords");
+                Field enterpriseKeywords = ClientContext.Web.Fields.GetByInternalNameOrTitle("EnterpriseKeywords");
                 if (enterpriseKeywords != null)
                 {
-                    _clientContext.Load(enterpriseKeywords);
-                    _clientContext.ExecuteQuery();
+                    ClientContext.Load(enterpriseKeywords);
+                    ClientContext.ExecuteQuery();
                     enterpriseKeywordsValue = enterpriseKeywords.Id;
                 }
             }
@@ -270,11 +270,11 @@ namespace MS365Provisioning.SharePoint.Services
             IQueryable<RoleAssignment> queryForList = list.RoleAssignments.Include(
                 roleAsg => roleAsg.Member,
                 roleAsg => roleAsg.RoleDefinitionBindings.Include(roleDef => roleDef.Name));
-            IEnumerable roles = _clientContext.LoadQuery(queryForList);
+            IEnumerable roles = ClientContext.LoadQuery(queryForList);
             Dictionary<string, string> permissionDetails = new();
             try
             {
-                _clientContext.ExecuteQuery();
+                ClientContext.ExecuteQuery();
 
                 foreach (RoleAssignment ra in roles)
                 {
@@ -296,7 +296,7 @@ namespace MS365Provisioning.SharePoint.Services
             }
             finally
             {
-                _clientContext.Dispose();
+                ClientContext.Dispose();
             }
             return permissionDetails;
         }
@@ -308,12 +308,12 @@ namespace MS365Provisioning.SharePoint.Services
             List<ListViewDto> listsViewDto = new();
             if (sharePointSettings.ListViewsFilePath != null)
                 FileName = sharePointSettings.ListViewsFilePath;
-            _clientContext.Load(_lists, lc => lc.Include(
+            ClientContext.Load(_lists, lc => lc.Include(
                 l => l.Hidden)
             );
             try
             {
-                _clientContext.ExecuteQuery();
+                ClientContext.ExecuteQuery();
                 foreach (List list in _lists)
                 {
                     if (!list.Hidden)
@@ -328,7 +328,7 @@ namespace MS365Provisioning.SharePoint.Services
             }
             finally
             {
-                _clientContext.Dispose();
+                ClientContext.Dispose();
             }
             DtoFile = listsViewDto;
             ExportServices();
@@ -338,16 +338,16 @@ namespace MS365Provisioning.SharePoint.Services
         {
             List<ListViewDto> listviewDto = new();
             Microsoft.SharePoint.Client.ViewCollection listViews = list.Views;
-            _clientContext.Load(list,
+            ClientContext.Load(list,
                 l => l.Title);
-            _clientContext.Load(listViews);
+            ClientContext.Load(listViews);
             try
             {
-                _clientContext.ExecuteQuery();
+                ClientContext.ExecuteQuery();
                 foreach (View listView in listViews)
                 {
-                    _clientContext.Load(listView);
-                    _clientContext.Load(
+                    ClientContext.Load(listView);
+                    ClientContext.Load(
                         listView,
                             lv => lv.ViewFields,
                             lv => lv.Title,
@@ -356,7 +356,7 @@ namespace MS365Provisioning.SharePoint.Services
                             lv => lv.Scope);
                     try
                     {
-                        _clientContext.ExecuteQuery();
+                        ClientContext.ExecuteQuery();
                         List<string> viewFields = new List<string>();
                         foreach (string field in listView.ViewFields)
                         {
@@ -384,7 +384,7 @@ namespace MS365Provisioning.SharePoint.Services
             }
             finally
             {
-                _clientContext.Dispose();
+                ClientContext.Dispose();
             }
             return listviewDto;
         }
@@ -398,8 +398,8 @@ namespace MS365Provisioning.SharePoint.Services
                 FileName = sharePointSettings.SiteColumnsFilePath;
             try
             {
-                FieldCollection siteColumns = _clientContext.Web.Fields;
-                _clientContext.Load(siteColumns,
+                FieldCollection siteColumns = ClientContext.Web.Fields;
+                ClientContext.Load(siteColumns,
                              scc => scc.Include(
                                     sc => sc.Hidden,
                                     sc => sc.InternalName,
@@ -407,7 +407,7 @@ namespace MS365Provisioning.SharePoint.Services
                                     sc => sc.DefaultValue));
                 try
                 {
-                    _clientContext.ExecuteQuery();
+                    ClientContext.ExecuteQuery();
                     foreach (Field siteColumn in siteColumns)
                     {
                         siteColumnsDtos.Add(new SiteColumnsDto(
@@ -425,7 +425,7 @@ namespace MS365Provisioning.SharePoint.Services
             }
             finally
             {
-                _clientContext.Dispose();
+                ClientContext.Dispose();
             }
             DtoFile = siteColumnsDtos;
             ExportServices();
@@ -439,22 +439,22 @@ namespace MS365Provisioning.SharePoint.Services
                 FileName = sharePointSettings.ContentTypesFilePath;
             try
             {
-                _clientContext.Load(_lists);
+                ClientContext.Load(_lists);
                 try
                 {
-                    _clientContext.ExecuteQuery();
+                    ClientContext.ExecuteQuery();
                     foreach (List list in _lists)
                     {
                         if (!list.Hidden)
                         {
                             ContentTypeCollection contentTypes = list.ContentTypes;
-                            _clientContext.Load(
+                            ClientContext.Load(
                                 contentTypes, cts => cts.Include(
                                     ct => ct.Name,
                                     ct => ct.Parent,
                                     ct => ct.Fields.Include(
                                         f => f.InternalName)));
-                            _clientContext.ExecuteQuery();
+                            ClientContext.ExecuteQuery();
                             List<string> contentTypeFields = new();
                             if (list.ContentTypes.Count == 0)
                             {
@@ -486,7 +486,7 @@ namespace MS365Provisioning.SharePoint.Services
             }
             finally
             {
-                _clientContext.Dispose();
+                ClientContext.Dispose();
             }
             DtoFile = contentTypesDto;
             ExportServices();
@@ -498,30 +498,30 @@ namespace MS365Provisioning.SharePoint.Services
             List<FolderStructureDto> folderStructureDtos = new List<FolderStructureDto>();
             if (sharePointSettings.FolderStructureFilePath != null)
                 FileName = sharePointSettings.FolderStructureFilePath;
-            _clientContext.Load(_lists);
+            ClientContext.Load(_lists);
             try
             {
-                _clientContext.ExecuteQuery();
+                ClientContext.ExecuteQuery();
 
                 foreach (List list in _lists)
                 {
                     if (!list.Hidden)
                     {
-                        _clientContext.Load(
+                        ClientContext.Load(
                             list,
                             l => l.Title,
                             l => l.Fields);
                         try
                         {
-                            _clientContext.ExecuteQuery();
+                            ClientContext.ExecuteQuery();
                             List<string> subFields = new List<string>();
                             foreach (Field field in list.Fields)
                             {
-                                _clientContext.Load(field,
+                                ClientContext.Load(field,
                                     f => f.Title);
                                 try
                                 {
-                                    _clientContext.ExecuteQuery();
+                                    ClientContext.ExecuteQuery();
                                     subFields.Add(field.Title);
                                 }
                                 catch (Exception ex)
@@ -549,7 +549,7 @@ namespace MS365Provisioning.SharePoint.Services
             }
             finally
             {
-                _clientContext.Dispose();
+                ClientContext.Dispose();
             }
             DtoFile = folderStructureDtos;
             ExportServices();
@@ -563,17 +563,17 @@ namespace MS365Provisioning.SharePoint.Services
                 FileName = sharePointSettings!.SitePermissionsFilePath;
             try
             {
-                _clientContext.Load(_clientContext.Web,
+                ClientContext.Load(ClientContext.Web,
                     w => w.Title,
                     w => w.SiteGroups.Include(
                         item => item.Users,
                         item => item.PrincipalType,
                         item => item.LoginName,
                         item => item.Title));
-                _clientContext.ExecuteQuery();
-                string webTitle = _clientContext.Web.Title;
+                ClientContext.ExecuteQuery();
+                string webTitle = ClientContext.Web.Title;
 
-                foreach (Group siteGroup in _clientContext.Web.SiteGroups.Where(group => group.Title.Contains(webTitle)))
+                foreach (Group siteGroup in ClientContext.Web.SiteGroups.Where(group => group.Title.Contains(webTitle)))
                 {
                     List<string> userNames = new List<string>();
                     foreach (User user in siteGroup.Users)
@@ -600,8 +600,8 @@ namespace MS365Provisioning.SharePoint.Services
             List<string> contentTypes = new();
             try
             {
-                _clientContext!.Load(list.ContentTypes);
-                _clientContext.ExecuteQuery();
+                ClientContext!.Load(list.ContentTypes);
+                ClientContext.ExecuteQuery();
                 if (list.ContentTypes.Count == 0)
                 {
                     return contentTypes;
