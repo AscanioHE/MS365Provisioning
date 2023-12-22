@@ -29,7 +29,7 @@ namespace MS365Provisioning.SharePoint.Services
                                  string siteUrl)
         {
 
-            sharePointSettings= new SharePointSettings();
+            sharePointSettings = new SharePointSettings();
             SiteUrl = siteUrl;
             SiteUrl = sharePointSettings.SiteUrl!;
             ClientContext = new ClientContext(sharePointSettings.SiteUrl);
@@ -42,8 +42,15 @@ namespace MS365Provisioning.SharePoint.Services
             ThumbPrint = sharePointSettings.ThumbPrint!;
             ClientContext = GetClientContext(siteUrl);
             _lists = ClientContext!.Web.Lists;
-            ClientContext.Load(_lists);
-            ClientContext.ExecuteQuery();
+            try
+            {
+                ClientContext.Load(_lists);
+                ClientContext.ExecuteQuery();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation($"Error fetching lists from clientcontext : {ex.Message}");
+            }
         }
         /*______________________________________________________________________________________________________________
          Create ClientContext
@@ -357,7 +364,7 @@ namespace MS365Provisioning.SharePoint.Services
                     try
                     {
                         ClientContext.ExecuteQuery();
-                        List<string> viewFields = new List<string>();
+                        List<string> viewFields = new();
                         foreach (string field in listView.ViewFields)
                         {
                             viewFields.Add(field);
@@ -393,7 +400,7 @@ namespace MS365Provisioning.SharePoint.Services
         ________________________________________________________________________________________________________________*/
         public List<SiteColumnsDto> LoadSiteColumns()
         {
-            List<SiteColumnsDto> siteColumnsDtos = new List<SiteColumnsDto>();
+            List<SiteColumnsDto> siteColumnsDtos = new();
             if (sharePointSettings.SiteColumnsFilePath != null)
                 FileName = sharePointSettings.SiteColumnsFilePath;
             try
@@ -434,55 +441,46 @@ namespace MS365Provisioning.SharePoint.Services
 
         public List<ContentTypesDto> LoadContentTypes()
         {
-            List<ContentTypesDto> contentTypesDto = new List<ContentTypesDto>();
+            List<ContentTypesDto> contentTypesDto = new();
             if (sharePointSettings.ContentTypesFilePath != null)
                 FileName = sharePointSettings.ContentTypesFilePath;
             try
             {
-                ClientContext.Load(_lists);
-                try
+                foreach (List list in _lists)
                 {
-                    ClientContext.ExecuteQuery();
-                    foreach (List list in _lists)
+                    if (!list.Hidden)
                     {
-                        if (!list.Hidden)
+                        ContentTypeCollection contentTypes = list.ContentTypes;
+                        ClientContext.Load(
+                            contentTypes, cts => cts.Include(
+                                ct => ct.Name,
+                                ct => ct.Parent,
+                                ct => ct.Fields.Include(
+                                    f => f.InternalName)));
+                        ClientContext.ExecuteQuery();
+                        List<string> contentTypeFields = new();
+                        if (list.ContentTypes.Count == 0)
                         {
-                            ContentTypeCollection contentTypes = list.ContentTypes;
-                            ClientContext.Load(
-                                contentTypes, cts => cts.Include(
-                                    ct => ct.Name,
-                                    ct => ct.Parent,
-                                    ct => ct.Fields.Include(
-                                        f => f.InternalName)));
-                            ClientContext.ExecuteQuery();
-                            List<string> contentTypeFields = new();
-                            if (list.ContentTypes.Count == 0)
-                            {
-                                return contentTypesDto;
-                            }
-                            foreach (ContentType contentType in contentTypes)
-                            {
-                                contentTypeFields.AddRange(
-                                        from Field field in contentType.Fields
-                                        let fieldName = field.InternalName
-                                        select fieldName);
-                                string contentTypeName = contentType.Name;
-                                string contentTypeParent = contentType.Parent.Name;
+                            return contentTypesDto;
+                        }
+                        foreach (ContentType contentType in contentTypes)
+                        {
+                            contentTypeFields.AddRange(
+                                    from Field field in contentType.Fields
+                                    let fieldName = field.InternalName
+                                    select fieldName);
+                            string contentTypeName = contentType.Name;
+                            string contentTypeParent = contentType.Parent.Name;
 
-                                contentTypesDto.Add(new ContentTypesDto(
-                                    contentTypeName, contentTypeParent, contentTypeFields));
-                            }
+                            contentTypesDto.Add(new ContentTypesDto(
+                                contentTypeName, contentTypeParent, contentTypeFields));
                         }
                     }
-                }
-                catch (Exception ex)
-                {
-                    _logger?.LogInformation($"Error fetching Content Types : {ex.Message}");
                 }
             }
             catch (Exception ex)
             {
-                _logger?.LogInformation($"Error fetching Lists types : {ex.Message}");
+                _logger?.LogInformation($"Error fetching Content Types : {ex.Message}");
             }
             finally
             {
@@ -495,14 +493,11 @@ namespace MS365Provisioning.SharePoint.Services
 
         public List<FolderStructureDto> GetFolderStructures()
         {
-            List<FolderStructureDto> folderStructureDtos = new List<FolderStructureDto>();
+            List<FolderStructureDto> folderStructureDtos = new();
             if (sharePointSettings.FolderStructureFilePath != null)
                 FileName = sharePointSettings.FolderStructureFilePath;
-            ClientContext.Load(_lists);
             try
             {
-                ClientContext.ExecuteQuery();
-
                 foreach (List list in _lists)
                 {
                     if (!list.Hidden)
@@ -514,7 +509,7 @@ namespace MS365Provisioning.SharePoint.Services
                         try
                         {
                             ClientContext.ExecuteQuery();
-                            List<string> subFields = new List<string>();
+                            List<string> subFields = new();
                             foreach (Field field in list.Fields)
                             {
                                 ClientContext.Load(field,
@@ -526,7 +521,7 @@ namespace MS365Provisioning.SharePoint.Services
                                 }
                                 catch (Exception ex)
                                 {
-                                    _logger?.LogInformation($"Error fetching SubFolders : {ex.ToString()}");
+                                    _logger?.LogInformation($"Error fetching SubFolders : {ex.Message}");
                                 }
                                 folderStructureDtos.Add(new(
                                     list.Title,
@@ -575,7 +570,7 @@ namespace MS365Provisioning.SharePoint.Services
 
                 foreach (Group siteGroup in ClientContext.Web.SiteGroups.Where(group => group.Title.Contains(webTitle)))
                 {
-                    List<string> userNames = new List<string>();
+                    List<string> userNames = new();
                     foreach (User user in siteGroup.Users)
                     {
                         if (!user.IsHiddenInUI && user.PrincipalType == PrincipalType.User)
@@ -618,10 +613,21 @@ namespace MS365Provisioning.SharePoint.Services
             }
             return contentTypes;
         }
+        public List<WebPartPagesDto> LoadWebPartPages()
+        {
+            List<WebPartPagesDto> webPartPagesDtos = new();
+            foreach (List list in _lists)
+            {
+
+            }
+            return webPartPagesDtos;
+        }
         public void ExportServices()
         {
-            ExportServices exportServices = new();
-            exportServices.DtoFile = DtoFile;
+            ExportServices exportServices = new()
+            {
+                DtoFile = DtoFile
+            };
             exportServices.FileName = exportServices.ConvertToJsonString();
             exportServices.WriteJsonStringToFile();
         }
