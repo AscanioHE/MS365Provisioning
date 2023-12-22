@@ -21,14 +21,8 @@ namespace MS365Provisioning.SharePoint.Tests
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("dev.settings.json")
                 .Build();
-            SharePointSettings sharePointSettings = new();
             ILogger? logger = output.BuildLogger();
-            string siteUrl = string.Empty;
-            if(sharePointSettings.SiteUrl != null)
-            {
-                siteUrl = sharePointSettings.SiteUrl;
-            }
-            _sharePointService = new SharePointService(this, logger, siteUrl);
+            _sharePointService = new SharePointService(this, logger);
         }
 
         public string? GetSetting(string key)
@@ -118,6 +112,15 @@ namespace MS365Provisioning.SharePoint.Tests
             //Assert
             Assert.NotEmpty(sitePermissions);
             Assert.IsType<List<SitePermissionsDto>>(sitePermissions);
+        }
+        [Fact]
+        public void Try_LoadWebParts_Expect_DTO()
+        {
+            //Act
+            List<WebPartPagesDto> webParts = _sharePointService.LoadWebParts();
+            //Assert
+            Assert.NotEmpty(webParts);
+            Assert.IsType<List<SitePermissionsDto>>(webParts);
         }
     }
 }

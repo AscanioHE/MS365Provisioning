@@ -16,5 +16,6 @@ namespace MS365Provisioning.SharePoint.Services
         List<ContentTypesDto> LoadContentTypes();
         List<FolderStructureDto> GetFolderStructures();
         List<SitePermissionsDto> LoadSitePermissions();
+        List<WebPartPagesDto> LoadWebParts();
     }
 }
