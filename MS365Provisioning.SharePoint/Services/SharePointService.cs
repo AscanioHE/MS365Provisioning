@@ -14,12 +14,13 @@ namespace MS365Provisioning.SharePoint.Services
     {
         private readonly ISharePointSettingsService _sharePointSettingsService;
         private readonly ILogger _logger;
-        private readonly ClientContext _clientContext;
+        private ClientContext _clientContext { get; set; }
         private readonly ListCollection _lists;
         private readonly SharePointSettings sharePointSettings;
         private object DtoFile;
         private string FileName { get; set; }
         private string ThumbPrint { get; set; }
+        private string SiteUrl { get; set; }
 
         public ISharePointSettingsService SharePointSettingsService => _sharePointSettingsService;
 
@@ -27,61 +28,48 @@ namespace MS365Provisioning.SharePoint.Services
                                  ILogger logger,
                                  string siteUrl)
         {
+
+            sharePointSettings= new SharePointSettings();
+            SiteUrl = siteUrl;
+            SiteUrl = sharePointSettings.SiteUrl!;
+            _clientContext = new ClientContext(sharePointSettings.SiteUrl);
             _sharePointSettingsService = sharePointSettingsService!;
             sharePointSettings = _sharePointSettingsService.GetSharePointSettings();
             _logger = logger;
-            _clientContext= new(string.Empty);
-            _clientContext = GetClientContext(siteUrl)!;
-            _lists = _clientContext.Web.Lists;
             DtoFile = new object();
-            try
-            {
-                _clientContext.Load(_lists);
-                _clientContext.ExecuteQuery();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogInformation("Error fetching Lists : {ex.Message}");
-            }
             FileName = string.Empty;
+            _lists = _clientContext.Web.Lists;
             ThumbPrint = sharePointSettings.ThumbPrint!;
+            _clientContext = GetClientContext(siteUrl);
+            _lists = _clientContext!.Web.Lists;
+            _clientContext.Load(_lists);
+            _clientContext.ExecuteQuery();
         }
         /*______________________________________________________________________________________________________________
          Create ClientContext
         ________________________________________________________________________________________________________________*/
-        private ClientContext? GetClientContext(string siteUrl)
+        private ClientContext GetClientContext(string siteUrl)
         {
             string message = $"{nameof(GetClientContext)} for site {siteUrl}...";
             _logger?.LogInformation(message: message);
-            ClientContext? ctx;
-            using (X509Certificate2? certificate = GetCertificateByThumbprint(ThumbPrint))
-            {
-                ctx = null;
-                try
-                {
-                    PnP.Framework.AuthenticationManager authManager = new(sharePointSettings.ClientId, certificate,
-                        sharePointSettings.TenantId);
-                    ctx = authManager.GetContext(sharePointSettings.SiteUrl);
-                }
-                catch (Exception ex)
-                {
-                    _logger?.LogError(message: $"Error fetching the ClientContext : {ex.Message}");
-                    return new ClientContext("");
-                }
-            }
+            ClientContext ctx;
+            X509Certificate2 certificate = GetCertificateByThumbprint();
+            PnP.Framework.AuthenticationManager authManager = new(sharePointSettings.ClientId, certificate,
+                sharePointSettings.TenantId);
+            ctx = authManager.GetContext(sharePointSettings.SiteUrl);
             return ctx;
         }
         /*______________________________________________________________________________________________________________
          Config SharePoint settings
         ________________________________________________________________________________________________________________*/
-        private X509Certificate2 GetCertificateByThumbprint(string thumbprint)
+        private X509Certificate2 GetCertificateByThumbprint()
         {
             X509Certificate2 x509Certificate = new();
             try
             {
                 using X509Store store = new(StoreName.My, StoreLocation.CurrentUser);
                 store.Open(OpenFlags.ReadOnly);
-                X509Certificate2Collection certificates = store.Certificates.Find(X509FindType.FindByThumbprint, thumbprint, false);
+                X509Certificate2Collection certificates = store.Certificates.Find(X509FindType.FindByThumbprint, ThumbPrint, false);
                 if (certificates.Count > 0)
                 {
                     _logger?.LogInformation("Authenticated and connected to SharePoint!");
@@ -89,7 +77,7 @@ namespace MS365Provisioning.SharePoint.Services
                 }
                 else
                 {
-                    throw new InvalidOperationException($"Certificate with thumbprint {thumbprint} not found!");
+                    throw new InvalidOperationException($"Certificate with thumbprint {ThumbPrint} not found!");
                 }
             }
             catch (Exception ex)
