@@ -612,10 +612,13 @@ namespace MS365Provisioning.SharePoint.Services
             {
                 if (!list.Hidden)
                 {
-                    // Veronderstel dat WebPartDefinitionCollection het juiste type is voor de verzameling van webonderdelen
-                    IEnumerable<WebPartDefinition>  webParts = Context.Web.GetWebParts(SiteUrl);
+                    var absoluteUrl = "https://23m2yz.sharepoint.com/sites/M365ProvisioningLve";
+                    var relativeUrl = absoluteUrl.Replace("https://23m2yz.sharepoint.com/", "");
 
-                    foreach (var v in webParts)
+                    var testSiteUrl = "https://23m2yz.sharepoint.com/sites/TestSite1";
+                    var testWebParts = Context.Web.GetWebParts(relativeUrl).ToList();
+
+                    foreach (var v in testWebParts)
                     {
                         var s = v;
                         // Voer hier de gewenste bewerkingen uit op de naam van het webonderdeel (s)
