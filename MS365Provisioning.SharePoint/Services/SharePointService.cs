@@ -6,8 +6,10 @@ using MS365Provisioning.Common;
 using MS365Provisioning.SharePoint.Model;
 using MS365Provisioning.SharePoint.Settings;
 using System.Collections;
+using System.ComponentModel;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using File = Microsoft.SharePoint.Client.File;
 
 namespace MS365Provisioning.SharePoint.Services
 {
@@ -612,16 +614,31 @@ namespace MS365Provisioning.SharePoint.Services
             {
                 if (!list.Hidden)
                 {
-                    var absoluteUrl = "https://23m2yz.sharepoint.com/sites/M365ProvisioningLve";
-                    var relativeUrl = absoluteUrl.Replace("https://23m2yz.sharepoint.com/", "");
-
-                    var testSiteUrl = "https://23m2yz.sharepoint.com/sites/TestSite1";
-                    var testWebParts = Context.Web.GetWebParts(relativeUrl).ToList();
-
-                    foreach (var v in testWebParts)
+                    try
                     {
-                        var s = v;
-                        // Voer hier de gewenste bewerkingen uit op de naam van het webonderdeel (s)
+                        ListItemCollection oColl = list.GetItems(CamlQuery.CreateAllItemsQuery());
+                        Context.Load(oColl);
+                        Context.Load(Context.Web, w => w.ServerRelativeUrl, w => w.Title, w => w.Webs, w => w.Lists, w => w.Url);
+                        Context.ExecuteQuery();
+                        foreach (ListItem item in oColl)
+                        {
+                            CamlQuery allPagesQuery = new();
+                            ListItemCollection pageItems = list.GetItems(allPagesQuery);
+                            Context.Load(pageItems, pi => pi.Include(i => i.Id, i => i.DisplayName));
+                            Context.ExecuteQuery();
+                            LimitedWebPartManager wpManager = item.File.GetLimitedWebPartManager(PersonalizationScope.Shared);
+                            Context.Load(wpManager, wpm => wpm.WebParts.Include(wp => wp.WebPart.Title, wp => wp.Id));
+                            foreach (WebPartDefinition wp in wpManager.WebParts)
+                            {
+                                _logger.LogInformation("Webpart in {0}: {1} [{2}]",
+                                item.File.ServerRelativeUrl, wp.WebPart.Title, wp.Id);
+                            }
+                        }
+
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogInformation("Error loading file");
                     }
                 }
                     
