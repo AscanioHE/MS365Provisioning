@@ -5,11 +5,21 @@ using Microsoft.SharePoint.Client.WebParts;
 using MS365Provisioning.Common;
 using MS365Provisioning.SharePoint.Model;
 using MS365Provisioning.SharePoint.Settings;
+using PnP.Framework.Provisioning.Model;
 using System.Collections;
-using System.ComponentModel;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
-using File = Microsoft.SharePoint.Client.File;
+using ContentType = Microsoft.SharePoint.Client.ContentType;
+using ContentTypeCollection = Microsoft.SharePoint.Client.ContentTypeCollection;
+using Field = Microsoft.SharePoint.Client.Field;
+using FieldCollection = Microsoft.SharePoint.Client.FieldCollection;
+using NavigationNode = Microsoft.SharePoint.Client.NavigationNode;
+using RoleAssignment = Microsoft.SharePoint.Client.RoleAssignment;
+using RoleAssignmentCollection = Microsoft.SharePoint.Client.RoleAssignmentCollection;
+using RoleDefinition = Microsoft.SharePoint.Client.RoleDefinition;
+using User = Microsoft.SharePoint.Client.User;
+using View = Microsoft.SharePoint.Client.View;
+using WebPart = Microsoft.SharePoint.Client.WebParts.WebPart;
 
 namespace MS365Provisioning.SharePoint.Services
 {
@@ -622,17 +632,75 @@ namespace MS365Provisioning.SharePoint.Services
                         Context.ExecuteQuery();
                         foreach (ListItem item in oColl)
                         {
-                            CamlQuery allPagesQuery = new();
-                            ListItemCollection pageItems = list.GetItems(allPagesQuery);
-                            Context.Load(pageItems, pi => pi.Include(i => i.Id, i => i.DisplayName));
+                            Context.Load(item, i => i.File);
                             Context.ExecuteQuery();
-                            LimitedWebPartManager wpManager = item.File.GetLimitedWebPartManager(PersonalizationScope.Shared);
-                            Context.Load(wpManager, wpm => wpm.WebParts.Include(wp => wp.WebPart.Title, wp => wp.Id));
-                            foreach (WebPartDefinition wp in wpManager.WebParts)
+
+                            _logger.LogInformation("Item ID: " + item.Id);
+                            //logger.LogInformation("Page Layout: " + ((FieldUrlValue)item.FieldValues["PublishingPageLayout"]).Description);
+                            var file = item.File;
+
+                            if (file != null)
                             {
-                                _logger.LogInformation("Webpart in {0}: {1} [{2}]",
-                                item.File.ServerRelativeUrl, wp.WebPart.Title, wp.Id);
+                                // Bestand bestaat, toegang tot de eigenschappen
+                                Context.Load(file);
+                                Context.ExecuteQuery();
+
+                                _logger.LogInformation($"File Ref: {file.ServerRelativeUrl}");
+
+                                // Haal het Web-object opnieuw op
+                                var web = Context.Web;
+                                Context.Load(web, w => w.ServerRelativeUrl);
+                                Context.ExecuteQuery();
+
+                                // Controleer of het web-object correct is geladen
+                                if (web != null)
+                                {
+                                    if (web != null && file != null)
+                                    {
+                                        var test = System.IO.Path.Combine(web.ServerRelativeUrl, file.ServerRelativeUrl);
+                                        // ...
+                                    }
+                                    // Bouw de absolute URL op basis van het ServerRelativeUrl van het bestand
+                                    var absoluteUrl = System.IO.Path.Combine(web.ServerRelativeUrl, file.ServerRelativeUrl);
+                                    var newFile = web.GetFileByServerRelativeUrl(absoluteUrl);
+                                    Context.Load(newFile);
+                                    Context.ExecuteQuery();
+
+                                    if (newFile != null)
+                                    {
+                                        var wpManager = newFile.GetLimitedWebPartManager(PersonalizationScope.Shared);
+                                        Context.Load(wpManager.WebParts);
+                                        Context.ExecuteQuery();
+                                        if(wpManager.WebParts.Count >0)
+                                        {
+                                            // Itereer over de webparts en voer de gewenste bewerkingen uit
+                                            foreach (var webPart in wpManager.WebParts)
+                                            {
+                                                _logger.LogInformation($"WebPart Title: {webPart.WebPart.Title}");
+
+                                                // Voeg hier je verdere bewerkingen toe met de webpart-gegevens
+                                            }
+                                        }
+
+                                        // Voer verdere bewerkingen uit
+                                    }
+                                    else
+                                    {
+                                        _logger.LogInformation("Het bestand is null.");
+                                    }
+
+
+                                }
+                                else
+                                {
+                                    _logger.LogInformation("Web-object is niet correct geladen.");
+                                }
                             }
+                            else
+                            {
+                                _logger.LogInformation("Het bestand is niet gekoppeld aan dit lijstitem.");
+                            }
+
                         }
 
                     }
@@ -641,7 +709,7 @@ namespace MS365Provisioning.SharePoint.Services
                         _logger.LogInformation("Error loading file");
                     }
                 }
-                    
+
             }
             DtoFile = webPartPagesDtos;
             ExportServices();
