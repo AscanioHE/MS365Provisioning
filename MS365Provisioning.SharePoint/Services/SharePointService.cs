@@ -2,10 +2,10 @@
 using Microsoft.SharePoint.Client;
 using Microsoft.SharePoint.Client.Utilities;
 using Microsoft.SharePoint.Client.WebParts;
+using Microsoft.SharePoint.News.DataModel;
 using MS365Provisioning.Common;
 using MS365Provisioning.SharePoint.Model;
 using MS365Provisioning.SharePoint.Settings;
-using PnP.Framework.Provisioning.Model;
 using System.Collections;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
@@ -67,8 +67,6 @@ namespace MS365Provisioning.SharePoint.Services
         ________________________________________________________________________________________________________________*/
         private ClientContext GetClientContext(string siteUrl)
         {
-            string message = $"{nameof(GetClientContext)} for site {siteUrl}...";
-            _logger?.LogInformation(message: message);
             ClientContext ctx;
             X509Certificate2 certificate = GetCertificateByThumbprint();
             PnP.Framework.AuthenticationManager authManager = new(sharePointSettings.ClientId, certificate,
@@ -588,7 +586,7 @@ namespace MS365Provisioning.SharePoint.Services
                 {
                     _logger?.LogInformation($"Error fetching Site Permissions : {ex.Message}");
                 }
-            FileName = sharePointSettings!.SitePermissionsFilePath;
+            FileName = sharePointSettings!.SitePermissionsFilePath!;
             DtoFile = sitePermissionsDtos;
             ExportServices();
             return sitePermissionsDtos;
@@ -626,81 +624,18 @@ namespace MS365Provisioning.SharePoint.Services
                 {
                     try
                     {
-                        ListItemCollection oColl = list.GetItems(CamlQuery.CreateAllItemsQuery());
-                        Context.Load(oColl);
-                        Context.Load(Context.Web, w => w.ServerRelativeUrl, w => w.Title, w => w.Webs, w => w.Lists, w => w.Url);
+                        ListItemCollection listItems = list.GetItems(CamlQuery.CreateAllItemsQuery());
+                        Context.Load(listItems, l => l.Include(i => i.ContentType));
+                        Context.Load(Context.Web,w=> w.ServerRelativeUrl);
                         Context.ExecuteQuery();
-                        foreach (ListItem item in oColl)
+                        foreach(var item in listItems)
                         {
-                            Context.Load(item, i => i.File);
+                            Context.Load(item, i => i.DisplayName, i => i.File, i => i.ContentType);
                             Context.ExecuteQuery();
-
-                            _logger.LogInformation("Item ID: " + item.Id);
-                            //logger.LogInformation("Page Layout: " + ((FieldUrlValue)item.FieldValues["PublishingPageLayout"]).Description);
+                            var i = item.DisplayName;
                             var file = item.File;
-
-                            if (file != null)
-                            {
-                                // Bestand bestaat, toegang tot de eigenschappen
-                                Context.Load(file);
-                                Context.ExecuteQuery();
-
-                                _logger.LogInformation($"File Ref: {file.ServerRelativeUrl}");
-
-                                // Haal het Web-object opnieuw op
-                                var web = Context.Web;
-                                Context.Load(web, w => w.ServerRelativeUrl);
-                                Context.ExecuteQuery();
-
-                                // Controleer of het web-object correct is geladen
-                                if (web != null)
-                                {
-                                    if (web != null && file != null)
-                                    {
-                                        var test = System.IO.Path.Combine(web.ServerRelativeUrl, file.ServerRelativeUrl);
-                                        // ...
-                                    }
-                                    // Bouw de absolute URL op basis van het ServerRelativeUrl van het bestand
-                                    var absoluteUrl = System.IO.Path.Combine(web.ServerRelativeUrl, file.ServerRelativeUrl);
-                                    var newFile = web.GetFileByServerRelativeUrl(absoluteUrl);
-                                    Context.Load(newFile);
-                                    Context.ExecuteQuery();
-
-                                    if (newFile != null)
-                                    {
-                                        var wpManager = newFile.GetLimitedWebPartManager(PersonalizationScope.Shared);
-                                        Context.Load(wpManager.WebParts);
-                                        Context.ExecuteQuery();
-                                        if(wpManager.WebParts.Count >0)
-                                        {
-                                            // Itereer over de webparts en voer de gewenste bewerkingen uit
-                                            foreach (var webPart in wpManager.WebParts)
-                                            {
-                                                _logger.LogInformation($"WebPart Title: {webPart.WebPart.Title}");
-
-                                                // Voeg hier je verdere bewerkingen toe met de webpart-gegevens
-                                            }
-                                        }
-
-                                        // Voer verdere bewerkingen uit
-                                    }
-                                    else
-                                    {
-                                        _logger.LogInformation("Het bestand is null.");
-                                    }
-
-
-                                }
-                                else
-                                {
-                                    _logger.LogInformation("Web-object is niet correct geladen.");
-                                }
-                            }
-                            else
-                            {
-                                _logger.LogInformation("Het bestand is niet gekoppeld aan dit lijstitem.");
-                            }
-
+                            var f = file.Name;
+                            var s = item.ContentType;
                         }
 
                     }
