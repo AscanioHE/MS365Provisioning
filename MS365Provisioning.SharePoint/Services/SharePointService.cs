@@ -7,6 +7,7 @@ using MS365Provisioning.Common;
 using MS365Provisioning.SharePoint.Model;
 using MS365Provisioning.SharePoint.Settings;
 using System.Collections;
+using System.Drawing.Imaging;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using ContentType = Microsoft.SharePoint.Client.ContentType;
@@ -619,34 +620,49 @@ namespace MS365Provisioning.SharePoint.Services
         {
             List<WebPartPagesDto> webPartPagesDtos = new();
             List<WebPart> webparts = new();
-            foreach (List list in _lists)
+
+            List pagesList = Context.Web.Lists.GetByTitle("Site Pages");
+            CamlQuery camlQuery = new ();
+            ListItemCollection pages = pagesList.GetItems(camlQuery);
+            Context.Load(pages);
+            Context.ExecuteQuery();
+            foreach(ListItem page in pages)
             {
-                if (!list.Hidden)
+
+                var file = page.File;
+                Context.Load(page,p=> p.DisplayName,p=>p.File);
+                Context.Load(file) ;
+                Context.ExecuteQuery();
+
+                var limitedWebPartManager = file.GetLimitedWebPartManager(PersonalizationScope.Shared);
+                Context.Load(limitedWebPartManager.WebParts, wpm => wpm.Include(wp=>wp.WebPart.Title)) ;
+                Context.ExecuteQuery();
+                var webParts = limitedWebPartManager.WebParts;
+
+                Context.Load(webParts);
+                Context.ExecuteQuery();
+                foreach (var webPart in webParts)
                 {
-                    try
-                    {
-                        ListItemCollection listItems = list.GetItems(CamlQuery.CreateAllItemsQuery());
-                        Context.Load(listItems, l => l.Include(i => i.ContentType));
-                        Context.Load(Context.Web,w=> w.ServerRelativeUrl);
-                        Context.ExecuteQuery();
-                        foreach(var item in listItems)
-                        {
-                            Context.Load(item, i => i.DisplayName, i => i.File, i => i.ContentType);
-                            Context.ExecuteQuery();
-                            var i = item.DisplayName;
-                            var file = item.File;
-                            var f = file.Name;
-                            var s = item.ContentType;
-                        }
+                    // Haal de gewenste gegevens op
+                    var title = webPart.WebPart.Title;
+                    var name = webPart.Id;
+                    var quickLaunchHeader = webPart.WebPart.Properties.FieldValues.ContainsKey("QuickLaunchHeader") ? webPart.WebPart.Properties.FieldValues["QuickLaunchHeader"] : null;
+                    var showComments = webPart.WebPart.Properties.FieldValues.ContainsKey("ShowComments") ? webPart.WebPart.Properties.FieldValues["ShowComments"] : null;
+                    var webPartType = webPart.WebPart.Properties.FieldValues.ContainsKey("WebPartType") ? webPart.WebPart.Properties.FieldValues["WebPartType"] : null;
+                    var list = webPart.WebPart.Properties.FieldValues.ContainsKey("List") ? webPart.WebPart.Properties.FieldValues["List"] : null;
+                    var view = webPart.WebPart.Properties.FieldValues.ContainsKey("View") ? webPart.WebPart.Properties.FieldValues["View"] : null;
 
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogInformation("Error loading file");
-                    }
+                    Console.WriteLine($"Title: {title}");
+                    Console.WriteLine($"Name: {name}");
+                    Console.WriteLine($"QuickLaunch Header: {quickLaunchHeader}");
+                    Console.WriteLine($"ShowComments: {showComments}");
+                    Console.WriteLine($"WebPart Type: {webPartType}");
+                    Console.WriteLine($"List: {list}");
+                    Console.WriteLine($"View: {view}");
+                    Console.WriteLine($"-----------------------");
                 }
-
             }
+
             DtoFile = webPartPagesDtos;
             ExportServices();
             return webPartPagesDtos;
