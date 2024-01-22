@@ -30,6 +30,7 @@ namespace MS365Provisioning.SharePoint.Services
         private ClientContext Context { get; set; }
         private readonly ListCollection _lists;
         private readonly SharePointSettings sharePointSettings;
+        private readonly FileSettings fileSettings;
         private object DtoFile;
         private string FileName { get; set; }
         private string ThumbPrint { get; set; }
@@ -44,6 +45,7 @@ namespace MS365Provisioning.SharePoint.Services
             sharePointSettings = new SharePointSettings();
             _sharePointSettingsService = sharePointSettingsService!;
             sharePointSettings = _sharePointSettingsService.GetSharePointSettings();
+            fileSettings = _sharePointSettingsService.GetFileSettings();
             SiteUrl = sharePointSettings.SiteUrl!;
             ThumbPrint = sharePointSettings.ThumbPrint!;
             Context = GetClientContext(SiteUrl);
@@ -101,8 +103,8 @@ namespace MS365Provisioning.SharePoint.Services
         public List<SiteSettingsDto> LoadSiteSettings()
         {
             List<SiteSettingsDto> siteSettingsDto = new();
-            if (sharePointSettings.SiteSettingsFilePath != null)
-                FileName = sharePointSettings.SiteSettingsFilePath;
+            if (fileSettings.SiteSettingsFilePath != null)
+                FileName = fileSettings.SiteSettingsFilePath;
             try
             {
                 WebTemplateCollection webTemplateCollection = Context.Web.GetAvailableWebTemplates(1033, true);
@@ -136,8 +138,7 @@ namespace MS365Provisioning.SharePoint.Services
         public List<ListsSettingsDto> LoadListsSettings()
         {
             List<ListsSettingsDto> listsSettingsDto = new();
-            if (sharePointSettings.ListsFilePath != null)
-                FileName = sharePointSettings.ListsFilePath;
+            FileName = fileSettings.ListsFilePath;
             bool breakRoleAssignment = false;
             Context.Load(_lists, lc => lc.Include(
                 l => l.Hidden)
@@ -314,8 +315,8 @@ namespace MS365Provisioning.SharePoint.Services
         public List<ListViewDto> LoadListViews()
         {
             List<ListViewDto> listsViewDto = new();
-            if (sharePointSettings.ListViewsFilePath != null)
-                FileName = sharePointSettings.ListViewsFilePath;
+            if (fileSettings.ListViewsFilePath != null)
+                FileName = fileSettings.ListViewsFilePath;
             Context.Load(_lists, lc => lc.Include(
                 l => l.Hidden)
             );
@@ -402,8 +403,8 @@ namespace MS365Provisioning.SharePoint.Services
         public List<SiteColumnsDto> LoadSiteColumns()
         {
             List<SiteColumnsDto> siteColumnsDtos = new();
-            if (sharePointSettings.SiteColumnsFilePath != null)
-                FileName = sharePointSettings.SiteColumnsFilePath;
+            if (fileSettings.SiteColumnsFilePath != null)
+                FileName = fileSettings.SiteColumnsFilePath;
             try
             {
                 FieldCollection siteColumns = Context.Web.Fields;
@@ -443,8 +444,8 @@ namespace MS365Provisioning.SharePoint.Services
         public List<ContentTypesDto> LoadContentTypes()
         {
             List<ContentTypesDto> contentTypesDto = new();
-            if (sharePointSettings.ContentTypesFilePath != null)
-                FileName = sharePointSettings.ContentTypesFilePath;
+            if (fileSettings.ContentTypesFilePath != null)
+                FileName = fileSettings.ContentTypesFilePath;
             try
             {
                 foreach (List list in _lists)
@@ -495,8 +496,8 @@ namespace MS365Provisioning.SharePoint.Services
         public List<FolderStructureDto> GetFolderStructures()
         {
             List<FolderStructureDto> folderStructureDtos = new();
-            if (sharePointSettings.FolderStructureFilePath != null)
-                FileName = sharePointSettings.FolderStructureFilePath;
+            if (fileSettings.FolderStructureFilePath != null)
+                FileName = fileSettings.FolderStructureFilePath;
             try
             {
                 foreach (List list in _lists)
@@ -555,7 +556,7 @@ namespace MS365Provisioning.SharePoint.Services
         public List<SitePermissionsDto> LoadSitePermissions()
         {
             List<SitePermissionsDto> sitePermissionsDtos = new();
-            if (sharePointSettings.SitePermissionsFilePath != null)
+            if (fileSettings.SitePermissionsFilePath != null)
                 try
                 {
                     Context.Load(Context.Web,
@@ -586,7 +587,7 @@ namespace MS365Provisioning.SharePoint.Services
                 {
                     _logger?.LogInformation($"Error fetching Site Permissions : {ex.Message}");
                 }
-            FileName = sharePointSettings!.SitePermissionsFilePath!;
+            FileName = fileSettings!.SitePermissionsFilePath!;
             DtoFile = sitePermissionsDtos;
             ExportServices();
             return sitePermissionsDtos;

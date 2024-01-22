@@ -37,7 +37,14 @@ namespace MS365Provisioning.SharePoint.Tests
                 ClientId = GetSetting("SharePoint:ClientId"),
                 TenantId = GetSetting("SharePoint:TenantId"),
                 ThumbPrint = GetSetting("SharePoint:ThumbPrint"),
-                SiteUrl = GetSetting("SharePoint:SiteUrl"),
+                SiteUrl = GetSetting("SharePoint:SiteUrl")
+            };
+        }
+
+        public FileSettings GetFileSettings()
+        {
+            return new FileSettings
+            {
                 FolderStructureFilePath = GetSetting("SharePoint:FolderStructureFilePath"),
                 ListsFilePath = GetSetting("SharePoint:ListsFilePath"),
                 ListViewsFilePath = GetSetting("SharePoint:ListViewsFilePath"),
@@ -122,5 +129,6 @@ namespace MS365Provisioning.SharePoint.Tests
             Assert.NotEmpty(webParts);
             Assert.IsType<List<SitePermissionsDto>>(webParts);
         }
+
     }
 }

@@ -8,18 +8,18 @@
   },
   "SharePoint": {
     "ClientId": "ed0eb438-d94a-4a1c-ae0b-2a07dbe8dd41",
-    "TenantId": "a569fa15-6e55-43dc-a47f-b4f38239e020",
+    "ContentTypesFilePath": "SiteSettings.json",
     "FolderStructureFilePath": "SharePoint/jsonfiles/FolderStructure.json",
     "JsonFilesFilePath": "C:\\Projects\\Repos\\MS365 Provisioning Engine\\MS365Provisioning.SharePoint\\JsonFiles\\",
     "ListsFilePath": "Lists.json",
     "ListViewsFilePath": "ListViews.json",
     "SiteColumnsFilePath": "SiteColumns.json",
-    "SiteSettingsFilePath": "SiteSettings.json",
     "SitePermissionsFilePath": "SiteSettings.json",
-    "WebPartsFilePath": "SiteSettings.json",
-    "ContentTypesFilePath": "SiteSettings.json",
+    "SiteSettingsFilePath": "SiteSettings.json",
     "SiteUrl": "https://23m2yz.sharepoint.com/sites/CompanyNews",
+    "TenantId": "a569fa15-6e55-43dc-a47f-b4f38239e020",
     "TestFilePath": "TestFile.json",
-    "ThumbPrint": "7a1abd6f8a5ee0d7c13d8faf0455630693ba7e51"
+    "ThumbPrint": "7a1abd6f8a5ee0d7c13d8faf0455630693ba7e51",
+    "WebPartsFilePath": "SiteSettings.json"
   }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.SharePoint.Client;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,6 +13,14 @@ namespace MS365Provisioning.SharePoint.Model
         public string? TenantId { get; set; }
         public string? ThumbPrint { get; set; }
         public string? SiteUrl { get; set; }
+        
+        public SharePointSettings()
+        {
+            
+        }
+    }
+    public class FileSettings
+    {
         public string? FolderStructureFilePath { get; set; }
         public string? ListsFilePath { get; set; }
         public string? ListViewsFilePath { get; set; }
@@ -20,10 +29,6 @@ namespace MS365Provisioning.SharePoint.Model
         public string? SitePermissionsFilePath { get; set; }
         public string? WebPartsFilePath { get; set; }
         public string? ContentTypesFilePath { get; set; }
-        
-        public SharePointSettings()
-        {
-            
-        }
+
     }
 }

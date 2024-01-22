@@ -5,5 +5,6 @@ namespace MS365Provisioning.SharePoint.Settings
     public interface ISharePointSettingsService
     {
         SharePointSettings GetSharePointSettings();
+        FileSettings GetFileSettings();
     }
 }
