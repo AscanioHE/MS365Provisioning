@@ -652,14 +652,6 @@ namespace MS365Provisioning.SharePoint.Services
                     var list = webPart.WebPart.Properties.FieldValues.ContainsKey("List") ? webPart.WebPart.Properties.FieldValues["List"] : null;
                     var view = webPart.WebPart.Properties.FieldValues.ContainsKey("View") ? webPart.WebPart.Properties.FieldValues["View"] : null;
 
-                    Console.WriteLine($"Title: {title}");
-                    Console.WriteLine($"Name: {name}");
-                    Console.WriteLine($"QuickLaunch Header: {quickLaunchHeader}");
-                    Console.WriteLine($"ShowComments: {showComments}");
-                    Console.WriteLine($"WebPart Type: {webPartType}");
-                    Console.WriteLine($"List: {list}");
-                    Console.WriteLine($"View: {view}");
-                    Console.WriteLine($"-----------------------");
                 }
             }
 
