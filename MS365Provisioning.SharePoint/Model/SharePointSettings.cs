@@ -13,6 +13,7 @@ namespace MS365Provisioning.SharePoint.Model
         public string? TenantId { get; set; }
         public string? ThumbPrint { get; set; }
         public string? SiteUrl { get; set; }
+        public string? CientSecret { get; set; }
         
         public SharePointSettings()
         {

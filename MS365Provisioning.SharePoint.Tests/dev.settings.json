@@ -8,6 +8,7 @@
   },
   "SharePoint": {
     "ClientId": "ed0eb438-d94a-4a1c-ae0b-2a07dbe8dd41",
+    "ClientSecret": "HHr8Q~bJq-G3CdA3S68GVEq-RluTT8EbZe4ecdpF",
     "ContentTypesFilePath": "SiteSettings.json",
     "FolderStructureFilePath": "SharePoint/jsonfiles/FolderStructure.json",
     "JsonFilesFilePath": "C:\\Projects\\Repos\\MS365 Provisioning Engine\\MS365Provisioning.SharePoint\\JsonFiles\\",

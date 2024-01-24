@@ -37,7 +37,8 @@ namespace MS365Provisioning.SharePoint.Tests
                 ClientId = GetSetting("SharePoint:ClientId"),
                 TenantId = GetSetting("SharePoint:TenantId"),
                 ThumbPrint = GetSetting("SharePoint:ThumbPrint"),
-                SiteUrl = GetSetting("SharePoint:SiteUrl")
+                SiteUrl = GetSetting("SharePoint:SiteUrl"),
+                CientSecret = GetSetting("SharePoint:ClientSecret")
             };
         }
 

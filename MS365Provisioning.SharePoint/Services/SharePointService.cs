@@ -2,18 +2,19 @@
 using Microsoft.SharePoint.Client;
 using Microsoft.SharePoint.Client.Utilities;
 using Microsoft.SharePoint.Client.WebParts;
-using Microsoft.SharePoint.News.DataModel;
 using MS365Provisioning.Common;
 using MS365Provisioning.SharePoint.Model;
 using MS365Provisioning.SharePoint.Settings;
 using System.Collections;
-using System.Drawing.Imaging;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using ContentType = Microsoft.SharePoint.Client.ContentType;
 using ContentTypeCollection = Microsoft.SharePoint.Client.ContentTypeCollection;
 using Field = Microsoft.SharePoint.Client.Field;
 using FieldCollection = Microsoft.SharePoint.Client.FieldCollection;
+using Group = Microsoft.SharePoint.Client.Group;
+using List = Microsoft.SharePoint.Client.List;
+using ListItem = Microsoft.SharePoint.Client.ListItem;
 using NavigationNode = Microsoft.SharePoint.Client.NavigationNode;
 using RoleAssignment = Microsoft.SharePoint.Client.RoleAssignment;
 using RoleAssignmentCollection = Microsoft.SharePoint.Client.RoleAssignmentCollection;
@@ -620,39 +621,59 @@ namespace MS365Provisioning.SharePoint.Services
         {
             List<WebPartPagesDto> webPartPagesDtos = new();
             List<WebPart> webparts = new();
-
-            List pagesList = Context.Web.Lists.GetByTitle("Site Pages");
-            CamlQuery camlQuery = new ();
-            ListItemCollection pages = pagesList.GetItems(camlQuery);
-            Context.Load(pages);
-            Context.ExecuteQuery();
-            foreach(ListItem page in pages)
+            try
             {
-
-                var file = page.File;
-                Context.Load(page,p=> p.DisplayName,p=>p.File);
-                Context.Load(file) ;
+                List pagesList = Context.Web.Lists.GetByTitle("Site Pages");
+                CamlQuery camlQuery = new();
+                Context.Load(pagesList);
                 Context.ExecuteQuery();
-
-                var limitedWebPartManager = file.GetLimitedWebPartManager(PersonalizationScope.Shared);
-                Context.Load(limitedWebPartManager.WebParts, wpm => wpm.Include(wp=>wp.WebPart.Title)) ;
+                ListItemCollection pages = pagesList.GetItems(camlQuery);
+                Context.Load(pages);
                 Context.ExecuteQuery();
-                var webParts = limitedWebPartManager.WebParts;
-
-                Context.Load(webParts);
-                Context.ExecuteQuery();
-                foreach (var webPart in webParts)
+                foreach (ListItem page in pages)
                 {
-                    // Haal de gewenste gegevens op
-                    var title = webPart.WebPart.Title;
-                    var name = webPart.Id;
-                    var quickLaunchHeader = webPart.WebPart.Properties.FieldValues.ContainsKey("QuickLaunchHeader") ? webPart.WebPart.Properties.FieldValues["QuickLaunchHeader"] : null;
-                    var showComments = webPart.WebPart.Properties.FieldValues.ContainsKey("ShowComments") ? webPart.WebPart.Properties.FieldValues["ShowComments"] : null;
-                    var webPartType = webPart.WebPart.Properties.FieldValues.ContainsKey("WebPartType") ? webPart.WebPart.Properties.FieldValues["WebPartType"] : null;
-                    var list = webPart.WebPart.Properties.FieldValues.ContainsKey("List") ? webPart.WebPart.Properties.FieldValues["List"] : null;
-                    var view = webPart.WebPart.Properties.FieldValues.ContainsKey("View") ? webPart.WebPart.Properties.FieldValues["View"] : null;
+                    Context.Load(page, p => p.DisplayName, p => p.File);
+                    Context.ExecuteQuery();
+                    if (page.DisplayName == "Home")
+                    {
+                        var file = page.File;
+                        Context.Load(file);
+                        Context.ExecuteQuery();
+                        try
+                        {
+                            var lwpmShared = file.GetLimitedWebPartManager(PersonalizationScope.Shared);
+                            var lwpmUser = file.GetLimitedWebPartManager(PersonalizationScope.User);
+                            Context.Load(lwpmShared.WebParts, wpm => wpm.Include(wp => wp.WebPart.Title));
+                            Context.Load(lwpmUser.WebParts, wpm => wpm.Include(wp => wp.WebPart.Title));
+                            Context.ExecuteQuery();
+                            var webPartsShared = lwpmShared.WebParts;
+                            var webPartsUser = lwpmUser.WebParts;
+                            Context.Load(webPartsShared);
+                            Context.ExecuteQuery();
+                            foreach (var webPart in webPartsShared)
+                            {
+                                // Haal de gewenste gegevens op
+                                string title = webPart.WebPart.Title;
+                                var name = webPart.Id;
+                                var quickLaunchHeader = webPart.WebPart.Properties.FieldValues.ContainsKey("QuickLaunchHeader") ? webPart.WebPart.Properties.FieldValues["QuickLaunchHeader"] : null;
+                                var showComments = webPart.WebPart.Properties.FieldValues.ContainsKey("ShowComments") ? webPart.WebPart.Properties.FieldValues["ShowComments"] : null;
+                                var webPartType = webPart.WebPart.Properties.FieldValues.ContainsKey("WebPartType") ? webPart.WebPart.Properties.FieldValues["WebPartType"] : null;
+                                var list = webPart.WebPart.Properties.FieldValues.ContainsKey("List") ? webPart.WebPart.Properties.FieldValues["List"] : null;
+                                var view = webPart.WebPart.Properties.FieldValues.ContainsKey("View") ? webPart.WebPart.Properties.FieldValues["View"] : null;
 
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger?.LogInformation($"Error fetching WebParts: {ex.Message}");
+                        }
+
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogInformation($"Error fetching Pages: {ex.Message}");
             }
 
             DtoFile = webPartPagesDtos;
