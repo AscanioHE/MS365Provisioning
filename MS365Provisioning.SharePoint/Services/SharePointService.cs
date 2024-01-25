@@ -5,9 +5,11 @@ using Microsoft.SharePoint.Client.WebParts;
 using MS365Provisioning.Common;
 using MS365Provisioning.SharePoint.Model;
 using MS365Provisioning.SharePoint.Settings;
+using PnP.Framework.Provisioning.Model;
 using System.Collections;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using Context = Microsoft.SharePoint.Client.ClientContext;
 using ContentType = Microsoft.SharePoint.Client.ContentType;
 using ContentTypeCollection = Microsoft.SharePoint.Client.ContentTypeCollection;
 using Field = Microsoft.SharePoint.Client.Field;
@@ -22,6 +24,13 @@ using RoleDefinition = Microsoft.SharePoint.Client.RoleDefinition;
 using User = Microsoft.SharePoint.Client.User;
 using View = Microsoft.SharePoint.Client.View;
 using WebPart = Microsoft.SharePoint.Client.WebParts.WebPart;
+using Microsoft.SharePoint.ClientSideComponent;
+using PnP.Framework.Modernization;
+using PnP.Core.Model.SharePoint;
+using PnP.Framework.Utilities.WebParts.Schema;
+using PnP.Framework.Extensions;
+using System.Drawing.Imaging;
+using System.Reflection;
 
 namespace MS365Provisioning.SharePoint.Services
 {
@@ -630,38 +639,33 @@ namespace MS365Provisioning.SharePoint.Services
                 ListItemCollection pages = pagesList.GetItems(camlQuery);
                 Context.Load(pages);
                 Context.ExecuteQuery();
-                foreach (ListItem page in pages)
+                foreach (ListItem item in pages)
                 {
-                    Context.Load(page, p => p.DisplayName, p => p.File);
-                    Context.ExecuteQuery();
-                    if (page.DisplayName == "Home")
+                    Context.Load(item, I => I.DisplayName, I => I.File);
+                    Context.ExecuteQueryRetry();
+                    if (item.DisplayName == "Home")
                     {
-                        var file = page.File;
+                        var file = item.File;
                         Context.Load(file);
                         Context.ExecuteQuery();
+                        var page = Context.Web.LoadClientSidePage(item.DisplayName);
+                        Context.ExecuteQuery();
+                        var webParts = page.Controls;
+                        if (webParts != null && webParts.Count > 0)
+                        {
+                            foreach(var control in webparts)
+                            {
+                                foreach(object o in control.Properties.FieldValues)
+                                {
+                                    var i = o.GetType().Name;
+                                    var j = o.ToString();
+                                }
+                                
+                            }
+                        }
                         try
                         {
-                            var lwpmShared = file.GetLimitedWebPartManager(PersonalizationScope.Shared);
-                            var lwpmUser = file.GetLimitedWebPartManager(PersonalizationScope.User);
-                            Context.Load(lwpmShared.WebParts, wpm => wpm.Include(wp => wp.WebPart.Title));
-                            Context.Load(lwpmUser.WebParts, wpm => wpm.Include(wp => wp.WebPart.Title));
-                            Context.ExecuteQuery();
-                            var webPartsShared = lwpmShared.WebParts;
-                            var webPartsUser = lwpmUser.WebParts;
-                            Context.Load(webPartsShared);
-                            Context.ExecuteQuery();
-                            foreach (var webPart in webPartsShared)
-                            {
-                                // Haal de gewenste gegevens op
-                                string title = webPart.WebPart.Title;
-                                var name = webPart.Id;
-                                var quickLaunchHeader = webPart.WebPart.Properties.FieldValues.ContainsKey("QuickLaunchHeader") ? webPart.WebPart.Properties.FieldValues["QuickLaunchHeader"] : null;
-                                var showComments = webPart.WebPart.Properties.FieldValues.ContainsKey("ShowComments") ? webPart.WebPart.Properties.FieldValues["ShowComments"] : null;
-                                var webPartType = webPart.WebPart.Properties.FieldValues.ContainsKey("WebPartType") ? webPart.WebPart.Properties.FieldValues["WebPartType"] : null;
-                                var list = webPart.WebPart.Properties.FieldValues.ContainsKey("List") ? webPart.WebPart.Properties.FieldValues["List"] : null;
-                                var view = webPart.WebPart.Properties.FieldValues.ContainsKey("View") ? webPart.WebPart.Properties.FieldValues["View"] : null;
-
-                            }
+                            
                         }
                         catch (Exception ex)
                         {
