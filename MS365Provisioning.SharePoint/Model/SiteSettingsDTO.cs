@@ -2,13 +2,25 @@
 {
     public class SiteSettingsDto
     {
-        public string SiteTemplate { get; set; } = string.Empty;
+        public Dictionary<string, uint> SiteTemplate { get; set; }
         public uint Value { get; set; }
-        public SiteSettingsDto() { }
-        public SiteSettingsDto(string siteTemplate, uint value)
+        public string Title { get; set; }
+        public string Description { get; set; }
+        public string Logo { get; set; }
+        public bool SiteDesignApplied { get; set; }
+        public string PrivacySetting { get; set; }  
+        public bool AssosiatedToHub { get; set; }
+
+        public SiteSettingsDto(Dictionary<string,uint> siteTemplate, uint value, string title, string description, string logo, bool siteDesignApplied, string privacySetting, bool assosiatedToHub)
         {
             SiteTemplate = siteTemplate;
             Value = value;
+            Title = title;
+            Description = description;
+            Logo = logo;
+            SiteDesignApplied = siteDesignApplied;
+            PrivacySetting = privacySetting;
+            AssosiatedToHub = assosiatedToHub;
         }
     }
 

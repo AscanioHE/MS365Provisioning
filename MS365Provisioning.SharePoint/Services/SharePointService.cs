@@ -1,17 +1,15 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.SharePoint.Client;
 using Microsoft.SharePoint.Client.Utilities;
-using Microsoft.SharePoint.Client.WebParts;
 using MS365Provisioning.Common;
 using MS365Provisioning.SharePoint.Model;
 using MS365Provisioning.SharePoint.Settings;
-using PnP.Framework.Provisioning.Model;
 using System.Collections;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
-using Context = Microsoft.SharePoint.Client.ClientContext;
 using ContentType = Microsoft.SharePoint.Client.ContentType;
 using ContentTypeCollection = Microsoft.SharePoint.Client.ContentTypeCollection;
+using Context = Microsoft.SharePoint.Client.ClientContext;
 using Field = Microsoft.SharePoint.Client.Field;
 using FieldCollection = Microsoft.SharePoint.Client.FieldCollection;
 using Group = Microsoft.SharePoint.Client.Group;
@@ -24,13 +22,6 @@ using RoleDefinition = Microsoft.SharePoint.Client.RoleDefinition;
 using User = Microsoft.SharePoint.Client.User;
 using View = Microsoft.SharePoint.Client.View;
 using WebPart = Microsoft.SharePoint.Client.WebParts.WebPart;
-using Microsoft.SharePoint.ClientSideComponent;
-using PnP.Framework.Modernization;
-using PnP.Core.Model.SharePoint;
-using PnP.Framework.Utilities.WebParts.Schema;
-using PnP.Framework.Extensions;
-using System.Drawing.Imaging;
-using System.Reflection;
 
 namespace MS365Provisioning.SharePoint.Services
 {
@@ -113,9 +104,41 @@ namespace MS365Provisioning.SharePoint.Services
 
         public List<SiteSettingsDto> LoadSiteSettings()
         {
+            Web web = Context.Web;
+            Context.Load(Context.Web,
+                w => w.Title,
+                w => w.Url,
+                w => w.Description,
+                w => w.SiteLogoUrl,
+                w => w.WebTemplate,
+                w => w.Title,
+                w => w.RelatedHubSiteIds,
+                w => w.AssociatedMemberGroup,
+                w => w.AssociatedVisitorGroup,
+                w => w.Language,
+                w => w.RegionalSettings,
+                w => w.Navigation,
+                w => w.QuickLaunchEnabled,
+                w => w.TreeViewEnabled,
+                w => w.HeaderLayout,
+                w => w.CustomMasterUrl);
+
+            
+            ObjectSharingSettings objectSharingSettings = web.GetObjectSharingSettingsForSite(true);
+            var sharingSettings = web.GetObjectSharingSettingsForSite;
+            string privacySettings = sharingSettings.Method.IsPublic;
+            Context.ExecuteQuery();
+            string title = web.Title;
+            string url = web.Url;
+            string description = web.Description;
+            string logo = web.SiteLogoUrl;
+            bool siteDesignApplied = web.WebTemplate != "STS";
+            //Dictionary<string, uint> webTemplates = new();
             List<SiteSettingsDto> siteSettingsDto = new();
             if (fileSettings.SiteSettingsFilePath != null)
+            {
                 FileName = fileSettings.SiteSettingsFilePath;
+            }
             try
             {
                 WebTemplateCollection webTemplateCollection = Context.Web.GetAvailableWebTemplates(1033, true);
@@ -123,12 +146,9 @@ namespace MS365Provisioning.SharePoint.Services
                 Context.ExecuteQuery();
                 foreach (WebTemplate webTemplate in webTemplateCollection)
                 {
-                    siteSettingsDto.Add(new SiteSettingsDto
-                    {
-                        SiteTemplate = webTemplate.Name,
-                        Value = webTemplate.Lcid
-                    });
+                    //webTemplates.Add(webTemplate.Title, webTemplate.Lcid);
                 }
+
             }
             catch (Exception ex)
             {
@@ -653,19 +673,19 @@ namespace MS365Provisioning.SharePoint.Services
                         var webParts = page.Controls;
                         if (webParts != null && webParts.Count > 0)
                         {
-                            foreach(var control in webparts)
+                            foreach (var control in webparts)
                             {
-                                foreach(object o in control.Properties.FieldValues)
+                                foreach (object o in control.Properties.FieldValues)
                                 {
                                     var i = o.GetType().Name;
                                     var j = o.ToString();
                                 }
-                                
+
                             }
                         }
                         try
                         {
-                            
+
                         }
                         catch (Exception ex)
                         {
