@@ -113,8 +113,6 @@ namespace MS365Provisioning.SharePoint.Services
                 w => w.WebTemplate,
                 w => w.Title,
                 w => w.RelatedHubSiteIds,
-                w => w.AssociatedMemberGroup,
-                w => w.AssociatedVisitorGroup,
                 w => w.Language,
                 w => w.RegionalSettings,
                 w => w.Navigation,
@@ -126,13 +124,21 @@ namespace MS365Provisioning.SharePoint.Services
             
             ObjectSharingSettings objectSharingSettings = web.GetObjectSharingSettingsForSite(true);
             var sharingSettings = web.GetObjectSharingSettingsForSite;
-            string privacySettings = sharingSettings.Method.IsPublic;
+            bool privacySettings = sharingSettings.Method.IsPublic;
+            string privacy = string.Empty;
             Context.ExecuteQuery();
+            privacy = privacySettings ? "Public" : "Private";
             string title = web.Title;
             string url = web.Url;
             string description = web.Description;
             string logo = web.SiteLogoUrl;
             bool siteDesignApplied = web.WebTemplate != "STS";
+            var relatedHubSiteIds = web.RelatedHubSiteIds;
+            var language = web.Language;
+            var navigation = web.Navigation;
+            var quickLauncEnabled = web.QuickLaunchEnabled;
+            var treeViewEnabled = web.TreeViewEnabled;
+            var headerLayout = web.HeaderLayout;   
             //Dictionary<string, uint> webTemplates = new();
             List<SiteSettingsDto> siteSettingsDto = new();
             if (fileSettings.SiteSettingsFilePath != null)
