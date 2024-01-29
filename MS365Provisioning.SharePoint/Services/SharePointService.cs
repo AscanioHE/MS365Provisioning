@@ -35,7 +35,7 @@ namespace MS365Provisioning.SharePoint.Services
         private readonly SharePointSettings sharePointSettings;
         private readonly FileSettings fileSettings;
         private object DtoFile;
-        private string FileName { get; set; } 
+        private string FileName { get; set; }
         private string ThumbPrint { get; set; }
         private string SiteUrl { get; set; }
 
@@ -129,26 +129,25 @@ namespace MS365Provisioning.SharePoint.Services
                 ObjectSharingSettings objectSharingSettings = web.GetObjectSharingSettingsForSite(true);
                 var sharingSettings = web.GetObjectSharingSettingsForSite;
                 bool privacySettings = sharingSettings.Method.IsPublic;
-                string privacy = string.Empty;
+                Context.Load(web.RegionalSettings, rs => rs.TimeZone.Id, rs => rs.DateFormat, rs => rs.LocaleId,rs=>rs.TimeZone.Description);
                 Context.ExecuteQuery();
-                privacy = privacySettings ? "Public" : "Private";
+
                 string title = web.Title;
                 string url = web.Url;
                 string description = web.Description;
+                string currentWebTemplate = web.WebTemplate;
                 string logo = web.SiteLogoUrl;
                 bool siteDesignApplied = web.WebTemplate != "STS";
+                string privacy = privacySettings ? "Public" : "Private";
                 var relatedHubSiteIds = web.RelatedHubSiteIds;
-                bool assosieatedToHub = relatedHubSiteIds.IsNullOrEmpty() ;
-                uint language = web.Language;
-                var regionalSettings = 
+                bool assosiatedToHub = !relatedHubSiteIds.IsNullOrEmpty();
+                var regionalSettings =
                 (
                     web.RegionalSettings.DateFormat,
-                    web.RegionalSettings.TimeZone,
+                    web.RegionalSettings.TimeZone.Description,
                     web.RegionalSettings.LocaleId
                 );
-                bool quickLaunchEnabled = web.QuickLaunchEnabled;
-                bool treeViewEnabled = web.TreeViewEnabled;
-                HeaderLayoutType headerLayout = web.HeaderLayout;
+                uint language = web.Language;
                 Dictionary<string, string> navigationItems = new();
                 var navigation = web.Navigation;
                 foreach (var node in navigation.QuickLaunch)
@@ -159,6 +158,9 @@ namespace MS365Provisioning.SharePoint.Services
                 {
                     navigationItems.Add(node.Title, node.Url);
                 }
+                bool quickLaunchEnabled = web.QuickLaunchEnabled;
+                bool treeViewEnabled = web.TreeViewEnabled;
+                string headerLayout = web.HeaderLayout.ToString();
 
                 Dictionary<string, uint> webTemplates = new();
                 if (fileSettings.SiteSettingsFilePath != null)
@@ -170,23 +172,28 @@ namespace MS365Provisioning.SharePoint.Services
                 Context.ExecuteQuery();
                 foreach (WebTemplate webTemplate in webTemplateCollection)
                 {
-                    webTemplates.Add(webTemplate.Title, webTemplate.Lcid);
+                    if (!webTemplates.ContainsKey(webTemplate.Title))
+                    {
+                        webTemplates.Add(webTemplate.Title, webTemplate.Lcid);
+                    }
                 }
 
                 siteSettingsDtos.Add(new SiteSettingsDto
                     (
                         title,
-                        webTemplates,
                         description,
+                        currentWebTemplate,
                         logo,
                         siteDesignApplied,
                         privacy,
-                        assosieatedToHub,
+                        assosiatedToHub,
                         language,
                         regionalSettings,
                         quickLaunchEnabled,
                         treeViewEnabled,
-                        navigationItems
+                        navigationItems,
+                        headerLayout,
+                        webTemplates
                     ));
 
             }
@@ -198,10 +205,9 @@ namespace MS365Provisioning.SharePoint.Services
             {
                 Context.Dispose();
             }
-            List<SiteSettingsDto> siteSettingsDto = new();
-            DtoFile = siteSettingsDto;
+            DtoFile = siteSettingsDtos;
             ExportServices();
-            return siteSettingsDto;
+            return siteSettingsDtos;
         }
 
         /*______________________________________________________________________________________________________________
@@ -749,9 +755,10 @@ namespace MS365Provisioning.SharePoint.Services
         {
             ExportServices exportServices = new()
             {
-                DtoFile = DtoFile
+                DtoFile = DtoFile,
+                FileName = FileName,
             };
-            exportServices.FileName = exportServices.ConvertToJsonString();
+            exportServices.ConvertToJsonString();
             exportServices.WriteJsonStringToFile();
         }
     }
