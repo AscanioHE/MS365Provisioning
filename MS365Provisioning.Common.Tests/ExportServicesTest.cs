@@ -12,7 +12,7 @@ namespace MS365Provisioning.Common.Tests
 
         public ExportServicesTest()
         {
-            List<ListViewDto> dtoTestFile = new List<ListViewDto>();
+            List<ListViewDto> dtoTestFile = new();
             DtoFile = dtoTestFile;
             _exportSettings = new ExportServices();
             FileName = _exportSettings.FileName;

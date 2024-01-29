@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.SharePoint.Client;
 using Microsoft.SharePoint.Client.Utilities;
 using MS365Provisioning.Common;
@@ -34,7 +35,7 @@ namespace MS365Provisioning.SharePoint.Services
         private readonly SharePointSettings sharePointSettings;
         private readonly FileSettings fileSettings;
         private object DtoFile;
-        private string FileName { get; set; }
+        private string FileName { get; set; } 
         private string ThumbPrint { get; set; }
         private string SiteUrl { get; set; }
 
@@ -50,7 +51,7 @@ namespace MS365Provisioning.SharePoint.Services
             fileSettings = _sharePointSettingsService.GetFileSettings();
             SiteUrl = sharePointSettings.SiteUrl!;
             ThumbPrint = sharePointSettings.ThumbPrint!;
-            Context = GetClientContext(SiteUrl);
+            Context = GetClientContext();
             _logger = logger;
             DtoFile = new object();
             FileName = string.Empty;
@@ -69,7 +70,7 @@ namespace MS365Provisioning.SharePoint.Services
         /*______________________________________________________________________________________________________________
          Create ClientContext
         ________________________________________________________________________________________________________________*/
-        private ClientContext GetClientContext(string siteUrl)
+        private ClientContext GetClientContext()
         {
             ClientContext ctx;
             X509Certificate2 certificate = GetCertificateByThumbprint();
@@ -104,6 +105,7 @@ namespace MS365Provisioning.SharePoint.Services
 
         public List<SiteSettingsDto> LoadSiteSettings()
         {
+            List<SiteSettingsDto> siteSettingsDtos = new();
             Web web = Context.Web;
             Context.Load(Context.Web,
                 w => w.Title,
@@ -119,41 +121,73 @@ namespace MS365Provisioning.SharePoint.Services
                 w => w.QuickLaunchEnabled,
                 w => w.TreeViewEnabled,
                 w => w.HeaderLayout,
-                w => w.CustomMasterUrl);
-
-            
-            ObjectSharingSettings objectSharingSettings = web.GetObjectSharingSettingsForSite(true);
-            var sharingSettings = web.GetObjectSharingSettingsForSite;
-            bool privacySettings = sharingSettings.Method.IsPublic;
-            string privacy = string.Empty;
-            Context.ExecuteQuery();
-            privacy = privacySettings ? "Public" : "Private";
-            string title = web.Title;
-            string url = web.Url;
-            string description = web.Description;
-            string logo = web.SiteLogoUrl;
-            bool siteDesignApplied = web.WebTemplate != "STS";
-            var relatedHubSiteIds = web.RelatedHubSiteIds;
-            var language = web.Language;
-            var navigation = web.Navigation;
-            var quickLauncEnabled = web.QuickLaunchEnabled;
-            var treeViewEnabled = web.TreeViewEnabled;
-            var headerLayout = web.HeaderLayout;   
-            //Dictionary<string, uint> webTemplates = new();
-            List<SiteSettingsDto> siteSettingsDto = new();
-            if (fileSettings.SiteSettingsFilePath != null)
-            {
-                FileName = fileSettings.SiteSettingsFilePath;
-            }
+                w => w.CustomMasterUrl,
+                w => w.Navigation.QuickLaunch,
+                w => w.Navigation.TopNavigationBar);
             try
             {
+                ObjectSharingSettings objectSharingSettings = web.GetObjectSharingSettingsForSite(true);
+                var sharingSettings = web.GetObjectSharingSettingsForSite;
+                bool privacySettings = sharingSettings.Method.IsPublic;
+                string privacy = string.Empty;
+                Context.ExecuteQuery();
+                privacy = privacySettings ? "Public" : "Private";
+                string title = web.Title;
+                string url = web.Url;
+                string description = web.Description;
+                string logo = web.SiteLogoUrl;
+                bool siteDesignApplied = web.WebTemplate != "STS";
+                var relatedHubSiteIds = web.RelatedHubSiteIds;
+                bool assosieatedToHub = relatedHubSiteIds.IsNullOrEmpty() ;
+                uint language = web.Language;
+                var regionalSettings = 
+                (
+                    web.RegionalSettings.DateFormat,
+                    web.RegionalSettings.TimeZone,
+                    web.RegionalSettings.LocaleId
+                );
+                bool quickLaunchEnabled = web.QuickLaunchEnabled;
+                bool treeViewEnabled = web.TreeViewEnabled;
+                HeaderLayoutType headerLayout = web.HeaderLayout;
+                Dictionary<string, string> navigationItems = new();
+                var navigation = web.Navigation;
+                foreach (var node in navigation.QuickLaunch)
+                {
+                    navigationItems.Add(node.Title, node.Url);
+                }
+                foreach (var node in web.Navigation.TopNavigationBar)
+                {
+                    navigationItems.Add(node.Title, node.Url);
+                }
+
+                Dictionary<string, uint> webTemplates = new();
+                if (fileSettings.SiteSettingsFilePath != null)
+                {
+                    FileName = fileSettings.SiteSettingsFilePath;
+                }
                 WebTemplateCollection webTemplateCollection = Context.Web.GetAvailableWebTemplates(1033, true);
                 Context.Load(webTemplateCollection);
                 Context.ExecuteQuery();
                 foreach (WebTemplate webTemplate in webTemplateCollection)
                 {
-                    //webTemplates.Add(webTemplate.Title, webTemplate.Lcid);
+                    webTemplates.Add(webTemplate.Title, webTemplate.Lcid);
                 }
+
+                siteSettingsDtos.Add(new SiteSettingsDto
+                    (
+                        title,
+                        webTemplates,
+                        description,
+                        logo,
+                        siteDesignApplied,
+                        privacy,
+                        assosieatedToHub,
+                        language,
+                        regionalSettings,
+                        quickLaunchEnabled,
+                        treeViewEnabled,
+                        navigationItems
+                    ));
 
             }
             catch (Exception ex)
@@ -164,6 +198,7 @@ namespace MS365Provisioning.SharePoint.Services
             {
                 Context.Dispose();
             }
+            List<SiteSettingsDto> siteSettingsDto = new();
             DtoFile = siteSettingsDto;
             ExportServices();
             return siteSettingsDto;
@@ -175,7 +210,7 @@ namespace MS365Provisioning.SharePoint.Services
         public List<ListsSettingsDto> LoadListsSettings()
         {
             List<ListsSettingsDto> listsSettingsDto = new();
-            FileName = fileSettings.ListsFilePath;
+            FileName = fileSettings.ListsFilePath!;
             bool breakRoleAssignment = false;
             Context.Load(_lists, lc => lc.Include(
                 l => l.Hidden)
