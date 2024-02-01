@@ -9,18 +9,18 @@
   "SharePoint": {
     "ClientId": "ed0eb438-d94a-4a1c-ae0b-2a07dbe8dd41",
     "ClientSecret": "HHr8Q~bJq-G3CdA3S68GVEq-RluTT8EbZe4ecdpF",
-    "ContentTypesFilePath": "SharePoint/jsonfiles/ContentTypes.json",
-    "FolderStructureFilePath": "jsonfiles/FolderStructure.json",
+    "ContentTypesFilePath": "C:\\Projects\\Repos\\MS365 Provisioning Engine\\MS365Provisioning.SharePoint\\JsonFiles\\ContentTypes.json",
+    "FolderStructureFilePath": "C:\\Projects\\Repos\\MS365 Provisioning Engine\\MS365Provisioning.SharePoint\\JsonFiles\\FolderStructure.json",
     "JsonFilesFilePath": "C:\\Projects\\Repos\\MS365 Provisioning Engine\\MS365Provisioning.SharePoint\\JsonFiles\\",
-    "ListsFilePath": "jsonfiles/Lists.json",
-    "ListViewsFilePath": "jsonfiles/ListViews.json",
-    "SiteColumnsFilePath": "jsonfiles/SiteColumns.json",
-    "SitePermissionsFilePath": "jsonfiles/SitePermissions.json",
-    "SiteSettingsFilePath": "SiteSettings.json",
+    "ListsFilePath": "C:\\Projects\\Repos\\MS365 Provisioning Engine\\MS365Provisioning.SharePoint\\JsonFiles\\Lists.json",
+    "ListViewsFilePath": "C:\\Projects\\Repos\\MS365 Provisioning Engine\\MS365Provisioning.SharePoint\\JsonFiles\\ListViews.json",
+    "SiteColumnsFilePath": "C:\\Projects\\Repos\\MS365 Provisioning Engine\\MS365Provisioning.SharePoint\\JsonFiles\\SiteColumns.json",
+    "SitePermissionsFilePath": "C:\\Projects\\Repos\\MS365 Provisioning Engine\\MS365Provisioning.SharePoint\\JsonFiles\\SitePermissions.json",
+    "SiteSettingsFilePath": "C:\\Projects\\Repos\\MS365 Provisioning Engine\\MS365Provisioning.SharePoint\\JsonFiles\\SiteSettings.json",
     "SiteUrl": "https://23m2yz.sharepoint.com/sites/CompanyNews",
     "TenantId": "a569fa15-6e55-43dc-a47f-b4f38239e020",
-    "TestFilePath": "TestFile.json",
+    "TestFilePath": "C:\\Projects\\Repos\\MS365 Provisioning Engine\\MS365Provisioning.SharePoint\\JsonFiles\\TestFile.json",
     "ThumbPrint": "7a1abd6f8a5ee0d7c13d8faf0455630693ba7e51",
-    "WebPartsFilePath": "jsonfiles/WebParts.json"
+    "WebPartsFilePath": "C:\\Projects\\Repos\\MS365 Provisioning Engine\\MS365Provisioning.SharePoint\\JsonFiles\\WebParts.json"
   }
 }

@@ -129,7 +129,7 @@ namespace MS365Provisioning.SharePoint.Services
                 ObjectSharingSettings objectSharingSettings = web.GetObjectSharingSettingsForSite(true);
                 var sharingSettings = web.GetObjectSharingSettingsForSite;
                 bool privacySettings = sharingSettings.Method.IsPublic;
-                Context.Load(web.RegionalSettings, rs => rs.TimeZone.Id, rs => rs.DateFormat, rs => rs.LocaleId,rs=>rs.TimeZone.Description);
+                Context.Load(web.RegionalSettings, rs => rs.TimeZone.Id, rs => rs.DateFormat, rs => rs.LocaleId, rs => rs.TimeZone.Description);
                 Context.ExecuteQuery();
 
                 string title = web.Title;
@@ -370,6 +370,7 @@ namespace MS365Provisioning.SharePoint.Services
                     foreach (RoleDefinition rd in rdc)
                     {
                         permissionBuilder.Append(rd.Name + ", ");
+                        _logger?.LogInformation(permissionBuilder.ToString());
                     }
                     string permission = permissionBuilder.ToString();
                     permissionBuilder.Clear();
@@ -647,7 +648,9 @@ namespace MS365Provisioning.SharePoint.Services
                     Context.ExecuteQuery();
                     string webTitle = Context.Web.Title;
 
-                    foreach (Group siteGroup in Context.Web.SiteGroups.Where(group => group.Title.Contains(webTitle)))
+                    _logger?.LogInformation($"{webTitle}, Total of groups: {Context.Web.SiteGroups.Count}");
+
+                    foreach (Group siteGroup in Context.Web.SiteGroups)
                     {
                         List<string> userNames = new();
                         foreach (User user in siteGroup.Users)
@@ -655,10 +658,18 @@ namespace MS365Provisioning.SharePoint.Services
                             if (!user.IsHiddenInUI && user.PrincipalType == PrincipalType.User)
                             {
                                 userNames.Add(user.UserPrincipalName);
+                                _logger?.LogInformation($"{webTitle},SiteGroup: {siteGroup.Title} User: {user.UserPrincipalName}");
                             }
                         }
-                        sitePermissionsDtos.Add(new SitePermissionsDto
-                            (webTitle, siteGroup.Title, userNames));
+                        sitePermissionsDtos.Add
+                            (new SitePermissionsDto
+                                (
+                                    webTitle, 
+                                    siteGroup.Title, 
+                                    userNames
+
+                                )
+                            );
                     }
                 }
                 catch (Exception ex)

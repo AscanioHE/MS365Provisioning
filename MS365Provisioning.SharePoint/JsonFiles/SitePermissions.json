@@ -1,23 +1,32 @@
 [
   {
-    "GroupName": "TestSite1",
-    "PermissionLevel": "TestSite1 - Bezoekers",
+    "GroupName": "Company News",
+    "PermissionLevel": "Company News Members",
     "UserNames": [
-      "ascanio_happy-experts.eu#ext#@23m2yz.onmicrosoft.com"
+      "pvandooren@23m2yz.onmicrosoft.com"
     ]
   },
   {
-    "GroupName": "TestSite1",
-    "PermissionLevel": "TestSite1 - Eigenaars",
+    "GroupName": "Company News",
+    "PermissionLevel": "Company News Owners",
     "UserNames": [
-      "ascanio@23m2yz.onmicrosoft.com"
+      "ascanio_happy-experts.eu#ext#@23m2yz.onmicrosoft.com",
+      "ascanio@itwizards.org"
     ]
   },
   {
-    "GroupName": "TestSite1",
-    "PermissionLevel": "TestSite1 - Leden",
+    "GroupName": "Company News",
+    "PermissionLevel": "Company News Visitors",
     "UserNames": [
-      "ascanio_happy-experts.eu#ext#@23m2yz.onmicrosoft.com"
+      "rferrari@23m2yz.onmicrosoft.com"
+    ]
+  },
+  {
+    "GroupName": "Company News",
+    "PermissionLevel": "CustomGroupReadOnly",
+    "UserNames": [
+      "ascanio_happy-experts.eu#ext#@23m2yz.onmicrosoft.com",
+      "slebon@23m2yz.onmicrosoft.com"
     ]
   }
 ]
