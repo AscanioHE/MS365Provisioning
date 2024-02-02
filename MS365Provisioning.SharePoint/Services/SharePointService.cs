@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
+using Microsoft.Graph.Models;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.SharePoint.Client;
-using Microsoft.SharePoint.Client.Utilities;
 using MS365Provisioning.Common;
 using MS365Provisioning.SharePoint.Model;
 using MS365Provisioning.SharePoint.Settings;
@@ -20,6 +20,7 @@ using NavigationNode = Microsoft.SharePoint.Client.NavigationNode;
 using RoleAssignment = Microsoft.SharePoint.Client.RoleAssignment;
 using RoleAssignmentCollection = Microsoft.SharePoint.Client.RoleAssignmentCollection;
 using RoleDefinition = Microsoft.SharePoint.Client.RoleDefinition;
+using Site = Microsoft.SharePoint.Client.Site;
 using User = Microsoft.SharePoint.Client.User;
 using View = Microsoft.SharePoint.Client.View;
 using WebPart = Microsoft.SharePoint.Client.WebParts.WebPart;
@@ -30,7 +31,8 @@ namespace MS365Provisioning.SharePoint.Services
     {
         private readonly ISharePointSettingsService _sharePointSettingsService;
         private readonly ILogger _logger;
-        private ClientContext Context { get; set; }
+        private Context Ctx { get; set; }
+        private Web web { get; set; }
         private readonly ListCollection _lists;
         private readonly SharePointSettings sharePointSettings;
         private readonly FileSettings fileSettings;
@@ -51,16 +53,19 @@ namespace MS365Provisioning.SharePoint.Services
             fileSettings = _sharePointSettingsService.GetFileSettings();
             SiteUrl = sharePointSettings.SiteUrl!;
             ThumbPrint = sharePointSettings.ThumbPrint!;
-            Context = GetClientContext();
+            Ctx = GetClientContext();
+            web = Ctx.Web;
+            Ctx.Load(web);
+            Ctx.ExecuteQuery();
             _logger = logger;
             DtoFile = new object();
             FileName = string.Empty;
-            _lists = Context.Web.Lists;
-            _lists = Context!.Web.Lists;
+            _lists = Ctx.Web.Lists;
+            _lists = Ctx!.Web.Lists;
             try
             {
-                Context.Load(_lists);
-                Context.ExecuteQuery();
+                Ctx.Load(_lists);
+                Ctx.ExecuteQuery();
             }
             catch (Exception ex)
             {
@@ -106,8 +111,8 @@ namespace MS365Provisioning.SharePoint.Services
         public List<SiteSettingsDto> LoadSiteSettings()
         {
             List<SiteSettingsDto> siteSettingsDtos = new();
-            Web web = Context.Web;
-            Context.Load(Context.Web,
+            Web web = Ctx.Web;
+            Ctx.Load(Ctx.Web,
                 w => w.Title,
                 w => w.Url,
                 w => w.Description,
@@ -129,8 +134,8 @@ namespace MS365Provisioning.SharePoint.Services
                 ObjectSharingSettings objectSharingSettings = web.GetObjectSharingSettingsForSite(true);
                 var sharingSettings = web.GetObjectSharingSettingsForSite;
                 bool privacySettings = sharingSettings.Method.IsPublic;
-                Context.Load(web.RegionalSettings, rs => rs.TimeZone.Id, rs => rs.DateFormat, rs => rs.LocaleId, rs => rs.TimeZone.Description);
-                Context.ExecuteQuery();
+                Ctx.Load(web.RegionalSettings, rs => rs.TimeZone.Id, rs => rs.DateFormat, rs => rs.LocaleId, rs => rs.TimeZone.Description);
+                Ctx.ExecuteQuery();
 
                 string title = web.Title;
                 string url = web.Url;
@@ -167,9 +172,9 @@ namespace MS365Provisioning.SharePoint.Services
                 {
                     FileName = fileSettings.SiteSettingsFilePath;
                 }
-                WebTemplateCollection webTemplateCollection = Context.Web.GetAvailableWebTemplates(1033, true);
-                Context.Load(webTemplateCollection);
-                Context.ExecuteQuery();
+                WebTemplateCollection webTemplateCollection = Ctx.Web.GetAvailableWebTemplates(1033, true);
+                Ctx.Load(webTemplateCollection);
+                Ctx.ExecuteQuery();
                 foreach (WebTemplate webTemplate in webTemplateCollection)
                 {
                     if (!webTemplates.ContainsKey(webTemplate.Title))
@@ -203,7 +208,7 @@ namespace MS365Provisioning.SharePoint.Services
             }
             finally
             {
-                Context.Dispose();
+                Ctx.Dispose();
             }
             DtoFile = siteSettingsDtos;
             ExportServices();
@@ -218,18 +223,18 @@ namespace MS365Provisioning.SharePoint.Services
             List<ListsSettingsDto> listsSettingsDto = new();
             FileName = fileSettings.ListsFilePath!;
             bool breakRoleAssignment = false;
-            Context.Load(_lists, lc => lc.Include(
+            Ctx.Load(_lists, lc => lc.Include(
                 l => l.Hidden)
                       );
             try
             {
-                Context.ExecuteQuery();
+                Ctx.ExecuteQuery();
                 if (_lists == null || _lists.Count <= 0) return listsSettingsDto;
                 foreach (List list in _lists)
                 {
                     if (!list.Hidden)
                     {
-                        Context.Load(
+                        Ctx.Load(
                             list,
                             l => l.Title,
                             l => l.DefaultViewUrl,
@@ -244,7 +249,7 @@ namespace MS365Provisioning.SharePoint.Services
                                 f => f.Title));
                         try
                         {
-                            Context.ExecuteQuery();
+                            Ctx.ExecuteQuery();
                             List<string> contentTypes = GetListContentTypes(list);
                             Dictionary<string, string> listPermissions = GetPermissionDetails(list);
                             Guid enterpiseKeywordsValue = GetEnterpriseKeywordsValue();
@@ -290,7 +295,7 @@ namespace MS365Provisioning.SharePoint.Services
             }
             finally
             {
-                Context.Dispose();
+                Ctx.Dispose();
             }
             DtoFile = listsSettingsDto;
             ExportServices();
@@ -302,18 +307,18 @@ namespace MS365Provisioning.SharePoint.Services
             List<string> quickLaunchHeaders = new();
             try
             {
-                Context.Load(Context.Web.Navigation.QuickLaunch);
-                Context.ExecuteQuery();
-                foreach (NavigationNode navigationNode in Context.Web.Navigation.QuickLaunch)
+                Ctx.Load(Ctx.Web.Navigation.QuickLaunch);
+                Ctx.ExecuteQuery();
+                foreach (NavigationNode navigationNode in Ctx.Web.Navigation.QuickLaunch)
                 {
-                    Context.Load
+                    Ctx.Load
                     (
                         navigationNode,
                         n => n.Children
                     );
                     try
                     {
-                        Context.ExecuteQuery();
+                        Ctx.ExecuteQuery();
                         foreach (NavigationNode childNode in navigationNode.Children)
                         {
                             quickLaunchHeaders.Add(childNode.Title);
@@ -337,11 +342,11 @@ namespace MS365Provisioning.SharePoint.Services
             Guid enterpriseKeywordsValue = Guid.Empty;
             try
             {
-                Field enterpriseKeywords = Context.Web.Fields.GetByInternalNameOrTitle("EnterpriseKeywords");
+                Field enterpriseKeywords = Ctx.Web.Fields.GetByInternalNameOrTitle("EnterpriseKeywords");
                 if (enterpriseKeywords != null)
                 {
-                    Context.Load(enterpriseKeywords);
-                    Context.ExecuteQuery();
+                    Ctx.Load(enterpriseKeywords);
+                    Ctx.ExecuteQuery();
                     enterpriseKeywordsValue = enterpriseKeywords.Id;
                 }
             }
@@ -357,11 +362,11 @@ namespace MS365Provisioning.SharePoint.Services
             IQueryable<RoleAssignment> queryForList = list.RoleAssignments.Include(
                 roleAsg => roleAsg.Member,
                 roleAsg => roleAsg.RoleDefinitionBindings.Include(roleDef => roleDef.Name));
-            IEnumerable roles = Context.LoadQuery(queryForList);
+            IEnumerable roles = Ctx.LoadQuery(queryForList);
             Dictionary<string, string> permissionDetails = new();
             try
             {
-                Context.ExecuteQuery();
+                Ctx.ExecuteQuery();
 
                 foreach (RoleAssignment ra in roles)
                 {
@@ -384,7 +389,7 @@ namespace MS365Provisioning.SharePoint.Services
             }
             finally
             {
-                Context.Dispose();
+                Ctx.Dispose();
             }
             return permissionDetails;
         }
@@ -396,12 +401,12 @@ namespace MS365Provisioning.SharePoint.Services
             List<ListViewDto> listsViewDto = new();
             if (fileSettings.ListViewsFilePath != null)
                 FileName = fileSettings.ListViewsFilePath;
-            Context.Load(_lists, lc => lc.Include(
+            Ctx.Load(_lists, lc => lc.Include(
                 l => l.Hidden)
             );
             try
             {
-                Context.ExecuteQuery();
+                Ctx.ExecuteQuery();
                 foreach (List list in _lists)
                 {
                     if (!list.Hidden)
@@ -416,7 +421,7 @@ namespace MS365Provisioning.SharePoint.Services
             }
             finally
             {
-                Context.Dispose();
+                Ctx.Dispose();
             }
             DtoFile = listsViewDto;
             ExportServices();
@@ -426,16 +431,16 @@ namespace MS365Provisioning.SharePoint.Services
         {
             List<ListViewDto> listviewDto = new();
             Microsoft.SharePoint.Client.ViewCollection listViews = list.Views;
-            Context.Load(list,
+            Ctx.Load(list,
                 l => l.Title);
-            Context.Load(listViews);
+            Ctx.Load(listViews);
             try
             {
-                Context.ExecuteQuery();
+                Ctx.ExecuteQuery();
                 foreach (View listView in listViews)
                 {
-                    Context.Load(listView);
-                    Context.Load(
+                    Ctx.Load(listView);
+                    Ctx.Load(
                         listView,
                             lv => lv.ViewFields,
                             lv => lv.Title,
@@ -444,7 +449,7 @@ namespace MS365Provisioning.SharePoint.Services
                             lv => lv.Scope);
                     try
                     {
-                        Context.ExecuteQuery();
+                        Ctx.ExecuteQuery();
                         List<string> viewFields = new();
                         foreach (string field in listView.ViewFields)
                         {
@@ -472,7 +477,7 @@ namespace MS365Provisioning.SharePoint.Services
             }
             finally
             {
-                Context.Dispose();
+                Ctx.Dispose();
             }
             return listviewDto;
         }
@@ -486,8 +491,8 @@ namespace MS365Provisioning.SharePoint.Services
                 FileName = fileSettings.SiteColumnsFilePath;
             try
             {
-                FieldCollection siteColumns = Context.Web.Fields;
-                Context.Load(siteColumns,
+                FieldCollection siteColumns = Ctx.Web.Fields;
+                Ctx.Load(siteColumns,
                              scc => scc.Include(
                                     sc => sc.Hidden,
                                     sc => sc.InternalName,
@@ -495,7 +500,7 @@ namespace MS365Provisioning.SharePoint.Services
                                     sc => sc.DefaultValue));
                 try
                 {
-                    Context.ExecuteQuery();
+                    Ctx.ExecuteQuery();
                     foreach (Field siteColumn in siteColumns)
                     {
                         siteColumnsDtos.Add(new SiteColumnsDto(
@@ -513,7 +518,7 @@ namespace MS365Provisioning.SharePoint.Services
             }
             finally
             {
-                Context.Dispose();
+                Ctx.Dispose();
             }
             DtoFile = siteColumnsDtos;
             ExportServices();
@@ -532,13 +537,13 @@ namespace MS365Provisioning.SharePoint.Services
                     if (!list.Hidden)
                     {
                         ContentTypeCollection contentTypes = list.ContentTypes;
-                        Context.Load(
+                        Ctx.Load(
                             contentTypes, cts => cts.Include(
                                 ct => ct.Name,
                                 ct => ct.Parent,
                                 ct => ct.Fields.Include(
                                     f => f.InternalName)));
-                        Context.ExecuteQuery();
+                        Ctx.ExecuteQuery();
                         List<string> contentTypeFields = new();
                         if (list.ContentTypes.Count == 0)
                         {
@@ -565,7 +570,7 @@ namespace MS365Provisioning.SharePoint.Services
             }
             finally
             {
-                Context.Dispose();
+                Ctx.Dispose();
             }
             DtoFile = contentTypesDto;
             ExportServices();
@@ -583,21 +588,21 @@ namespace MS365Provisioning.SharePoint.Services
                 {
                     if (!list.Hidden)
                     {
-                        Context.Load(
+                        Ctx.Load(
                             list,
                             l => l.Title,
                             l => l.Fields);
                         try
                         {
-                            Context.ExecuteQuery();
+                            Ctx.ExecuteQuery();
                             List<string> subFields = new();
                             foreach (Field field in list.Fields)
                             {
-                                Context.Load(field,
+                                Ctx.Load(field,
                                     f => f.Title);
                                 try
                                 {
-                                    Context.ExecuteQuery();
+                                    Ctx.ExecuteQuery();
                                     subFields.Add(field.Title);
                                 }
                                 catch (Exception ex)
@@ -625,7 +630,7 @@ namespace MS365Provisioning.SharePoint.Services
             }
             finally
             {
-                Context.Dispose();
+                Ctx.Dispose();
             }
             DtoFile = folderStructureDtos;
             ExportServices();
@@ -635,47 +640,141 @@ namespace MS365Provisioning.SharePoint.Services
         public List<SitePermissionsDto> LoadSitePermissions()
         {
             List<SitePermissionsDto> sitePermissionsDtos = new();
-            if (fileSettings.SitePermissionsFilePath != null)
-                try
+            Ctx.Load(
+                web,
+                w => w.HasUniqueRoleAssignments,
+                w => w.RoleAssignments.Include
+                    (
+                        ra => ra.RoleDefinitionBindings
+                    ),
+                w => w.RoleDefinitions.Include
+                    (
+                        r => r.Name,
+                        r => r.BasePermissions
+                    ),
+                w => w.SiteGroups.Include
+                    (
+                        group => group.Title,
+                        group => group.Users
+                        //TODO: adding group.Roles
+                    ),
+                w => w.RequestAccessEmail
+                );
+            Ctx.Load
+                (
+                    Ctx.Site.SecondaryContact,
+                    sc => sc.LoginName
+                );
+            Site site = Ctx.Site;
+            Ctx.Load
+                (
+                    site,
+                    s => s.Owner,
+                    s => s.SecondaryContact,
+                    s=>s.SecondaryContact.LoginName
+                );
+            Ctx.ExecuteQuery();
+
+            _logger?.LogInformation($"Site Title:{web.Title}");
+            _logger?.LogInformation($"Site URL: {SiteUrl}");
+
+            bool hasUniqueRoleAssignments = web.HasUniqueRoleAssignments;
+            if (hasUniqueRoleAssignments)
+            {
+                _logger?.LogInformation($"Security is broken in this site");
+            }
+            else
+            {
+                _logger?.LogInformation($"Security is inherited from the parent site.");
+            }
+
+            RoleDefinitionCollection roleDefinitions = web.RoleDefinitions;
+            _logger?.LogInformation($"Available Permission Levels");
+            List<string> roleDefinitionName = new List<string>();
+            foreach (RoleDefinition roleDefinition in roleDefinitions)
+            {
+                _logger?.LogInformation($" - {roleDefinition.Name}");
+                roleDefinitionName.Add(roleDefinition.Name);
+            }
+
+
+            RoleAssignmentCollection roleAssignmentCollection = web.RoleAssignments;
+            _logger?.LogInformation($"Default Permission Levels:");
+            List<string> roleAssignments = new();
+            foreach (RoleAssignment roleAssignment in roleAssignmentCollection)
+            {
+                foreach (RoleDefinition roleDefinition in roleAssignment.RoleDefinitionBindings)
                 {
-                    Context.Load(Context.Web,
-                        w => w.Title,
-                        w => w.SiteGroups.Include(
-                            item => item.Users,
-                            item => item.PrincipalType,
-                            item => item.LoginName,
-                            item => item.Title));
-                    Context.ExecuteQuery();
-                    string webTitle = Context.Web.Title;
-
-                    _logger?.LogInformation($"{webTitle}, Total of groups: {Context.Web.SiteGroups.Count}");
-
-                    foreach (Group siteGroup in Context.Web.SiteGroups)
-                    {
-                        List<string> userNames = new();
-                        foreach (User user in siteGroup.Users)
-                        {
-                            if (!user.IsHiddenInUI && user.PrincipalType == PrincipalType.User)
-                            {
-                                userNames.Add(user.UserPrincipalName);
-                                _logger?.LogInformation($"{webTitle},SiteGroup: {siteGroup.Title} User: {user.UserPrincipalName}");
-                            }
-                        }
-                        sitePermissionsDtos.Add
-                            (new SitePermissionsDto
-                                (
-                                    webTitle, 
-                                    siteGroup.Title, 
-                                    userNames
-
-                                )
-                            );
-                    }
+                    _logger?.LogInformation($" - {roleDefinition.Name}");
+                    roleAssignments.Add(roleDefinition.Name);
                 }
-                catch (Exception ex)
+            }
+
+            _logger?.LogInformation("Custom Permission Levels:");
+            foreach (RoleDefinition customRole in web.RoleDefinitions)
+            {
+                _logger?.LogInformation($"{customRole.Name}");
+                roleAssignments.Add(customRole.Name);
+            }
+
+            _logger?.LogInformation($"Groups and Users Information:");
+            foreach (Group group in web.SiteGroups)
+            {
+                _logger?.LogInformation($" - Group Name:");
+                _logger?.LogInformation($" Members:");
+                foreach (User user in group.Users)
                 {
-                    _logger?.LogInformation($"Error fetching Site Permissions : {ex.Message}");
+                    _logger?.LogInformation($" - {user.LoginName}");
                 }
+            }
+            var secContact = Ctx.Site.SecondaryContact;
+            Ctx.Load(secContact,
+                    sc=>sc.LoginName);
+            Ctx.ExecuteQuery();
+            _logger?.LogInformation($"Access Request Settings : {web.RequestAccessEmail}");
+            _logger?.LogInformation($" - Owner: {site.Owner.LoginName}");
+             _logger?.LogInformation($" - Secondary Contact: {site.SecondaryContact.LoginName}");
+            //if (fileSettings.SitePermissionsFilePath != null)
+            //    try
+            //    {
+            //        Context.Load(Context.Web,
+            //            w => w.Title,
+            //            w => w.SiteGroups.Include(
+            //                item => item.Users,
+            //                item => item.PrincipalType,
+            //                item => item.LoginName,
+            //                item => item.Title));
+            //        Context.ExecuteQuery();
+            //        string webTitle = Context.Web.Title;
+
+            //        _logger?.LogInformation($"{webTitle}, Total of groups: {Context.Web.SiteGroups.Count}");
+
+            //        foreach (Group siteGroup in Context.Web.SiteGroups)
+            //        {
+            //            List<string> userNames = new();
+            //            foreach (User user in siteGroup.Users)
+            //            {
+            //                if (!user.IsHiddenInUI && user.PrincipalType == PrincipalType.User)
+            //                {
+            //                    userNames.Add(user.UserPrincipalName);
+            //                    _logger?.LogInformation($"{webTitle},SiteGroup: {siteGroup.Title} User: {user.UserPrincipalName}");
+            //                }
+            //            }
+            //            sitePermissionsDtos.Add
+            //                (new SitePermissionsDto
+            //                    (
+            //                        webTitle, 
+            //                        siteGroup.Title, 
+            //                        userNames
+
+            //                    )
+            //                );
+            //        }
+            //    }
+            //    catch (Exception ex)
+            //    {
+            //        _logger?.LogInformation($"Error fetching Site Permissions : {ex.Message}");
+            //    }
             FileName = fileSettings!.SitePermissionsFilePath!;
             DtoFile = sitePermissionsDtos;
             ExportServices();
@@ -686,8 +785,8 @@ namespace MS365Provisioning.SharePoint.Services
             List<string> contentTypes = new();
             try
             {
-                Context!.Load(list.ContentTypes);
-                Context.ExecuteQuery();
+                Ctx!.Load(list.ContentTypes);
+                Ctx.ExecuteQuery();
                 if (list.ContentTypes.Count == 0)
                 {
                     return contentTypes;
@@ -710,24 +809,24 @@ namespace MS365Provisioning.SharePoint.Services
             List<WebPart> webparts = new();
             try
             {
-                List pagesList = Context.Web.Lists.GetByTitle("Site Pages");
+                List pagesList = Ctx.Web.Lists.GetByTitle("Site Pages");
                 CamlQuery camlQuery = new();
-                Context.Load(pagesList);
-                Context.ExecuteQuery();
+                Ctx.Load(pagesList);
+                Ctx.ExecuteQuery();
                 ListItemCollection pages = pagesList.GetItems(camlQuery);
-                Context.Load(pages);
-                Context.ExecuteQuery();
+                Ctx.Load(pages);
+                Ctx.ExecuteQuery();
                 foreach (ListItem item in pages)
                 {
-                    Context.Load(item, I => I.DisplayName, I => I.File);
-                    Context.ExecuteQueryRetry();
+                    Ctx.Load(item, I => I.DisplayName, I => I.File);
+                    Ctx.ExecuteQueryRetry();
                     if (item.DisplayName == "Home")
                     {
                         var file = item.File;
-                        Context.Load(file);
-                        Context.ExecuteQuery();
-                        var page = Context.Web.LoadClientSidePage(item.DisplayName);
-                        Context.ExecuteQuery();
+                        Ctx.Load(file);
+                        Ctx.ExecuteQuery();
+                        var page = Ctx.Web.LoadClientSidePage(item.DisplayName);
+                        Ctx.ExecuteQuery();
                         var webParts = page.Controls;
                         if (webParts != null && webParts.Count > 0)
                         {
