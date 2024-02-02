@@ -12,9 +12,9 @@
     "EnterpriseKeywords": "00000000-0000-0000-0000-000000000000",
     "BreakRoleInheritance": false,
     "Permissions": {
-      "Full Control, ": "Company News Owners",
-      "Read, ": "Company News Visitors",
-      "Edit, ": "Company News Members"
+      "Full Control": "Company News Owners",
+      "Read": "Company News Visitors",
+      "Edit": "Company News Members"
     },
     "QuickLauncHeaders": []
   },
@@ -30,9 +30,9 @@
     "EnterpriseKeywords": "00000000-0000-0000-0000-000000000000",
     "BreakRoleInheritance": false,
     "Permissions": {
-      "Full Control, ": "Company News Owners",
-      "Read, ": "Company News Visitors",
-      "Edit, ": "Company News Members"
+      "Full Control": "Company News Owners",
+      "Read": "Company News Visitors",
+      "Edit": "Company News Members"
     },
     "QuickLauncHeaders": []
   },
@@ -48,9 +48,9 @@
     "EnterpriseKeywords": "00000000-0000-0000-0000-000000000000",
     "BreakRoleInheritance": false,
     "Permissions": {
-      "Full Control, ": "Company News Owners",
-      "Read, ": "Company News Visitors",
-      "Edit, ": "Company News Members"
+      "Full Control": "Company News Owners",
+      "Read": "Company News Visitors",
+      "Edit": "Company News Members"
     },
     "QuickLauncHeaders": []
   },
@@ -67,9 +67,9 @@
     "EnterpriseKeywords": "00000000-0000-0000-0000-000000000000",
     "BreakRoleInheritance": false,
     "Permissions": {
-      "Full Control, ": "Company News Owners",
-      "Read, ": "Company News Visitors",
-      "Edit, ": "Company News Members"
+      "Full Control": "Company News Owners",
+      "Read": "Company News Visitors",
+      "Edit": "Company News Members"
     },
     "QuickLauncHeaders": []
   },
@@ -87,9 +87,9 @@
     "EnterpriseKeywords": "00000000-0000-0000-0000-000000000000",
     "BreakRoleInheritance": false,
     "Permissions": {
-      "Full Control, ": "Company News Owners",
-      "Read, ": "Company News Visitors",
-      "Edit, ": "Company News Members"
+      "Full Control": "Company News Owners",
+      "Read": "Company News Visitors",
+      "Edit": "Company News Members"
     },
     "QuickLauncHeaders": []
   },
@@ -106,9 +106,9 @@
     "EnterpriseKeywords": "00000000-0000-0000-0000-000000000000",
     "BreakRoleInheritance": false,
     "Permissions": {
-      "Full Control, ": "Company News Owners",
-      "Read, ": "Company News Visitors",
-      "Edit, ": "Company News Members"
+      "Full Control": "Company News Owners",
+      "Read": "Company News Visitors",
+      "Edit": "Company News Members"
     },
     "QuickLauncHeaders": []
   }

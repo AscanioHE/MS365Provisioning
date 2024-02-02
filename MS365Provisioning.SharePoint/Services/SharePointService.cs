@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Logging;
-using Microsoft.Graph.Models;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.SharePoint.Client;
 using MS365Provisioning.Common;
@@ -20,8 +19,7 @@ using NavigationNode = Microsoft.SharePoint.Client.NavigationNode;
 using RoleAssignment = Microsoft.SharePoint.Client.RoleAssignment;
 using RoleAssignmentCollection = Microsoft.SharePoint.Client.RoleAssignmentCollection;
 using RoleDefinition = Microsoft.SharePoint.Client.RoleDefinition;
-using Site = Microsoft.SharePoint.Client.Site;
-using User = Microsoft.SharePoint.Client.User;
+using RoleType = Microsoft.SharePoint.Client.RoleType;
 using View = Microsoft.SharePoint.Client.View;
 using WebPart = Microsoft.SharePoint.Client.WebParts.WebPart;
 
@@ -32,7 +30,7 @@ namespace MS365Provisioning.SharePoint.Services
         private readonly ISharePointSettingsService _sharePointSettingsService;
         private readonly ILogger _logger;
         private Context Ctx { get; set; }
-        private Web web { get; set; }
+        private Web Web { get; set; }
         private readonly ListCollection _lists;
         private readonly SharePointSettings sharePointSettings;
         private readonly FileSettings fileSettings;
@@ -54,8 +52,8 @@ namespace MS365Provisioning.SharePoint.Services
             SiteUrl = sharePointSettings.SiteUrl!;
             ThumbPrint = sharePointSettings.ThumbPrint!;
             Ctx = GetClientContext();
-            web = Ctx.Web;
-            Ctx.Load(web);
+            Web = Ctx.Web;
+            Ctx.Load(Web);
             Ctx.ExecuteQuery();
             _logger = logger;
             DtoFile = new object();
@@ -374,7 +372,7 @@ namespace MS365Provisioning.SharePoint.Services
                     StringBuilder permissionBuilder = new();
                     foreach (RoleDefinition rd in rdc)
                     {
-                        permissionBuilder.Append(rd.Name + ", ");
+                        permissionBuilder.Append(rd.Name);
                         _logger?.LogInformation(permissionBuilder.ToString());
                     }
                     string permission = permissionBuilder.ToString();
@@ -640,147 +638,129 @@ namespace MS365Provisioning.SharePoint.Services
         public List<SitePermissionsDto> LoadSitePermissions()
         {
             List<SitePermissionsDto> sitePermissionsDtos = new();
-            Ctx.Load(
-                web,
-                w => w.HasUniqueRoleAssignments,
-                w => w.RoleAssignments.Include
-                    (
-                        ra => ra.RoleDefinitionBindings
-                    ),
-                w => w.RoleDefinitions.Include
-                    (
-                        r => r.Name,
-                        r => r.BasePermissions
-                    ),
-                w => w.SiteGroups.Include
-                    (
-                        group => group.Title,
-                        group => group.Users
-                        //TODO: adding group.Roles
-                    ),
-                w => w.RequestAccessEmail
-                );
-            Ctx.Load
-                (
-                    Ctx.Site.SecondaryContact,
-                    sc => sc.LoginName
-                );
-            Site site = Ctx.Site;
-            Ctx.Load
-                (
-                    site,
-                    s => s.Owner,
-                    s => s.SecondaryContact,
-                    s=>s.SecondaryContact.LoginName
-                );
+
+            Ctx.Load(Web.AssociatedOwnerGroup);
+            Ctx.Load(Web.AssociatedMemberGroup);
+            Ctx.Load(Web.AssociatedVisitorGroup);
+            Ctx.Load(Web.RoleAssignments);
+            Ctx.Load(Web.RoleDefinitions);
+            Ctx.ExecuteQuery();
+            SitePermissionsDto sitePermissionsDto = new SitePermissionsDto();
+            List<string> siteOwnerMembers = new List<string>();
+            var siteOwners = Web.AssociatedOwnerGroup.Users;
+            Ctx.Load(siteOwners);
             Ctx.ExecuteQuery();
 
-            _logger?.LogInformation($"Site Title:{web.Title}");
-            _logger?.LogInformation($"Site URL: {SiteUrl}");
-
-            bool hasUniqueRoleAssignments = web.HasUniqueRoleAssignments;
-            if (hasUniqueRoleAssignments)
+            //Site Administrators
+            siteOwnerMembers.AddRange(siteOwners.Select(user => user.UserPrincipalName));
+            _logger?.LogInformation($"Site Owners:");
+            foreach (string member in siteOwnerMembers)
             {
-                _logger?.LogInformation($"Security is broken in this site");
+                _logger?.LogInformation($"  {member}");
             }
-            else
-            {
-                _logger?.LogInformation($"Security is inherited from the parent site.");
-            }
+            sitePermissionsDto.SiteCollectionAdministrators = siteOwnerMembers;
 
-            RoleDefinitionCollection roleDefinitions = web.RoleDefinitions;
-            _logger?.LogInformation($"Available Permission Levels");
-            List<string> roleDefinitionName = new List<string>();
-            foreach (RoleDefinition roleDefinition in roleDefinitions)
+            // Available Permission Levels
+            List<string> availablePermissionLevels = Web.RoleDefinitions.Select(rd => rd.Name).ToList();
+            sitePermissionsDto.AvailablePermissionLevels = availablePermissionLevels;
+            _logger?.LogInformation($"Available Permission levels:");
+            foreach (string availablePermissionLevel in availablePermissionLevels)
             {
-                _logger?.LogInformation($" - {roleDefinition.Name}");
-                roleDefinitionName.Add(roleDefinition.Name);
+                _logger?.LogInformation($"  {availablePermissionLevel}");
             }
 
-
-            RoleAssignmentCollection roleAssignmentCollection = web.RoleAssignments;
+            // Default Permission Levels
             _logger?.LogInformation($"Default Permission Levels:");
-            List<string> roleAssignments = new();
-            foreach (RoleAssignment roleAssignment in roleAssignmentCollection)
+            string permissionLevelAdmin = GetRoleDefinitionForGroup("Owners", RoleType.Administrator);
+            string permissionlevelMember = GetRoleDefinitionForGroup("Members", RoleType.Contributor);
+            string permissionlevelVisitor = GetRoleDefinitionForGroup("Visitors", RoleType.Reader);
+            sitePermissionsDto.DefaultPermissionLevels?.Add(permissionLevelAdmin);
+            sitePermissionsDto.DefaultPermissionLevels?.Add(permissionlevelMember);
+            sitePermissionsDto.DefaultPermissionLevels?.Add(permissionlevelVisitor);
+            _logger?.LogInformation($"  {permissionLevelAdmin}");
+            _logger?.LogInformation($"  {permissionlevelMember}");
+            _logger?.LogInformation($"  {permissionlevelVisitor}");
+
+            // Custom Permission Levels
+            foreach(RoleDefinition roleDefinition in Web.RoleDefinitions)
             {
-                foreach (RoleDefinition roleDefinition in roleAssignment.RoleDefinitionBindings)
+                CustomPermissionLevelDto customPermissionLevelDto = new CustomPermissionLevelDto
                 {
-                    _logger?.LogInformation($" - {roleDefinition.Name}");
-                    roleAssignments.Add(roleDefinition.Name);
-                }
+                    Name = roleDefinition.Name,
+                    SelectedListPermissions = GetSelectedListPermissions(roleDefinition),
+
+                };
             }
 
-            _logger?.LogInformation("Custom Permission Levels:");
-            foreach (RoleDefinition customRole in web.RoleDefinitions)
-            {
-                _logger?.LogInformation($"{customRole.Name}");
-                roleAssignments.Add(customRole.Name);
-            }
-
-            _logger?.LogInformation($"Groups and Users Information:");
-            foreach (Group group in web.SiteGroups)
-            {
-                _logger?.LogInformation($" - Group Name:");
-                _logger?.LogInformation($" Members:");
-                foreach (User user in group.Users)
-                {
-                    _logger?.LogInformation($" - {user.LoginName}");
-                }
-            }
-            var secContact = Ctx.Site.SecondaryContact;
-            Ctx.Load(secContact,
-                    sc=>sc.LoginName);
-            Ctx.ExecuteQuery();
-            _logger?.LogInformation($"Access Request Settings : {web.RequestAccessEmail}");
-            _logger?.LogInformation($" - Owner: {site.Owner.LoginName}");
-             _logger?.LogInformation($" - Secondary Contact: {site.SecondaryContact.LoginName}");
-            //if (fileSettings.SitePermissionsFilePath != null)
-            //    try
-            //    {
-            //        Context.Load(Context.Web,
-            //            w => w.Title,
-            //            w => w.SiteGroups.Include(
-            //                item => item.Users,
-            //                item => item.PrincipalType,
-            //                item => item.LoginName,
-            //                item => item.Title));
-            //        Context.ExecuteQuery();
-            //        string webTitle = Context.Web.Title;
-
-            //        _logger?.LogInformation($"{webTitle}, Total of groups: {Context.Web.SiteGroups.Count}");
-
-            //        foreach (Group siteGroup in Context.Web.SiteGroups)
-            //        {
-            //            List<string> userNames = new();
-            //            foreach (User user in siteGroup.Users)
-            //            {
-            //                if (!user.IsHiddenInUI && user.PrincipalType == PrincipalType.User)
-            //                {
-            //                    userNames.Add(user.UserPrincipalName);
-            //                    _logger?.LogInformation($"{webTitle},SiteGroup: {siteGroup.Title} User: {user.UserPrincipalName}");
-            //                }
-            //            }
-            //            sitePermissionsDtos.Add
-            //                (new SitePermissionsDto
-            //                    (
-            //                        webTitle, 
-            //                        siteGroup.Title, 
-            //                        userNames
-
-            //                    )
-            //                );
-            //        }
-            //    }
-            //    catch (Exception ex)
-            //    {
-            //        _logger?.LogInformation($"Error fetching Site Permissions : {ex.Message}");
-            //    }
             FileName = fileSettings!.SitePermissionsFilePath!;
             DtoFile = sitePermissionsDtos;
             ExportServices();
             return sitePermissionsDtos;
         }
-        private List<string> GetListContentTypes(List list)
+
+        private bool IsListPermission(PermissionKind permission)
+        {
+            // Check if the permission is related to lists
+            switch (permission)
+            {
+                case PermissionKind.AddListItems:
+                case PermissionKind.EditListItems:
+                case PermissionKind.DeleteListItems:
+                case PermissionKind.OpenItems:
+                case PermissionKind.ViewVersions:
+                case PermissionKind.DeleteVersions:
+                case PermissionKind.CancelCheckout:
+                case PermissionKind.ManagePersonalViews:
+                    return true;
+                default:
+                    return false;
+            }
+        }
+        private List<string> GetSelectedListPermissions(RoleDefinition roleDefinition)
+        {
+            List<string> selectedListPermissions = new List<string>();
+            Ctx.Load(roleDefinition, rd => rd.BasePermissions);
+            Ctx.ExecuteQuery();
+            _logger?.LogInformation($"Selected List Permissions:");
+            if(roleDefinition.BasePermissions!=null)
+            {
+                foreach(var permission in Enum.GetValues(typeof(PermissionKind)))
+                {
+                    if(roleDefinition.BasePermissions.Has((PermissionKind)permission) && 
+                        IsListPermission((PermissionKind)permission))
+                    {
+                        selectedListPermissions.Add(permission.ToString()!);
+                        _logger?.LogInformation($"  {permission.ToString()}");
+                    }
+                }
+            }
+            return selectedListPermissions;
+        }
+        private List<string> GetGroupMembers(RoleDefinition roleDefinition)
+        {
+            List<string> members = new List<string>();
+            Group group = Web.SiteGroups.GetByName(roleDefinition.Name);
+            Ctx.Load(group);
+            Ctx.ExecuteQuery();
+            members.AddRange(group.Users.Select(user => user.LoginName));
+            return members;
+        }
+        private string GetRoleDefinitionForGroup(string groupName, RoleType roleType)
+        {            
+            RoleDefinitionCollection roleDefinitions = Web.RoleDefinitions;
+            RoleAssignmentCollection roleAssignments = Web.RoleAssignments;
+            var roleDefinitionsBindingCollection = Web.RoleAssignments.Include(ra => ra.RoleDefinitionBindings);
+            Ctx.Load(roleDefinitions);
+            Ctx.Load(roleAssignments);
+            Ctx.Load(Web.RoleAssignments,
+                        wra => wra.Include(ra => ra.RoleDefinitionBindings));
+            Ctx.ExecuteQuery();
+
+            var roleAssignment = Web.RoleAssignments.FirstOrDefault(ra => ra.RoleDefinitionBindings.Any(rdb => rdb.RoleTypeKind == roleType));
+
+            return roleAssignment?.RoleDefinitionBindings.First(rdb => rdb.RoleTypeKind == roleType)?.Name ?? string.Empty;
+        }
+             private List<string> GetListContentTypes(List list)
         {
             List<string> contentTypes = new();
             try
