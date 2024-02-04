@@ -644,6 +644,7 @@ namespace MS365Provisioning.SharePoint.Services
             Ctx.Load(Web.AssociatedVisitorGroup);
             Ctx.Load(Web.RoleAssignments);
             Ctx.Load(Web.RoleDefinitions);
+            Ctx.Load(Ctx.Site.RootWeb);
             Ctx.ExecuteQuery();
             SitePermissionsDto sitePermissionsDto = new SitePermissionsDto();
             List<string> siteOwnerMembers = new List<string>();
@@ -670,34 +671,88 @@ namespace MS365Provisioning.SharePoint.Services
             }
 
             // Default Permission Levels
-            _logger?.LogInformation($"Default Permission Levels:");
             string permissionLevelAdmin = GetRoleDefinitionForGroup("Owners", RoleType.Administrator);
             string permissionlevelMember = GetRoleDefinitionForGroup("Members", RoleType.Contributor);
             string permissionlevelVisitor = GetRoleDefinitionForGroup("Visitors", RoleType.Reader);
             sitePermissionsDto.DefaultPermissionLevels?.Add(permissionLevelAdmin);
             sitePermissionsDto.DefaultPermissionLevels?.Add(permissionlevelMember);
             sitePermissionsDto.DefaultPermissionLevels?.Add(permissionlevelVisitor);
+            _logger?.LogInformation($"Default Permission Levels:");
             _logger?.LogInformation($"  {permissionLevelAdmin}");
             _logger?.LogInformation($"  {permissionlevelMember}");
             _logger?.LogInformation($"  {permissionlevelVisitor}");
 
             // Custom Permission Levels
-            foreach(RoleDefinition roleDefinition in Web.RoleDefinitions)
+            foreach (RoleDefinition roleDefinition in Web.RoleDefinitions)
             {
                 CustomPermissionLevelDto customPermissionLevelDto = new CustomPermissionLevelDto
                 {
                     Name = roleDefinition.Name,
                     SelectedListPermissions = GetSelectedListPermissions(roleDefinition),
-
+                    GroupName = GetAssignedGroup(roleDefinition),
+                    Members = GetGroupMembers(roleDefinition),
+                    AssignedPermissionLevel = roleDefinition.Name,
+                    AccessRequestSettings = GetAccessRequestSettings()
                 };
+                sitePermissionsDto.CustomPermissionLevels.Add(customPermissionLevelDto);
             }
-
             FileName = fileSettings!.SitePermissionsFilePath!;
             DtoFile = sitePermissionsDtos;
             ExportServices();
             return sitePermissionsDtos;
         }
 
+        private bool GetAccessRequestSettings()
+        {
+            foreach (List list in _lists)
+            {
+                if (Ctx.Site.RootWeb.HasUniqueRoleAssignments)
+                {
+                    return !string.IsNullOrEmpty(Ctx.Site.RootWeb.RequestAccessEmail);
+                }
+            }
+            return false;
+        }
+
+        private string GetAssignedGroup(RoleDefinition roleDefinition)
+        {
+            string groupName = string.Empty;
+            switch(roleDefinition.Name)
+            {
+                case "Full Control":
+                    groupName = $"{Ctx.Web.Title} Owners";
+                    break;
+                case "Edit":
+                    groupName = $"{Ctx.Web.Title} Members";
+                    break;
+                case "Read":
+                    groupName = $"{Ctx.Web.Title} Visitors";
+                    break;
+
+                default:
+                    break;
+                
+            }
+            GroupCollection groups = Web.SiteGroups;
+            Ctx.Load(
+                        groups,gc=>gc.Include
+                        (
+                            g=>g.LoginName,
+                            g=>g.Title,
+                            g=>g.PrincipalType
+                        )
+                    );
+            Ctx.ExecuteQuery();
+            foreach(Group group in Web.SiteGroups)
+            {
+                if(group.LoginName == groupName)
+                {
+                    return groupName;
+                }
+            }
+            //string groupName = groups.LoginName;
+            return string.Empty;
+        }
         private bool IsListPermission(PermissionKind permission)
         {
             // Check if the permission is related to lists
@@ -722,11 +777,11 @@ namespace MS365Provisioning.SharePoint.Services
             Ctx.Load(roleDefinition, rd => rd.BasePermissions);
             Ctx.ExecuteQuery();
             _logger?.LogInformation($"Selected List Permissions:");
-            if(roleDefinition.BasePermissions!=null)
+            if (roleDefinition.BasePermissions != null)
             {
-                foreach(var permission in Enum.GetValues(typeof(PermissionKind)))
+                foreach (var permission in Enum.GetValues(typeof(PermissionKind)))
                 {
-                    if(roleDefinition.BasePermissions.Has((PermissionKind)permission) && 
+                    if (roleDefinition.BasePermissions.Has((PermissionKind)permission) &&
                         IsListPermission((PermissionKind)permission))
                     {
                         selectedListPermissions.Add(permission.ToString()!);
@@ -739,28 +794,59 @@ namespace MS365Provisioning.SharePoint.Services
         private List<string> GetGroupMembers(RoleDefinition roleDefinition)
         {
             List<string> members = new List<string>();
-            Group group = Web.SiteGroups.GetByName(roleDefinition.Name);
-            Ctx.Load(group);
+            string groupName = string.Empty;
+            switch (roleDefinition.Name)
+            {
+                case "Full Control":
+                    groupName = $"{Ctx.Web.Title} Owners";
+                    break;
+                case "Edit":
+                    groupName = $"{Ctx.Web.Title} Members";
+                    break;
+                case "Read":
+                    groupName = $"{Ctx.Web.Title} Visitors";
+                    break;
+
+                default:
+                    break;
+
+            }
+            GroupCollection groups = Web.SiteGroups;
+            Ctx.Load(groups);
             Ctx.ExecuteQuery();
-            members.AddRange(group.Users.Select(user => user.LoginName));
+            foreach (Group group in groups)
+            {
+                if (group.LoginName == groupName)
+                {
+                    members.AddRange(group.Users.Select(user => user.LoginName));
+                    return members;
+                }
+            }
             return members;
         }
         private string GetRoleDefinitionForGroup(string groupName, RoleType roleType)
-        {            
-            RoleDefinitionCollection roleDefinitions = Web.RoleDefinitions;
-            RoleAssignmentCollection roleAssignments = Web.RoleAssignments;
-            var roleDefinitionsBindingCollection = Web.RoleAssignments.Include(ra => ra.RoleDefinitionBindings);
-            Ctx.Load(roleDefinitions);
-            Ctx.Load(roleAssignments);
+        {
             Ctx.Load(Web.RoleAssignments,
-                        wra => wra.Include(ra => ra.RoleDefinitionBindings));
+             wra => wra.Include(ra => ra.RoleDefinitionBindings));
             Ctx.ExecuteQuery();
 
-            var roleAssignment = Web.RoleAssignments.FirstOrDefault(ra => ra.RoleDefinitionBindings.Any(rdb => rdb.RoleTypeKind == roleType));
+            var roleAssignment = Web.RoleAssignments.FirstOrDefault(ra =>
+                ra.RoleDefinitionBindings.Any(rdb => rdb.RoleTypeKind == roleType));
 
-            return roleAssignment?.RoleDefinitionBindings.First(rdb => rdb.RoleTypeKind == roleType)?.Name ?? string.Empty;
+            if (roleAssignment != null)
+            {
+                var roleDefinition = roleAssignment.RoleDefinitionBindings
+                    .FirstOrDefault(rdb => rdb.RoleTypeKind == roleType);
+
+                if (roleDefinition != null)
+                {
+                    return roleDefinition.Name;
+                }
+            }
+
+            return string.Empty;
         }
-             private List<string> GetListContentTypes(List list)
+        private List<string> GetListContentTypes(List list)
         {
             List<string> contentTypes = new();
             try
