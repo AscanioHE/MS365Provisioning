@@ -1,4 +1,6 @@
 ﻿using Microsoft.Graph.Models;
+using Microsoft.SharePoint.Client;
+using Microsoft.SharePoint.Client.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -39,9 +41,16 @@ namespace MS365Provisioning.SharePoint.Model
 
     public class GroupDto
     {
-        public string? GroupName { get; set; }
-        public List<string>? Members { get; set; }
-        public string? AssignedPermissionLevel { get; set; }
-        public bool? IsCustomGroup { get; set; }
+        public string Title { get; set; }
+        public string Description { get; set; }
+        public int Id { get; set; }
+        public bool IsHiddenInUI { get; set; }
+        public string LoginName { get; set; }
+        public bool AllowMembersEditMembership { get; set; }
+        public bool OnlyAllowMembersViewMembership { get; set; }
+        public Principal Owner { get; set; }
+        public PrincipalType PrincipalType { get; set; }
+        public string RequestToJoinLeaveEmailSetting { get; set; }
+        public List<string> Users { get; set; }
     }
 }

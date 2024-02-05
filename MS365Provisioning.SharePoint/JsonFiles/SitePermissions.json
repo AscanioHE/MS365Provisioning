@@ -1,1 +1,125 @@
-[]
+{
+  "IsInheritedSecurity": null,
+  "AvailablePermissionLevels": [
+    "Full Control",
+    "Design",
+    "Edit",
+    "Contribute",
+    "Read",
+    "Limited Access",
+    "CustomPermissionLevel"
+  ],
+  "DefaultPermissionLevels": [],
+  "CustomPermissionLevels": [
+    {
+      "Name": "Full Control",
+      "SelectedListPermissions": [
+        "AddListItems",
+        "EditListItems",
+        "DeleteListItems",
+        "OpenItems",
+        "ViewVersions",
+        "DeleteVersions",
+        "CancelCheckout",
+        "ManagePersonalViews"
+      ],
+      "SelectedPersonalPermissions": null,
+      "GroupName": "Company News Owners",
+      "Members": null,
+      "AssignedPermissionLevel": "Full Control",
+      "AccessRequestSettings": false
+    },
+    {
+      "Name": "Design",
+      "SelectedListPermissions": [
+        "AddListItems",
+        "EditListItems",
+        "DeleteListItems",
+        "OpenItems",
+        "ViewVersions",
+        "DeleteVersions",
+        "CancelCheckout",
+        "ManagePersonalViews"
+      ],
+      "SelectedPersonalPermissions": null,
+      "GroupName": "",
+      "Members": null,
+      "AssignedPermissionLevel": "Design",
+      "AccessRequestSettings": false
+    },
+    {
+      "Name": "Edit",
+      "SelectedListPermissions": [
+        "AddListItems",
+        "EditListItems",
+        "DeleteListItems",
+        "OpenItems",
+        "ViewVersions",
+        "DeleteVersions",
+        "ManagePersonalViews"
+      ],
+      "SelectedPersonalPermissions": null,
+      "GroupName": "Company News Members",
+      "Members": null,
+      "AssignedPermissionLevel": "Edit",
+      "AccessRequestSettings": false
+    },
+    {
+      "Name": "Contribute",
+      "SelectedListPermissions": [
+        "AddListItems",
+        "EditListItems",
+        "DeleteListItems",
+        "OpenItems",
+        "ViewVersions",
+        "DeleteVersions",
+        "ManagePersonalViews"
+      ],
+      "SelectedPersonalPermissions": null,
+      "GroupName": "",
+      "Members": null,
+      "AssignedPermissionLevel": "Contribute",
+      "AccessRequestSettings": false
+    },
+    {
+      "Name": "Read",
+      "SelectedListPermissions": [
+        "OpenItems",
+        "ViewVersions"
+      ],
+      "SelectedPersonalPermissions": null,
+      "GroupName": "Company News Visitors",
+      "Members": null,
+      "AssignedPermissionLevel": "Read",
+      "AccessRequestSettings": false
+    },
+    {
+      "Name": "Limited Access",
+      "SelectedListPermissions": [],
+      "SelectedPersonalPermissions": null,
+      "GroupName": "",
+      "Members": null,
+      "AssignedPermissionLevel": "Limited Access",
+      "AccessRequestSettings": false
+    },
+    {
+      "Name": "CustomPermissionLevel",
+      "SelectedListPermissions": [
+        "AddListItems",
+        "EditListItems",
+        "DeleteListItems",
+        "OpenItems"
+      ],
+      "SelectedPersonalPermissions": null,
+      "GroupName": "",
+      "Members": null,
+      "AssignedPermissionLevel": "CustomPermissionLevel",
+      "AccessRequestSettings": false
+    }
+  ],
+  "AssociatedGroups": [],
+  "SiteCollectionAdministrators": [
+    "ascanio_happy-experts.eu#ext#@23m2yz.onmicrosoft.com",
+    "ascanio@itwizards.org"
+  ]
+}

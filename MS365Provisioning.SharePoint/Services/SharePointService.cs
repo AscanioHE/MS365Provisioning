@@ -4,7 +4,9 @@ using Microsoft.SharePoint.Client;
 using MS365Provisioning.Common;
 using MS365Provisioning.SharePoint.Model;
 using MS365Provisioning.SharePoint.Settings;
+using PnP.Core.Model.SharePoint;
 using System.Collections;
+using System.Diagnostics.CodeAnalysis;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using ContentType = Microsoft.SharePoint.Client.ContentType;
@@ -16,6 +18,7 @@ using Group = Microsoft.SharePoint.Client.Group;
 using List = Microsoft.SharePoint.Client.List;
 using ListItem = Microsoft.SharePoint.Client.ListItem;
 using NavigationNode = Microsoft.SharePoint.Client.NavigationNode;
+using PermissionKind = Microsoft.SharePoint.Client.PermissionKind;
 using RoleAssignment = Microsoft.SharePoint.Client.RoleAssignment;
 using RoleAssignmentCollection = Microsoft.SharePoint.Client.RoleAssignmentCollection;
 using RoleDefinition = Microsoft.SharePoint.Client.RoleDefinition;
@@ -635,7 +638,7 @@ namespace MS365Provisioning.SharePoint.Services
             return folderStructureDtos;
         }
 
-        public List<SitePermissionsDto> LoadSitePermissions()
+        public SitePermissionsDto LoadSitePermissions()
         {
             List<SitePermissionsDto> sitePermissionsDtos = new();
 
@@ -644,22 +647,44 @@ namespace MS365Provisioning.SharePoint.Services
             Ctx.Load(Web.AssociatedVisitorGroup);
             Ctx.Load(Web.RoleAssignments);
             Ctx.Load(Web.RoleDefinitions);
-            Ctx.Load(Ctx.Site.RootWeb);
+            Ctx.Load(Ctx.Site.RootWeb,
+                rw=>rw.HasUniqueRoleAssignments,
+                rw=>rw.RequestAccessEmail
+                );
+            Ctx.Load(Web.SiteGroups,
+                    sg => sg.Include
+                    (
+                        g => g.Title,
+                        g => g.Description,
+                        g => g.Id,
+                        g => g.IsHiddenInUI,
+                        g => g.LoginName,
+                        g=> g.AllowMembersEditMembership,
+                        g => g.OnlyAllowMembersViewMembership,
+                        g => g.Owner,
+                        g => g.PrincipalType,
+                        g => g.RequestToJoinLeaveEmailSetting,
+                        g => g.Users.Include
+                        (
+                            u=>u.UserPrincipalName
+                            )
+                        )
+                    ); ;
             Ctx.ExecuteQuery();
-            SitePermissionsDto sitePermissionsDto = new SitePermissionsDto();
             List<string> siteOwnerMembers = new List<string>();
             var siteOwners = Web.AssociatedOwnerGroup.Users;
             Ctx.Load(siteOwners);
             Ctx.ExecuteQuery();
 
+            SitePermissionsDto sitePermissionsDto = new SitePermissionsDto();
             //Site Administrators
+            UserCollection Owners = siteOwners;
             siteOwnerMembers.AddRange(siteOwners.Select(user => user.UserPrincipalName));
             _logger?.LogInformation($"Site Owners:");
             foreach (string member in siteOwnerMembers)
             {
                 _logger?.LogInformation($"  {member}");
             }
-            sitePermissionsDto.SiteCollectionAdministrators = siteOwnerMembers;
 
             // Available Permission Levels
             List<string> availablePermissionLevels = Web.RoleDefinitions.Select(rd => rd.Name).ToList();
@@ -669,37 +694,63 @@ namespace MS365Provisioning.SharePoint.Services
             {
                 _logger?.LogInformation($"  {availablePermissionLevel}");
             }
+            List<GroupDto> groupDtos = new List<GroupDto>();
+            foreach (Group group in Web.SiteGroups)
+            {
+                GroupDto groupDto = new GroupDto
+                {
+                    Title = group.Title,
+                    Description = group.Description,
+                    Id = group.Id,
+                    IsHiddenInUI = group.IsHiddenInUI,
+                    LoginName = group.LoginName,
+                    AllowMembersEditMembership = group.AllowMembersEditMembership,
+                    OnlyAllowMembersViewMembership = group.OnlyAllowMembersViewMembership,
+                    Owner = group.Owner,
+                    PrincipalType = group.PrincipalType,
+                    RequestToJoinLeaveEmailSetting = group.RequestToJoinLeaveEmailSetting,
+                    Users = GetGroupMembers(group) // Veronderstellend dat GetGroupMembers een methode is die de gebruikers van de groep ophaalt
+                };
+                    _logger?.LogInformation($"{groupDto}");
+                    groupDtos.Add(groupDto);
 
-            // Default Permission Levels
-            string permissionLevelAdmin = GetRoleDefinitionForGroup("Owners", RoleType.Administrator);
-            string permissionlevelMember = GetRoleDefinitionForGroup("Members", RoleType.Contributor);
-            string permissionlevelVisitor = GetRoleDefinitionForGroup("Visitors", RoleType.Reader);
-            sitePermissionsDto.DefaultPermissionLevels?.Add(permissionLevelAdmin);
-            sitePermissionsDto.DefaultPermissionLevels?.Add(permissionlevelMember);
-            sitePermissionsDto.DefaultPermissionLevels?.Add(permissionlevelVisitor);
-            _logger?.LogInformation($"Default Permission Levels:");
-            _logger?.LogInformation($"  {permissionLevelAdmin}");
-            _logger?.LogInformation($"  {permissionlevelMember}");
-            _logger?.LogInformation($"  {permissionlevelVisitor}");
+                _logger?.LogInformation($"Permissions for group: {groupDto.Title}");
 
+                foreach (RoleType roleType in Enum.GetValues(typeof(RoleType)))
+                {
+                    string permissionLevel = GetRoleDefinitionForGroup(group.Title, roleType);
+
+                    if (!string.IsNullOrEmpty(permissionLevel))
+                    {
+                        _logger?.LogInformation($"RoleType: {roleType}, PermissionsLevel: {permissionLevel}");
+                    }
+                    else
+                    {
+                        _logger?.LogInformation($"RoleType: {roleType}, Permission level not found for group {group.Title}");
+                    }
+                }
+            }
             // Custom Permission Levels
+            List<CustomPermissionLevelDto> customPermissionLevelDtos = new();
             foreach (RoleDefinition roleDefinition in Web.RoleDefinitions)
             {
                 CustomPermissionLevelDto customPermissionLevelDto = new CustomPermissionLevelDto
                 {
                     Name = roleDefinition.Name,
-                    SelectedListPermissions = GetSelectedListPermissions(roleDefinition),
                     GroupName = GetAssignedGroup(roleDefinition),
-                    Members = GetGroupMembers(roleDefinition),
+                    SelectedListPermissions = GetSelectedListPermissions(roleDefinition),
                     AssignedPermissionLevel = roleDefinition.Name,
                     AccessRequestSettings = GetAccessRequestSettings()
                 };
-                sitePermissionsDto.CustomPermissionLevels.Add(customPermissionLevelDto);
+                customPermissionLevelDtos.Add(customPermissionLevelDto);
             }
+
+            sitePermissionsDto.SiteCollectionAdministrators = siteOwnerMembers;
+            sitePermissionsDto.CustomPermissionLevels = customPermissionLevelDtos;
             FileName = fileSettings!.SitePermissionsFilePath!;
-            DtoFile = sitePermissionsDtos;
+            DtoFile = sitePermissionsDto;
             ExportServices();
-            return sitePermissionsDtos;
+            return sitePermissionsDto;
         }
 
         private bool GetAccessRequestSettings()
@@ -791,38 +842,14 @@ namespace MS365Provisioning.SharePoint.Services
             }
             return selectedListPermissions;
         }
-        private List<string> GetGroupMembers(RoleDefinition roleDefinition)
+        private List<string> GetGroupMembers(Group group)
         {
-            List<string> members = new List<string>();
-            string groupName = string.Empty;
-            switch (roleDefinition.Name)
+            List<string> users= new();
+            foreach(User user in group.Users)
             {
-                case "Full Control":
-                    groupName = $"{Ctx.Web.Title} Owners";
-                    break;
-                case "Edit":
-                    groupName = $"{Ctx.Web.Title} Members";
-                    break;
-                case "Read":
-                    groupName = $"{Ctx.Web.Title} Visitors";
-                    break;
-
-                default:
-                    break;
-
+                users.Add(user.UserPrincipalName);
             }
-            GroupCollection groups = Web.SiteGroups;
-            Ctx.Load(groups);
-            Ctx.ExecuteQuery();
-            foreach (Group group in groups)
-            {
-                if (group.LoginName == groupName)
-                {
-                    members.AddRange(group.Users.Select(user => user.LoginName));
-                    return members;
-                }
-            }
-            return members;
+            return users;
         }
         private string GetRoleDefinitionForGroup(string groupName, RoleType roleType)
         {

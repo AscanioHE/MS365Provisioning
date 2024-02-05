@@ -116,10 +116,10 @@ namespace MS365Provisioning.SharePoint.Tests
         public void Try_LoadSitePermissions_Expect_DTO()
         {
             //Act
-            List<SitePermissionsDto> sitePermissions = _sharePointService.LoadSitePermissions();
+            SitePermissionsDto sitePermissions = _sharePointService.LoadSitePermissions();
             //Assert
             //Assert.NotEmpty(sitePermissions);
-            Assert.IsType<List<SitePermissionsDto>>(sitePermissions);
+            Assert.IsType<SitePermissionsDto>(sitePermissions);
         }
         [Fact]
         public void Try_LoadWebParts_Expect_DTO()
@@ -128,7 +128,7 @@ namespace MS365Provisioning.SharePoint.Tests
             List<WebPartPagesDto> webParts = _sharePointService.LoadWebParts();
             //Assert
             Assert.NotEmpty(webParts);
-            Assert.IsType<List<SitePermissionsDto>>(webParts);
+            Assert.IsType<List<WebPartPagesDto>>(webParts);
         }
 
     }
