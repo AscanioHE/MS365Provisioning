@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using Microsoft.Graph.Models;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.SharePoint.Client;
 using MS365Provisioning.Common;
@@ -21,6 +22,7 @@ using RoleAssignment = Microsoft.SharePoint.Client.RoleAssignment;
 using RoleAssignmentCollection = Microsoft.SharePoint.Client.RoleAssignmentCollection;
 using RoleDefinition = Microsoft.SharePoint.Client.RoleDefinition;
 using RoleType = Microsoft.SharePoint.Client.RoleType;
+using User = Microsoft.SharePoint.Client.User;
 using View = Microsoft.SharePoint.Client.View;
 using WebPart = Microsoft.SharePoint.Client.WebParts.WebPart;
 
@@ -654,39 +656,43 @@ namespace MS365Provisioning.SharePoint.Services
                     (
                         g => g.Title,
                         g => g.Description,
-                        g => g.Id,
-                        g => g.IsHiddenInUI,
                         g => g.LoginName,
-                        g => g.AllowMembersEditMembership,
-                        g => g.OnlyAllowMembersViewMembership,
                         g => g.Owner,
-                        g => g.PrincipalType,
-                        g => g.RequestToJoinLeaveEmailSetting,
                         g => g.Users.Include
                         (
-                            u => u.UserPrincipalName
+                            u => u.UserPrincipalName,
+                            u => u.Email,
+                            u => u.Title,
+                            u => u.IsSiteAdmin
                             )
                         )
                     ); ;
             Ctx.ExecuteQuery();
-            List<string> siteOwnerMembers = new List<string>();
-            var siteOwners = Web.AssociatedOwnerGroup.Users;
+            UserCollection siteOwners = Web.AssociatedOwnerGroup.Users;
             Ctx.Load(siteOwners);
             Ctx.ExecuteQuery();
-
-            SitePermissionsDto sitePermissionsDto = new SitePermissionsDto();
-            //Site Administrators
-            UserCollection Owners = siteOwners;
-            siteOwnerMembers.AddRange(siteOwners.Select(user => user.UserPrincipalName));
             _logger?.LogInformation($"Site Owners:");
-            foreach (string member in siteOwnerMembers)
+            List<Users> siteOwnerMembers = new ();
+
+            foreach(User user in siteOwners)
             {
-                _logger?.LogInformation($"  {member}");
+                _logger?.LogInformation($"  {user.Title}");
+                _logger?.LogInformation($"  {user.UserPrincipalName}");
+                _logger?.LogInformation($"  {user.Email}");
+                _logger?.LogInformation($"  {user.IsSiteAdmin.ToString()}");
+                Users users = new Users
+                (
+                    user.UserPrincipalName,
+                    user.Title,
+                    user.Email,
+                    user.IsSiteAdmin
+                );
+                siteOwnerMembers.Add( users );
             }
+            SitePermissionsDto sitePermissionsDto = new SitePermissionsDto();
 
             // Available Permission Levels
             List<string> availablePermissionLevels = Web.RoleDefinitions.Select(rd => rd.Name).ToList();
-            sitePermissionsDto.AvailablePermissionLevels = availablePermissionLevels;
             _logger?.LogInformation($"Available Permission levels:");
             foreach (string availablePermissionLevel in availablePermissionLevels)
             {
@@ -696,19 +702,13 @@ namespace MS365Provisioning.SharePoint.Services
             foreach (Group group in Web.SiteGroups)
             {
                 GroupDto groupDto = new GroupDto
-                {
-                    Title = group.Title,
-                    Description = group.Description,
-                    Id = group.Id,
-                    IsHiddenInUI = group.IsHiddenInUI,
-                    LoginName = group.LoginName,
-                    AllowMembersEditMembership = group.AllowMembersEditMembership,
-                    OnlyAllowMembersViewMembership = group.OnlyAllowMembersViewMembership,
-                    Owner = group.Owner,
-                    PrincipalType = group.PrincipalType,
-                    RequestToJoinLeaveEmailSetting = group.RequestToJoinLeaveEmailSetting,
-                    Users = GetGroupMembers(group) // Veronderstellend dat GetGroupMembers een methode is die de gebruikers van de groep ophaalt
-                };
+                (
+                    group.Title,
+                    group.Description,
+                    group.LoginName,
+                    group.Owner,
+                    GetGroupMembers(group) 
+                );
                 _logger?.LogInformation($"{groupDto}");
                 groupDtos.Add(groupDto);
 
@@ -728,29 +728,24 @@ namespace MS365Provisioning.SharePoint.Services
                     }
                 }
             }
-            foreach (RoleDefinition roleDefinition in Web.RoleDefinitions)
-            {
-                _logger?.LogInformation($"Naam: {roleDefinition.Name}");
-                // Base permissions ophalen
-                BasePermissions basePermissions = roleDefinition.BasePermissions;
-
-                // Controleren of de base permissions overeenkomen met de standaard permissies
-                bool isDefaultPermission = IsDefaultPermission(basePermissions);
-                _logger?.LogInformation($"Is standaard permissie: {isDefaultPermission}");
-            }
-                // Permission Levels
-                List<PermissionLevelDto> customPermissionLevelDtos = new();
+            // Permission Levels
+            List<PermissionLevelDto> customPermissionLevelDtos = new();
             List<PermissionLevelDto> defaultPermissionDtos = new();
+            List<string> personalPermissions = new List<string>();
             foreach (RoleDefinition roleDefinition in Web.RoleDefinitions)
             {
+                string groupName = GetAssignedGroup(roleDefinition);
+                Group group = Web.SiteGroups.GetByName(groupName);
                 PermissionLevelDto permissionLevelDto = new PermissionLevelDto
-                {
-                    Name = roleDefinition.Name,
-                    GroupName = GetAssignedGroup(roleDefinition),
-                    AssignedPermissionLevel = roleDefinition.Name,
-                    AccessRequestSettings = GetAccessRequestSettings(),
-                    SelectedListPermissions = GetSelectedListPermissions(roleDefinition)
-                };
+                (
+                    name: roleDefinition.Name,
+                    selectedPersonalPermissions: personalPermissions,
+                    groupName: GetAssignedGroup(roleDefinition),
+                    members: GetGroupMembers(group),
+                    assignedPermissionLevel:"",
+                    accessRequestSettings: GetAccessRequestSettings(),
+                    selectedListPermissions: GetSelectedListPermissions(roleDefinition)
+                ); ;
                 if (IsDefaultPermission(roleDefinition.BasePermissions))
                 {
                     defaultPermissionDtos.Add(permissionLevelDto);
@@ -761,6 +756,7 @@ namespace MS365Provisioning.SharePoint.Services
                 }
 
             }
+            sitePermissionsDto.AvailablePermissionLevels = availablePermissionLevels;
             sitePermissionsDto.SiteCollectionAdministrators = siteOwnerMembers;
             sitePermissionsDto.CustomPermissionLevels = customPermissionLevelDtos;
             sitePermissionsDto.DefaultPermissionLevels = defaultPermissionDtos;
@@ -874,12 +870,18 @@ namespace MS365Provisioning.SharePoint.Services
             }
             return selectedListPermissions;
         }
-        private List<string> GetGroupMembers(Group group)
+        private List<Users> GetGroupMembers(Group group)
         {
-            List<string> users = new();
+            List<Users> users = new();
             foreach (User user in group.Users)
             {
-                users.Add(user.UserPrincipalName);
+                users.Add(new Users
+                (
+                    user.UserPrincipalName,
+                    user.Email,
+                    user.Title,
+                    user.IsSiteAdmin
+                ));
             }
             return users;
         }
