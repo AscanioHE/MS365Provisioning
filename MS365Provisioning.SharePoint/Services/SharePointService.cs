@@ -4,9 +4,7 @@ using Microsoft.SharePoint.Client;
 using MS365Provisioning.Common;
 using MS365Provisioning.SharePoint.Model;
 using MS365Provisioning.SharePoint.Settings;
-using PnP.Core.Model.SharePoint;
 using System.Collections;
-using System.Diagnostics.CodeAnalysis;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using ContentType = Microsoft.SharePoint.Client.ContentType;
@@ -648,8 +646,8 @@ namespace MS365Provisioning.SharePoint.Services
             Ctx.Load(Web.RoleAssignments);
             Ctx.Load(Web.RoleDefinitions);
             Ctx.Load(Ctx.Site.RootWeb,
-                rw=>rw.HasUniqueRoleAssignments,
-                rw=>rw.RequestAccessEmail
+                rw => rw.HasUniqueRoleAssignments,
+                rw => rw.RequestAccessEmail
                 );
             Ctx.Load(Web.SiteGroups,
                     sg => sg.Include
@@ -659,14 +657,14 @@ namespace MS365Provisioning.SharePoint.Services
                         g => g.Id,
                         g => g.IsHiddenInUI,
                         g => g.LoginName,
-                        g=> g.AllowMembersEditMembership,
+                        g => g.AllowMembersEditMembership,
                         g => g.OnlyAllowMembersViewMembership,
                         g => g.Owner,
                         g => g.PrincipalType,
                         g => g.RequestToJoinLeaveEmailSetting,
                         g => g.Users.Include
                         (
-                            u=>u.UserPrincipalName
+                            u => u.UserPrincipalName
                             )
                         )
                     ); ;
@@ -711,8 +709,8 @@ namespace MS365Provisioning.SharePoint.Services
                     RequestToJoinLeaveEmailSetting = group.RequestToJoinLeaveEmailSetting,
                     Users = GetGroupMembers(group) // Veronderstellend dat GetGroupMembers een methode is die de gebruikers van de groep ophaalt
                 };
-                    _logger?.LogInformation($"{groupDto}");
-                    groupDtos.Add(groupDto);
+                _logger?.LogInformation($"{groupDto}");
+                groupDtos.Add(groupDto);
 
                 _logger?.LogInformation($"Permissions for group: {groupDto.Title}");
 
@@ -730,45 +728,78 @@ namespace MS365Provisioning.SharePoint.Services
                     }
                 }
             }
-            // Custom Permission Levels
-            List<CustomPermissionLevelDto> customPermissionLevelDtos = new();
             foreach (RoleDefinition roleDefinition in Web.RoleDefinitions)
             {
-                CustomPermissionLevelDto customPermissionLevelDto = new CustomPermissionLevelDto
+                _logger?.LogInformation($"Naam: {roleDefinition.Name}");
+                // Base permissions ophalen
+                BasePermissions basePermissions = roleDefinition.BasePermissions;
+
+                // Controleren of de base permissions overeenkomen met de standaard permissies
+                bool isDefaultPermission = IsDefaultPermission(basePermissions);
+                _logger?.LogInformation($"Is standaard permissie: {isDefaultPermission}");
+            }
+                // Permission Levels
+                List<PermissionLevelDto> customPermissionLevelDtos = new();
+            List<PermissionLevelDto> defaultPermissionDtos = new();
+            foreach (RoleDefinition roleDefinition in Web.RoleDefinitions)
+            {
+                PermissionLevelDto permissionLevelDto = new PermissionLevelDto
                 {
                     Name = roleDefinition.Name,
                     GroupName = GetAssignedGroup(roleDefinition),
-                    SelectedListPermissions = GetSelectedListPermissions(roleDefinition),
                     AssignedPermissionLevel = roleDefinition.Name,
-                    AccessRequestSettings = GetAccessRequestSettings()
+                    AccessRequestSettings = GetAccessRequestSettings(),
+                    SelectedListPermissions = GetSelectedListPermissions(roleDefinition)
                 };
-                customPermissionLevelDtos.Add(customPermissionLevelDto);
-            }
+                if (IsDefaultPermission(roleDefinition.BasePermissions))
+                {
+                    defaultPermissionDtos.Add(permissionLevelDto);
+                }
+                else
+                {
+                    customPermissionLevelDtos.Add(permissionLevelDto);
+                }
 
+            }
             sitePermissionsDto.SiteCollectionAdministrators = siteOwnerMembers;
             sitePermissionsDto.CustomPermissionLevels = customPermissionLevelDtos;
+            sitePermissionsDto.DefaultPermissionLevels = defaultPermissionDtos;
+            sitePermissionsDto.AssociatedGroups = groupDtos;
             FileName = fileSettings!.SitePermissionsFilePath!;
             DtoFile = sitePermissionsDto;
             ExportServices();
             return sitePermissionsDto;
         }
 
-        private bool GetAccessRequestSettings()
+        private string GetAccessRequestSettings()
         {
-            foreach (List list in _lists)
+            string status = string.Empty;
+            Ctx.Load(Web, w => w.RequestAccessEmail);
+            try
             {
-                if (Ctx.Site.RootWeb.HasUniqueRoleAssignments)
+                Ctx.ExecuteQuery();
+                bool accessRequestEnabled = Web.RequestAccessEmail !=null;
+                if (accessRequestEnabled)
                 {
-                    return !string.IsNullOrEmpty(Ctx.Site.RootWeb.RequestAccessEmail);
+                    status = "Enabled";
+                }
+                else
+                {
+                    status = "Disabled";
                 }
             }
-            return false;
+            catch (Exception ex)
+            {
+                _logger?.LogInformation($"Error loading Request Access Email: {ex.Message}");
+                return string.Empty;
+            }
+            return string.Empty;
         }
 
         private string GetAssignedGroup(RoleDefinition roleDefinition)
         {
             string groupName = string.Empty;
-            switch(roleDefinition.Name)
+            switch (roleDefinition.Name)
             {
                 case "Full Control":
                     groupName = $"{Ctx.Web.Title} Owners";
@@ -779,30 +810,20 @@ namespace MS365Provisioning.SharePoint.Services
                 case "Read":
                     groupName = $"{Ctx.Web.Title} Visitors";
                     break;
-
                 default:
                     break;
-                
             }
-            GroupCollection groups = Web.SiteGroups;
-            Ctx.Load(
-                        groups,gc=>gc.Include
-                        (
-                            g=>g.LoginName,
-                            g=>g.Title,
-                            g=>g.PrincipalType
-                        )
-                    );
-            Ctx.ExecuteQuery();
-            foreach(Group group in Web.SiteGroups)
+
+            // Controleer of de groep al bestaat met de berekende groepsnaam
+            Group targetGroup = Web.SiteGroups.FirstOrDefault(g => g.LoginName == groupName);
+            if (targetGroup != null)
             {
-                if(group.LoginName == groupName)
-                {
-                    return groupName;
-                }
+                return groupName;
             }
-            //string groupName = groups.LoginName;
-            return string.Empty;
+            else
+            {
+                return string.Empty; // Groep niet gevonden
+            }
         }
         private bool IsListPermission(PermissionKind permission)
         {
@@ -821,6 +842,17 @@ namespace MS365Provisioning.SharePoint.Services
                 default:
                     return false;
             }
+        }
+        private bool IsDefaultPermission(BasePermissions basePermissions)
+        {
+            return basePermissions.Has(PermissionKind.AddListItems) &&
+                   basePermissions.Has(PermissionKind.EditListItems) &&
+                   basePermissions.Has(PermissionKind.DeleteListItems) &&
+                   basePermissions.Has(PermissionKind.OpenItems) &&
+                   basePermissions.Has(PermissionKind.ViewVersions) &&
+                   basePermissions.Has(PermissionKind.DeleteVersions) &&
+                   basePermissions.Has(PermissionKind.CancelCheckout) &&
+                   basePermissions.Has(PermissionKind.ManagePersonalViews);
         }
         private List<string> GetSelectedListPermissions(RoleDefinition roleDefinition)
         {
@@ -844,8 +876,8 @@ namespace MS365Provisioning.SharePoint.Services
         }
         private List<string> GetGroupMembers(Group group)
         {
-            List<string> users= new();
-            foreach(User user in group.Users)
+            List<string> users = new();
+            foreach (User user in group.Users)
             {
                 users.Add(user.UserPrincipalName);
             }

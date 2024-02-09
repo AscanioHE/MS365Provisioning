@@ -13,30 +13,30 @@ namespace MS365Provisioning.SharePoint.Model
     {
         public bool? IsInheritedSecurity { get; set; }
         public List<string>? AvailablePermissionLevels { get; set; }
-        public List<string>? DefaultPermissionLevels { get; set; }
-        public List<CustomPermissionLevelDto>? CustomPermissionLevels { get; set; }
+        public List<PermissionLevelDto>? DefaultPermissionLevels { get; set; }
+        public List<PermissionLevelDto>? CustomPermissionLevels { get; set; }
         public List<GroupDto>? AssociatedGroups { get; set; }
         public List<string>? SiteCollectionAdministrators { get; set; }
 
         public SitePermissionsDto()
         {
-            AvailablePermissionLevels = new List<string>();
-            DefaultPermissionLevels = new List<string>();
-            CustomPermissionLevels = new List<CustomPermissionLevelDto>();
             AssociatedGroups = new List<GroupDto>();
             SiteCollectionAdministrators = new List<string>();
+            AvailablePermissionLevels = new List<string>();
+            DefaultPermissionLevels = new List<PermissionLevelDto>();
+            CustomPermissionLevels = new List<PermissionLevelDto>();
         }
     }
 
-    public class CustomPermissionLevelDto
+    public class PermissionLevelDto
     {
         public string? Name { get; set; }
-        public List<string>? SelectedListPermissions { get; set; }
         public List<string>? SelectedPersonalPermissions { get; set; }
         public string? GroupName { get; set; }
         public List<string>? Members { get; set; }
         public string? AssignedPermissionLevel { get; set; }
-        public bool? AccessRequestSettings { get; set; }
+        public string? AccessRequestSettings { get; set; }
+        public List<string>? SelectedListPermissions { get; set; }
     }
 
     public class GroupDto
