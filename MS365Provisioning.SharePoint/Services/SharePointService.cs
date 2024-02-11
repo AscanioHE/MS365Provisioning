@@ -698,6 +698,7 @@ namespace MS365Provisioning.SharePoint.Services
             {
                 _logger?.LogInformation($"  {availablePermissionLevel}");
             }
+            string permissionLevel = string.Empty;
             List<GroupDto> groupDtos = new List<GroupDto>();
             foreach (Group group in Web.SiteGroups)
             {
@@ -716,7 +717,7 @@ namespace MS365Provisioning.SharePoint.Services
 
                 foreach (RoleType roleType in Enum.GetValues(typeof(RoleType)))
                 {
-                    string permissionLevel = GetRoleDefinitionForGroup(group.Title, roleType);
+                    permissionLevel = GetRoleDefinitionForGroup(group.Title, roleType);
 
                     if (!string.IsNullOrEmpty(permissionLevel))
                     {
@@ -736,13 +737,27 @@ namespace MS365Provisioning.SharePoint.Services
             {
                 string groupName = GetAssignedGroup(roleDefinition);
                 Group group = Web.SiteGroups.GetByName(groupName);
+                UserCollection users = group.Users;
+                Ctx.Load(users);
+                Ctx.ExecuteQuery();
+                List<Users> usersDtos = new();
+                foreach (User user in users)
+                {
+                    usersDtos.Add(new
+                        (
+                            userPrincipalName: user.UserPrincipalName,
+                            email:user.Email,
+                            title: user.Title,
+                            isSiteAdmin: user.IsSiteAdmin
+                        ));
+                }
                 PermissionLevelDto permissionLevelDto = new PermissionLevelDto
                 (
                     name: roleDefinition.Name,
                     selectedPersonalPermissions: personalPermissions,
                     groupName: GetAssignedGroup(roleDefinition),
-                    members: GetGroupMembers(group),
-                    assignedPermissionLevel:"",
+                    members: usersDtos,
+                    assignedPermissionLevel: roleDefinition.Name,
                     accessRequestSettings: GetAccessRequestSettings(),
                     selectedListPermissions: GetSelectedListPermissions(roleDefinition)
                 ); ;
@@ -873,6 +888,9 @@ namespace MS365Provisioning.SharePoint.Services
         private List<Users> GetGroupMembers(Group group)
         {
             List<Users> users = new();
+            UserCollection members = group.Users;
+            Ctx.Load(members);
+            Ctx.ExecuteQuery();
             foreach (User user in group.Users)
             {
                 users.Add(new Users
