@@ -69,7 +69,7 @@ namespace MS365Provisioning.SharePoint.Services
             }
             catch (Exception ex)
             {
-                _logger.LogInformation($"Error fetching lists from clientcontext : {ex.Message}");
+                _logger.LogInformation($"Error fetching lists from clientcontext : {ex.Message}, StackTrace: {ex.StackTrace}");
             }
         }
         /*______________________________________________________________________________________________________________
@@ -204,7 +204,7 @@ namespace MS365Provisioning.SharePoint.Services
             }
             catch (Exception ex)
             {
-                _logger?.LogError(message: $"Error fetching the Webtemplates : {ex.Message}");
+                _logger?.LogError(message: $"Error fetching the Webtemplates : {ex.Message}, StackTrace: {{ex.StackTrace}}\"");
             }
             finally
             {
@@ -278,12 +278,12 @@ namespace MS365Provisioning.SharePoint.Services
                             catch (Exception ex)
                             {
                                 _logger?.LogInformation(
-                                    $"Unable to create the List Data Transfer Object : {ex.Message}");
+                                    $"Unable to create the List Data Transfer Object : {ex.Message}, StackTrace: {{ex.StackTrace}}\"");
                             }
                         }
                         catch (Exception ex)
                         {
-                            _logger?.LogInformation($"Error Fetching list properties : {ex.Message}");
+                            _logger?.LogInformation($"Error Fetching list properties : {ex.Message}, StackTrace: {{ex.StackTrace}}\"");
                         }
 
                     }
@@ -291,7 +291,7 @@ namespace MS365Provisioning.SharePoint.Services
             }
             catch (Exception ex)
             {
-                _logger?.LogError($"Error fetching the ClientContext Lists: {ex.Message}");
+                _logger?.LogError($"Error fetching the ClientContext Lists: {ex.Message}, StackTrace: {ex.StackTrace}");
             }
             finally
             {
@@ -326,13 +326,13 @@ namespace MS365Provisioning.SharePoint.Services
                     }
                     catch (Exception ex)
                     {
-                        _logger?.LogInformation($"Error fetching ClientContext: {ex}");
+                        _logger?.LogInformation($"Error fetching ClientContext: {ex}, StackTrace: {ex.StackTrace}");
                     }
                 }
             }
             catch (Exception ex)
             {
-                _logger?.LogInformation($"Error fetching List QuickLaunchHeader : {ex.Message}");
+                _logger?.LogInformation($"Error fetching List QuickLaunchHeader : {ex.Message}, StackTrace: {ex.StackTrace} ");
             }
 
             return quickLaunchHeaders;
@@ -352,7 +352,7 @@ namespace MS365Provisioning.SharePoint.Services
             }
             catch (Exception ex)
             {
-                _logger?.LogInformation($"Error fetching Enterprise Keywords value: {ex.Message}");
+                _logger?.LogInformation($"Error fetching Enterprise Keywords value: {ex.Message}, StackTrace: {ex.StackTrace}");
                 enterpriseKeywordsValue = Guid.Empty;
             }
             return enterpriseKeywordsValue;
@@ -385,7 +385,7 @@ namespace MS365Provisioning.SharePoint.Services
             }
             catch (Exception ex)
             {
-                _logger?.LogInformation(message: $"Error fetching permissions : {ex}");
+                _logger?.LogInformation(message: $"Error fetching permissions : {ex.Message}, StackTrace: {ex.StackTrace}");
             }
             finally
             {
@@ -417,7 +417,7 @@ namespace MS365Provisioning.SharePoint.Services
             }
             catch (Exception ex)
             {
-                _logger?.LogInformation($"Error Fetching Lists : {ex.Message}");
+                _logger?.LogInformation($"Error Fetching Lists : {ex.Message}, StackTrace: {ex.StackTrace}");
             }
             finally
             {
@@ -467,13 +467,13 @@ namespace MS365Provisioning.SharePoint.Services
                     }
                     catch (Exception ex)
                     {
-                        _logger?.LogInformation($"Error fetching ListView : {ex.Message}");
+                        _logger?.LogInformation($"Error fetching ListView : {ex.Message}, StackTrace: {ex.StackTrace}");
                     }
                 }
             }
             catch (Exception ex)
             {
-                _logger?.LogInformation($"Error fetching Listviews : {ex.Message}");
+                _logger?.LogInformation($"Error fetching List views : {ex.Message}, StackTrace: {ex.StackTrace}");
             }
             finally
             {
@@ -509,12 +509,12 @@ namespace MS365Provisioning.SharePoint.Services
                 }
                 catch (Exception ex)
                 {
-                    _logger?.LogInformation($"Error fetching Site Column settings : {ex.Message}");
+                    _logger?.LogInformation($"Error fetching Site Column settings : {ex.Message}, StackTrace: {ex.StackTrace}");
                 }
             }
             catch (Exception ex)
             {
-                _logger?.LogInformation($"Error fetching ContextClient :  {ex.Message}");
+                _logger?.LogInformation($"Error fetching ContextClient :  {ex.Message}, StackTrace: {ex.StackTrace}");
             }
             finally
             {
@@ -566,7 +566,7 @@ namespace MS365Provisioning.SharePoint.Services
             }
             catch (Exception ex)
             {
-                _logger?.LogInformation($"Error fetching Content Types : {ex.Message}");
+                _logger?.LogInformation($"Error fetching Content Types : {ex.Message}, StackTrace: {ex.StackTrace}");
             }
             finally
             {
@@ -607,7 +607,7 @@ namespace MS365Provisioning.SharePoint.Services
                                 }
                                 catch (Exception ex)
                                 {
-                                    _logger?.LogInformation($"Error fetching SubFolders : {ex.Message}");
+                                    _logger?.LogInformation($"Error fetching SubFolders : {ex.Message}, StackTrace: {ex.StackTrace}");
                                 }
                                 folderStructureDtos.Add(new(
                                     list.Title,
@@ -618,7 +618,7 @@ namespace MS365Provisioning.SharePoint.Services
                         }
                         catch (Exception ex)
                         {
-                            _logger?.LogInformation($"Error fetching list Fields : {ex.Message}");
+                            _logger?.LogInformation($"Error fetching list Fields : {ex.Message}, StackTrace: {ex.StackTrace}");
                         }
 
                     }
@@ -626,7 +626,7 @@ namespace MS365Provisioning.SharePoint.Services
             }
             catch (Exception ex)
             {
-                _logger?.LogInformation($"Error fetching context Lists : {ex.Message}");
+                _logger?.LogInformation($"Error fetching context Lists : {ex.Message}, StackTrace: {ex.StackTrace}");
             }
             finally
             {
@@ -640,36 +640,101 @@ namespace MS365Provisioning.SharePoint.Services
         public SitePermissionsDto LoadSitePermissions()
         {
             List<SitePermissionsDto> sitePermissionsDtos = new();
-
-            Ctx.Load(Web.AssociatedOwnerGroup);
-            Ctx.Load(Web.AssociatedMemberGroup);
-            Ctx.Load(Web.AssociatedVisitorGroup);
-            Ctx.Load(Web.RoleAssignments);
-            Ctx.Load(Web.RoleDefinitions);
-            Ctx.Load(Ctx.Site.RootWeb,
-                rw => rw.HasUniqueRoleAssignments,
-                rw => rw.RequestAccessEmail
-                );
-            Ctx.Load(Web.SiteGroups,
-                    sg => sg.Include
-                    (
-                        g => g.Title,
-                        g => g.Description,
-                        g => g.LoginName,
-                        g => g.Owner,
-                        g => g.Users.Include
-                        (
-                            u => u.UserPrincipalName,
-                            u => u.Email,
-                            u => u.Title,
-                            u => u.IsSiteAdmin
-                            )
-                        )
-                    ); ;
-            Ctx.ExecuteQuery();
+            try
+            {
+            Ctx.Load(Web);
+                Ctx.ExecuteQuery();
+            }
+            catch(Exception ex)
+            {
+                _logger?.LogInformation($"Error Fetching Web: {ex.Message}, StackTrace: {ex.StackTrace}");
+            }
+            try
+            {
+                Ctx.Load(Web.AssociatedOwnerGroup);
+                Ctx.ExecuteQuery();
+            }
+            catch(Exception ex)
+            {
+                _logger?.LogInformation($"Error Fetching AssociatedOwnerGroup: {ex.Message}, StackTrace: {ex.StackTrace}");
+            }
+            try
+            {
+                Ctx.Load(Web.AssociatedMemberGroup);
+                Ctx.ExecuteQuery();
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogInformation($"Error Fetching AssociatedMemberGroup: {ex.Message}, StackTrace: {ex.StackTrace}");
+            }
+            try
+            {
+                Ctx.Load(Web.AssociatedVisitorGroup);
+                Ctx.ExecuteQuery();
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogInformation($"Error Fetching AssociatedVisitorGroup: {ex.Message}, StackTrace: {ex.StackTrace}");
+            }
+            try
+            {
+                Ctx.Load(Web.RoleAssignments);
+                Ctx.ExecuteQuery();
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogInformation($"Error Fetching RoleAssignments: {ex.Message}, StackTrace: {ex.StackTrace}");
+            }
+            try
+            {
+                Ctx.Load(Web.RoleDefinitions);
+                Ctx.ExecuteQuery();
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogInformation($"Error Fetching RoleDefinitions: {ex.Message}, StackTrace: {ex.StackTrace}");
+            }
+            try
+            {
+                Ctx.Load(Web, w => w.HasUniqueRoleAssignments);
+                Ctx.ExecuteQuery();
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogInformation($"Error Fetching Web, w => w.HasUniqueRoleAssignments: {ex.Message}, StackTrace: {ex.StackTrace}");
+            }
+            try
+            {
+                Ctx.Load(Ctx.Site.RootWeb,
+                    rw => rw.HasUniqueRoleAssignments,
+                    rw => rw.RequestAccessEmail
+                    );
+                Ctx.ExecuteQuery();
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogInformation($"Error Fetching Site.RootWeb: {ex.Message}, StackTrace: {ex.StackTrace}");
+            }
+            try
+            {
+                Ctx.Load(Web.SiteGroups);
+                Ctx.ExecuteQuery();
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogInformation($"Error Fetching SiteGroups: {ex.Message}, StackTrace: {ex.StackTrace}");
+            }
+            try
+            {
+                Ctx.Load(Web.AssociatedOwnerGroup.Users);
+                Ctx.ExecuteQuery();
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogInformation($"Error Fetching Web.AssociatedOwnerGroup.Users: {ex.Message}, StackTrace: {ex.StackTrace}");
+            }
+            bool hasUniqueRoleAssignments = Web.HasUniqueRoleAssignments;
             UserCollection siteOwners = Web.AssociatedOwnerGroup.Users;
-            Ctx.Load(siteOwners);
-            Ctx.ExecuteQuery();
             _logger?.LogInformation($"Site Owners:");
             List<Users> siteOwnerMembers = new();
 
@@ -701,6 +766,15 @@ namespace MS365Provisioning.SharePoint.Services
             List<GroupDto> groupDtos = new List<GroupDto>();
             foreach (Group group in Web.SiteGroups)
             {
+                try
+                {
+                    Ctx.Load(group.Owner);
+                    Ctx.ExecuteQuery();
+                }
+                catch (Exception ex)
+                {
+                    _logger?.LogInformation($"Error Fetching group.Owner: {ex.Message}, StackTrace: {ex.StackTrace}");
+                }
                 GroupDto groupDto = new GroupDto
                 (
                     group.Title,
@@ -732,6 +806,7 @@ namespace MS365Provisioning.SharePoint.Services
             List<PermissionLevelDto> customPermissionLevelDtos = new();
             List<PermissionLevelDto> defaultPermissionDtos = new();
             List<string> personalPermissions = new List<string>();
+            List<Users> usersDtos = new();
             foreach (RoleDefinition roleDefinition in Web.RoleDefinitions)
             {
                 if (roleDefinition != null)
@@ -740,69 +815,79 @@ namespace MS365Provisioning.SharePoint.Services
                     Group group = Web.SiteGroups.GetByName(groupName);
                     if (groupName != string.Empty)
                     {
-                        Ctx.Load(group,
-                                g => g.Title,
-                                g => g.Description,
-                                g => g.LoginName,
-                                g => g.Owner
-                            );
                         try
                         {
-                            Ctx.ExecuteQuery();
-                            UserCollection users = group.Users;
-                            Ctx.Load
-                                (
-                                users,
-                                        u => u.Include
-                                        (
-                                            u=>u.UserPrincipalName,
-                                            u=>u.Email,
-                                            u=>u.Title,
-                                            u=> u.IsSiteAdmin
-                                            )
-                                        );
+                            Ctx.Load(group.Owner);
+                            Ctx.ExecuteQuery(); 
+                            Ctx.Load(group,
+                                    g => g.Title,
+                                    g => g.Description,
+                                    g => g.LoginName,
+                                    g => g.Owner
+                                );
                             try
                             {
                                 Ctx.ExecuteQuery();
-                                List<Users> usersDtos = new();
-                                foreach (User user in users)
+                                UserCollection users = group.Users;
+                                Ctx.Load
+                                    (
+                                    users,
+                                            u => u.Include
+                                            (
+                                                u => u.UserPrincipalName,
+                                                u => u.Email,
+                                                u => u.Title,
+                                                u => u.IsSiteAdmin
+                                                )
+                                            );
+                                try
                                 {
-                                    usersDtos.Add(new
-                                        (
-                                            userPrincipalName: user.UserPrincipalName,
-                                            email: user.Email,
-                                            title: user.Title,
-                                            isSiteAdmin: user.IsSiteAdmin
-                                        ));
+                                    Ctx.ExecuteQuery();
+                                    foreach (User user in users)
+                                    {
+                                        Ctx.ExecuteQuery();
+                                        usersDtos.Add(new
+                                            (
+                                                userPrincipalName: user.UserPrincipalName,
+                                                email: user.Email,
+                                                title: user.Title,
+                                                isSiteAdmin: user.IsSiteAdmin
+                                            ));
+                                    }
+                                    PermissionLevelDto permissionLevelDto = new PermissionLevelDto
+                                    (
+                                        name: roleDefinition.Name,
+                                        selectedPersonalPermissions: personalPermissions,
+                                        groupName: GetAssignedGroup(roleDefinition),
+                                        members: usersDtos,
+                                        assignedPermissionLevel: roleDefinition.Name,
+                                        accessRequestSettings: GetAccessRequestSettings(),
+                                        selectedListPermissions: GetSelectedListPermissions(roleDefinition)
+                                    ); ;
+                                    if (IsDefaultPermission(roleDefinition.BasePermissions))
+                                    {
+                                        defaultPermissionDtos.Add(permissionLevelDto);
+                                    }
+                                    else
+                                    {
+                                        customPermissionLevelDtos.Add(permissionLevelDto);
+                                    }
                                 }
-                                PermissionLevelDto permissionLevelDto = new PermissionLevelDto
-                                (
-                                    name: roleDefinition.Name,
-                                    selectedPersonalPermissions: personalPermissions,
-                                    groupName: GetAssignedGroup(roleDefinition),
-                                    members: usersDtos,
-                                    assignedPermissionLevel: roleDefinition.Name,
-                                    accessRequestSettings: GetAccessRequestSettings(),
-                                    selectedListPermissions: GetSelectedListPermissions(roleDefinition)
-                                ); ;
-                                if (IsDefaultPermission(roleDefinition.BasePermissions))
+                                catch (Exception ex)
                                 {
-                                    defaultPermissionDtos.Add(permissionLevelDto);
-                                }
-                                else
-                                {
-                                    customPermissionLevelDtos.Add(permissionLevelDto);
+                                    _logger?.LogInformation($"Error Fechting User:{ex.Message}, StackTrace: {ex.StackTrace}");
                                 }
                             }
-                            catch(Exception ex)
+                            catch (Exception ex)
                             {
-                                _logger?.LogInformation($"Error Fechting User:{ex.Message}");
+                                _logger?.LogInformation($"Error Fetching Group members {ex.Message}, StackTrace: {ex.StackTrace}");
                             }
                         }
                         catch (Exception ex)
                         {
-                            _logger?.LogInformation($"Error Fetching Group {ex.Message}");
+                            _logger?.LogInformation($"Error Fetching group.Owner: {ex.Message}, StackTrace: {ex.StackTrace}");
                         }
+                        
                     }
                 }
             }
@@ -811,6 +896,7 @@ namespace MS365Provisioning.SharePoint.Services
             sitePermissionsDto.CustomPermissionLevels = customPermissionLevelDtos;
             sitePermissionsDto.DefaultPermissionLevels = defaultPermissionDtos;
             sitePermissionsDto.AssociatedGroups = groupDtos;
+            sitePermissionsDto.IsInheritedSecurity = hasUniqueRoleAssignments;
             FileName = fileSettings!.SitePermissionsFilePath!;
             DtoFile = sitePermissionsDto;
             ExportServices();
@@ -836,7 +922,7 @@ namespace MS365Provisioning.SharePoint.Services
             }
             catch (Exception ex)
             {
-                _logger?.LogInformation($"Error loading Request Access Email: {ex.Message}");
+                _logger?.LogInformation($"Error loading Request Access Email: {ex.Message}, StackTrace: {ex.StackTrace}");
                 return string.Empty;
             }
             return string.Empty;
@@ -982,7 +1068,7 @@ namespace MS365Provisioning.SharePoint.Services
             }
             catch (Exception ex)
             {
-                _logger?.LogInformation($"Error fetching ContentTypes: {ex.Message}");
+                _logger?.LogInformation($"Error fetching ContentTypes: {ex.Message}, StackTrace: {ex.StackTrace}");
                 contentTypes.Clear();
             }
             return contentTypes;
@@ -1030,7 +1116,7 @@ namespace MS365Provisioning.SharePoint.Services
                         }
                         catch (Exception ex)
                         {
-                            _logger?.LogInformation($"Error fetching WebParts: {ex.Message}");
+                            _logger?.LogInformation($"Error fetching WebParts: {ex.Message}, StackTrace: {ex.StackTrace}");
                         }
 
                     }
@@ -1038,7 +1124,7 @@ namespace MS365Provisioning.SharePoint.Services
             }
             catch (Exception ex)
             {
-                _logger?.LogInformation($"Error fetching Pages: {ex.Message}");
+                _logger?.LogInformation($"Error fetching Pages: {ex.Message}, StackTrace: {ex.StackTrace}");
             }
 
             DtoFile = webPartPagesDtos;

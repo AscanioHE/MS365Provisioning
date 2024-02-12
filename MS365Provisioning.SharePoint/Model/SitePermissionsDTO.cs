@@ -53,15 +53,10 @@ namespace MS365Provisioning.SharePoint.Model
 
     public class GroupDto
     {
-        [JsonProperty(Order = 1)]
         public string Title { get; set; }
-        [JsonProperty(Order = 2)]
         public string Description { get; set; }
-        [JsonProperty(Order = 3)]
         public string LoginName { get; set; }
-        [JsonProperty(Order = 4)]
         public Principal Owner { get; set; }
-        [JsonProperty(Order = 5)]
         public List<Users> Members { get; set; }
         public GroupDto(string title, string description, string loginName, Principal owner, List<Users> members) 
         { 
