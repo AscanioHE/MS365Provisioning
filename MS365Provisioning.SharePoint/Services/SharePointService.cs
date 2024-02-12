@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Logging;
-using Microsoft.Graph.Models;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.SharePoint.Client;
 using MS365Provisioning.Common;
@@ -672,9 +671,9 @@ namespace MS365Provisioning.SharePoint.Services
             Ctx.Load(siteOwners);
             Ctx.ExecuteQuery();
             _logger?.LogInformation($"Site Owners:");
-            List<Users> siteOwnerMembers = new ();
+            List<Users> siteOwnerMembers = new();
 
-            foreach(User user in siteOwners)
+            foreach (User user in siteOwners)
             {
                 _logger?.LogInformation($"  {user.Title}");
                 _logger?.LogInformation($"  {user.UserPrincipalName}");
@@ -687,7 +686,7 @@ namespace MS365Provisioning.SharePoint.Services
                     user.Email,
                     user.IsSiteAdmin
                 );
-                siteOwnerMembers.Add( users );
+                siteOwnerMembers.Add(users);
             }
             SitePermissionsDto sitePermissionsDto = new SitePermissionsDto();
 
@@ -708,7 +707,7 @@ namespace MS365Provisioning.SharePoint.Services
                     group.Description,
                     group.LoginName,
                     group.Owner,
-                    GetGroupMembers(group) 
+                    GetGroupMembers(group)
                 );
                 _logger?.LogInformation($"{groupDto}");
                 groupDtos.Add(groupDto);
@@ -735,41 +734,77 @@ namespace MS365Provisioning.SharePoint.Services
             List<string> personalPermissions = new List<string>();
             foreach (RoleDefinition roleDefinition in Web.RoleDefinitions)
             {
-                string groupName = GetAssignedGroup(roleDefinition);
-                Group group = Web.SiteGroups.GetByName(groupName);
-                UserCollection users = group.Users;
-                Ctx.Load(users);
-                Ctx.ExecuteQuery();
-                List<Users> usersDtos = new();
-                foreach (User user in users)
+                if (roleDefinition != null)
                 {
-                    usersDtos.Add(new
-                        (
-                            userPrincipalName: user.UserPrincipalName,
-                            email:user.Email,
-                            title: user.Title,
-                            isSiteAdmin: user.IsSiteAdmin
-                        ));
+                    string groupName = GetAssignedGroup(roleDefinition);
+                    Group group = Web.SiteGroups.GetByName(groupName);
+                    if (groupName != string.Empty)
+                    {
+                        Ctx.Load(group,
+                                g => g.Title,
+                                g => g.Description,
+                                g => g.LoginName,
+                                g => g.Owner
+                            );
+                        try
+                        {
+                            Ctx.ExecuteQuery();
+                            UserCollection users = group.Users;
+                            Ctx.Load
+                                (
+                                users,
+                                        u => u.Include
+                                        (
+                                            u=>u.UserPrincipalName,
+                                            u=>u.Email,
+                                            u=>u.Title,
+                                            u=> u.IsSiteAdmin
+                                            )
+                                        );
+                            try
+                            {
+                                Ctx.ExecuteQuery();
+                                List<Users> usersDtos = new();
+                                foreach (User user in users)
+                                {
+                                    usersDtos.Add(new
+                                        (
+                                            userPrincipalName: user.UserPrincipalName,
+                                            email: user.Email,
+                                            title: user.Title,
+                                            isSiteAdmin: user.IsSiteAdmin
+                                        ));
+                                }
+                                PermissionLevelDto permissionLevelDto = new PermissionLevelDto
+                                (
+                                    name: roleDefinition.Name,
+                                    selectedPersonalPermissions: personalPermissions,
+                                    groupName: GetAssignedGroup(roleDefinition),
+                                    members: usersDtos,
+                                    assignedPermissionLevel: roleDefinition.Name,
+                                    accessRequestSettings: GetAccessRequestSettings(),
+                                    selectedListPermissions: GetSelectedListPermissions(roleDefinition)
+                                ); ;
+                                if (IsDefaultPermission(roleDefinition.BasePermissions))
+                                {
+                                    defaultPermissionDtos.Add(permissionLevelDto);
+                                }
+                                else
+                                {
+                                    customPermissionLevelDtos.Add(permissionLevelDto);
+                                }
+                            }
+                            catch(Exception ex)
+                            {
+                                _logger?.LogInformation($"Error Fechting User:{ex.Message}");
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger?.LogInformation($"Error Fetching Group {ex.Message}");
+                        }
+                    }
                 }
-                PermissionLevelDto permissionLevelDto = new PermissionLevelDto
-                (
-                    name: roleDefinition.Name,
-                    selectedPersonalPermissions: personalPermissions,
-                    groupName: GetAssignedGroup(roleDefinition),
-                    members: usersDtos,
-                    assignedPermissionLevel: roleDefinition.Name,
-                    accessRequestSettings: GetAccessRequestSettings(),
-                    selectedListPermissions: GetSelectedListPermissions(roleDefinition)
-                ); ;
-                if (IsDefaultPermission(roleDefinition.BasePermissions))
-                {
-                    defaultPermissionDtos.Add(permissionLevelDto);
-                }
-                else
-                {
-                    customPermissionLevelDtos.Add(permissionLevelDto);
-                }
-
             }
             sitePermissionsDto.AvailablePermissionLevels = availablePermissionLevels;
             sitePermissionsDto.SiteCollectionAdministrators = siteOwnerMembers;
@@ -810,6 +845,7 @@ namespace MS365Provisioning.SharePoint.Services
         private string GetAssignedGroup(RoleDefinition roleDefinition)
         {
             string groupName = string.Empty;
+            bool exist = roleDefinition.Name.Contains(groupName);
             switch (roleDefinition.Name)
             {
                 case "Full Control":
@@ -820,6 +856,9 @@ namespace MS365Provisioning.SharePoint.Services
                     break;
                 case "Read":
                     groupName = $"{Ctx.Web.Title} Visitors";
+                    break;
+                case "Design":
+                    groupName = $"{Ctx.Web.Title} Design";
                     break;
                 default:
                     break;
