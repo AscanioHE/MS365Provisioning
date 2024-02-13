@@ -17,15 +17,17 @@ namespace MS365Provisioning.SharePoint.Model
         public List<PermissionLevelDto>? DefaultPermissionLevels { get; set; }
         public List<PermissionLevelDto>? CustomPermissionLevels { get; set; }
         public List<GroupDto>? AssociatedGroups { get; set; }
-        public List<Users>? SiteCollectionAdministrators { get; set; }
+        public List<UsersDto>? SiteCollectionAdministrators { get; set; }
 
-        public SitePermissionsDto()
+        public SitePermissionsDto() { }
+        public SitePermissionsDto(List<string> availablePermissionLevels,List<PermissionLevelDto> defaultPermissionLevelDtos,List<PermissionLevelDto> customPermissionLevel,
+            List<GroupDto> associatedGroups,List<UsersDto> usersDtos)
         {
-            AssociatedGroups = new List<GroupDto>();
-            AvailablePermissionLevels = new List<string>();
-            SiteCollectionAdministrators = new List<Users>();
-            DefaultPermissionLevels = new List<PermissionLevelDto>();
-            CustomPermissionLevels = new List<PermissionLevelDto>();
+            AvailablePermissionLevels = availablePermissionLevels;
+            DefaultPermissionLevels = defaultPermissionLevelDtos; 
+            CustomPermissionLevels = customPermissionLevel; 
+            AssociatedGroups = associatedGroups;
+            SiteCollectionAdministrators = usersDtos;
         }
     }
 
@@ -34,17 +36,16 @@ namespace MS365Provisioning.SharePoint.Model
         public string? Name { get; set; }
         public List<string>? SelectedPersonalPermissions { get; set; }
         public string? GroupName { get; set; }
-        public List<Users>? Members { get; set; }
         public string? AssignedPermissionLevel { get; set; }
         public string? AccessRequestSettings { get; set; }
         public List<string>? SelectedListPermissions { get; set; }
-        public PermissionLevelDto(string name, List<string> selectedPersonalPermissions, string groupName, List<Users> members, string assignedPermissionLevel,
+        public PermissionLevelDto() { }
+        public PermissionLevelDto(string name, List<string> selectedPersonalPermissions, string groupName,string assignedPermissionLevel,
             string accessRequestSettings,List<string> selectedListPermissions)
         {
             Name = name;
             SelectedPersonalPermissions = selectedPersonalPermissions;
             GroupName = groupName;
-            Members = members;
             AssignedPermissionLevel = assignedPermissionLevel;
             AccessRequestSettings = accessRequestSettings;
             SelectedListPermissions = selectedListPermissions;
@@ -56,9 +57,18 @@ namespace MS365Provisioning.SharePoint.Model
         public string Title { get; set; }
         public string Description { get; set; }
         public string LoginName { get; set; }
-        public Principal Owner { get; set; }
-        public List<Users> Members { get; set; }
-        public GroupDto(string title, string description, string loginName, Principal owner, List<Users> members) 
+        public string Owner { get; set; }
+        public List<UsersDto> Members { get; set; }
+        // Standaardconstructor toegevoegd
+        public GroupDto()
+        {
+            Title = "";
+            Description = "";
+            LoginName = "";
+            Owner = "";
+            Members = new List<UsersDto>();
+        }
+        public GroupDto(string title, string description, string loginName,string owner,List<UsersDto> members) 
         { 
             Title = title;
             Description = description;
@@ -67,18 +77,14 @@ namespace MS365Provisioning.SharePoint.Model
             Members = members;
         }
     }
-    public class Users
+    public class UsersDto
     {
-        public string UserPrincipalName { get; set; }
         public string Email { get; set; }
         public string Title { get; set; }
-        public bool IsSiteAdmin { get; set; }
-        public Users(string userPrincipalName, string email, string title, bool isSiteAdmin)
+        public UsersDto(string email, string title)
         {
-            UserPrincipalName = userPrincipalName;
             Email = email;
             Title = title;
-            IsSiteAdmin = isSiteAdmin;
         }
     }
 }

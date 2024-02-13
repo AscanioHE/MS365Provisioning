@@ -39,7 +39,6 @@ namespace MS365Provisioning.SharePoint.Services
         private object DtoFile;
         private string FileName { get; set; }
         private string ThumbPrint { get; set; }
-        private string SiteUrl { get; set; }
 
         public ISharePointSettingsService SharePointSettingsService => _sharePointSettingsService;
 
@@ -51,7 +50,6 @@ namespace MS365Provisioning.SharePoint.Services
             _sharePointSettingsService = sharePointSettingsService!;
             sharePointSettings = _sharePointSettingsService.GetSharePointSettings();
             fileSettings = _sharePointSettingsService.GetFileSettings();
-            SiteUrl = sharePointSettings.SiteUrl!;
             ThumbPrint = sharePointSettings.ThumbPrint!;
             Ctx = GetClientContext();
             Web = Ctx.Web;
@@ -639,270 +637,240 @@ namespace MS365Provisioning.SharePoint.Services
 
         public SitePermissionsDto LoadSitePermissions()
         {
-            List<SitePermissionsDto> sitePermissionsDtos = new();
-            try
-            {
-            Ctx.Load(Web);
-                Ctx.ExecuteQuery();
-            }
-            catch(Exception ex)
-            {
-                _logger?.LogInformation($"Error Fetching Web: {ex.Message}, StackTrace: {ex.StackTrace}");
-            }
-            try
-            {
-                Ctx.Load(Web.AssociatedOwnerGroup);
-                Ctx.ExecuteQuery();
-            }
-            catch(Exception ex)
-            {
-                _logger?.LogInformation($"Error Fetching AssociatedOwnerGroup: {ex.Message}, StackTrace: {ex.StackTrace}");
-            }
-            try
-            {
-                Ctx.Load(Web.AssociatedMemberGroup);
-                Ctx.ExecuteQuery();
-            }
-            catch (Exception ex)
-            {
-                _logger?.LogInformation($"Error Fetching AssociatedMemberGroup: {ex.Message}, StackTrace: {ex.StackTrace}");
-            }
-            try
-            {
-                Ctx.Load(Web.AssociatedVisitorGroup);
-                Ctx.ExecuteQuery();
-            }
-            catch (Exception ex)
-            {
-                _logger?.LogInformation($"Error Fetching AssociatedVisitorGroup: {ex.Message}, StackTrace: {ex.StackTrace}");
-            }
-            try
-            {
-                Ctx.Load(Web.RoleAssignments);
-                Ctx.ExecuteQuery();
-            }
-            catch (Exception ex)
-            {
-                _logger?.LogInformation($"Error Fetching RoleAssignments: {ex.Message}, StackTrace: {ex.StackTrace}");
-            }
-            try
-            {
-                Ctx.Load(Web.RoleDefinitions);
-                Ctx.ExecuteQuery();
-            }
-            catch (Exception ex)
-            {
-                _logger?.LogInformation($"Error Fetching RoleDefinitions: {ex.Message}, StackTrace: {ex.StackTrace}");
-            }
-            try
-            {
-                Ctx.Load(Web, w => w.HasUniqueRoleAssignments);
-                Ctx.ExecuteQuery();
-            }
-            catch (Exception ex)
-            {
-                _logger?.LogInformation($"Error Fetching Web, w => w.HasUniqueRoleAssignments: {ex.Message}, StackTrace: {ex.StackTrace}");
-            }
-            try
-            {
-                Ctx.Load(Ctx.Site.RootWeb,
-                    rw => rw.HasUniqueRoleAssignments,
-                    rw => rw.RequestAccessEmail
-                    );
-                Ctx.ExecuteQuery();
-            }
-            catch (Exception ex)
-            {
-                _logger?.LogInformation($"Error Fetching Site.RootWeb: {ex.Message}, StackTrace: {ex.StackTrace}");
-            }
-            try
-            {
-                Ctx.Load(Web.SiteGroups);
-                Ctx.ExecuteQuery();
-            }
-            catch (Exception ex)
-            {
-                _logger?.LogInformation($"Error Fetching SiteGroups: {ex.Message}, StackTrace: {ex.StackTrace}");
-            }
-            try
-            {
-                Ctx.Load(Web.AssociatedOwnerGroup.Users);
-                Ctx.ExecuteQuery();
-            }
-            catch (Exception ex)
-            {
-                _logger?.LogInformation($"Error Fetching Web.AssociatedOwnerGroup.Users: {ex.Message}, StackTrace: {ex.StackTrace}");
-            }
-            bool hasUniqueRoleAssignments = Web.HasUniqueRoleAssignments;
-            UserCollection siteOwners = Web.AssociatedOwnerGroup.Users;
-            _logger?.LogInformation($"Site Owners:");
-            List<Users> siteOwnerMembers = new();
-
-            foreach (User user in siteOwners)
-            {
-                _logger?.LogInformation($"  {user.Title}");
-                _logger?.LogInformation($"  {user.UserPrincipalName}");
-                _logger?.LogInformation($"  {user.Email}");
-                _logger?.LogInformation($"  {user.IsSiteAdmin.ToString()}");
-                Users users = new Users
-                (
-                    user.UserPrincipalName,
-                    user.Title,
-                    user.Email,
-                    user.IsSiteAdmin
-                );
-                siteOwnerMembers.Add(users);
-            }
-            SitePermissionsDto sitePermissionsDto = new SitePermissionsDto();
-
-            // Available Permission Levels
-            List<string> availablePermissionLevels = Web.RoleDefinitions.Select(rd => rd.Name).ToList();
-            _logger?.LogInformation($"Available Permission levels:");
-            foreach (string availablePermissionLevel in availablePermissionLevels)
-            {
-                _logger?.LogInformation($"  {availablePermissionLevel}");
-            }
-            string permissionLevel = string.Empty;
-            List<GroupDto> groupDtos = new List<GroupDto>();
-            foreach (Group group in Web.SiteGroups)
-            {
-                try
-                {
-                    Ctx.Load(group.Owner);
-                    Ctx.ExecuteQuery();
-                }
-                catch (Exception ex)
-                {
-                    _logger?.LogInformation($"Error Fetching group.Owner: {ex.Message}, StackTrace: {ex.StackTrace}");
-                }
-                GroupDto groupDto = new GroupDto
-                (
-                    group.Title,
-                    group.Description,
-                    group.LoginName,
-                    group.Owner,
-                    GetGroupMembers(group)
-                );
-                _logger?.LogInformation($"{groupDto}");
-                groupDtos.Add(groupDto);
-
-                _logger?.LogInformation($"Permissions for group: {groupDto.Title}");
-
-                foreach (RoleType roleType in Enum.GetValues(typeof(RoleType)))
-                {
-                    permissionLevel = GetRoleDefinitionForGroup(group.Title, roleType);
-
-                    if (!string.IsNullOrEmpty(permissionLevel))
-                    {
-                        _logger?.LogInformation($"RoleType: {roleType}, PermissionsLevel: {permissionLevel}");
-                    }
-                    else
-                    {
-                        _logger?.LogInformation($"RoleType: {roleType}, Permission level not found for group {group.Title}");
-                    }
-                }
-            }
-            // Permission Levels
+            SitePermissionsDto sitePermissionsDto = new();
             List<PermissionLevelDto> customPermissionLevelDtos = new();
             List<PermissionLevelDto> defaultPermissionDtos = new();
-            List<string> personalPermissions = new List<string>();
-            List<Users> usersDtos = new();
-            foreach (RoleDefinition roleDefinition in Web.RoleDefinitions)
+            List<string> personalPermissions = new();
+            List<GroupDto> associatedGroupsDtos = new();
+            List<GroupDto> groupDtos = new();
+            List<UsersDto> usersDtos = new();
+            List<UsersDto> siteOwnerMembers = new();
+            List<string> availablePermissionLevels = new();
+
+            Ctx.Load(Web,
+                w => w.SiteGroups,
+                w => w.AssociatedMemberGroup,
+                w => w.AssociatedOwnerGroup,
+                w => w.AssociatedVisitorGroup,
+                w => w.RoleAssignments,
+                w => w.RoleDefinitions,
+                w => w.HasUniqueRoleAssignments);
+            try
             {
-                if (roleDefinition != null)
+                Ctx.ExecuteQuery();
+                _logger?.LogWarning($"Fetching Web: Successful");
+                GroupCollection siteGroups = Web.SiteGroups;
+                Ctx.Load(siteGroups);
+                try
                 {
-                    string groupName = GetAssignedGroup(roleDefinition);
-                    Group group = Web.SiteGroups.GetByName(groupName);
-                    if (groupName != string.Empty)
+                    Ctx.ExecuteQuery();
+                    _logger?.LogWarning($"Fetching Web.SiteGroups: Successful, Total Groups: {siteGroups.Count}");
+                    foreach (Group siteGroup in siteGroups)
                     {
+                        _logger?.LogWarning($"GroupName: {siteGroup.Title}");
+                    }
+                    foreach (Group siteGroup in siteGroups)
+                    {
+                        Ctx.Load(siteGroup, sg => sg.Id, sg => sg.Title);
                         try
                         {
-                            Ctx.Load(group.Owner);
-                            Ctx.ExecuteQuery(); 
-                            Ctx.Load(group,
-                                    g => g.Title,
-                                    g => g.Description,
-                                    g => g.LoginName,
-                                    g => g.Owner
-                                );
+                            Ctx.ExecuteQuery();
+                            int id = siteGroup.Id;
+                            _logger?.LogWarning($"GroupName: {siteGroup.Title}");
+                            Group? associatedMemberGroup = Web.AssociatedMemberGroup;
+                            Group? associatedOwnerGroup = Web.AssociatedOwnerGroup;
+                            Group? associatedVisitorGroup = Web.AssociatedVisitorGroup;
+                            Ctx.ExecuteQuery();
+                            bool isAssociatedGroup = id == associatedMemberGroup.Id ||
+                                                     id == associatedOwnerGroup.Id ||
+                                                     id == associatedVisitorGroup.Id;
+                            _logger?.LogWarning($"{siteGroup.Title} Assosciated group: {isAssociatedGroup}");
+                            if (isAssociatedGroup)
+                            {
+                                // Check if the group already exists in the list before adding it
+                                bool memberGroupExists = associatedGroupsDtos.Any(g => g.Title == associatedMemberGroup.Title);
+                                bool ownerGroupExists = associatedGroupsDtos.Any(g => g.Title == associatedOwnerGroup.Title);
+                                bool visitorGroupExists = associatedGroupsDtos.Any(g => g.Title == associatedVisitorGroup.Title);
+
+                                // Add each group to the list if it doesn't already exist
+                                if (!memberGroupExists)
+                                {
+                                    associatedGroupsDtos.Add(ConvertToGroupDto(associatedMemberGroup));
+                                }
+                                if (!ownerGroupExists)
+                                {
+                                    associatedGroupsDtos.Add(ConvertToGroupDto(associatedOwnerGroup));
+                                }
+                                if (!visitorGroupExists)
+                                {
+                                    associatedGroupsDtos.Add(ConvertToGroupDto(associatedVisitorGroup));
+                                }
+                            }
                             try
                             {
-                                Ctx.ExecuteQuery();
-                                UserCollection users = group.Users;
-                                Ctx.Load
-                                    (
-                                    users,
-                                            u => u.Include
-                                            (
-                                                u => u.UserPrincipalName,
-                                                u => u.Email,
-                                                u => u.Title,
-                                                u => u.IsSiteAdmin
-                                                )
-                                            );
-                                try
+                                availablePermissionLevels = Web.RoleDefinitions.Select(rd => rd.Name).Distinct().ToList();
+                                _logger?.LogWarning($"Fetching Available permissionlevels: Successful, Total Permissionlevels: {availablePermissionLevels.Count}");
+
+                            }
+                            catch (Exception ex)
+                            {
+                                _logger?.LogWarning($"Error fetching Available permissionlevels: {ex.Message}, StackTrace: {ex.StackTrace}");
+
+                            }
+                            RoleDefinitionCollection roleDefinitions = Web.RoleDefinitions;
+                            foreach (RoleDefinition roleDefinition in roleDefinitions)
+                            {
+                                _logger?.LogInformation($"Roledefinition: {roleDefinition.Name}");
+                                string groupName = GetAssignedGroup(roleDefinition);
+                                if (!string.IsNullOrEmpty(groupName))
                                 {
-                                    Ctx.ExecuteQuery();
-                                    foreach (User user in users)
+                                    Group? group = Web.SiteGroups.FirstOrDefault(grp => grp.Title == groupName);
+                                    if (group != null)
                                     {
-                                        Ctx.ExecuteQuery();
-                                        usersDtos.Add(new
-                                            (
-                                                userPrincipalName: user.UserPrincipalName,
-                                                email: user.Email,
-                                                title: user.Title,
-                                                isSiteAdmin: user.IsSiteAdmin
-                                            ));
+                                        groupDtos.Add(ConvertToGroupDto((Group)group));
                                     }
-                                    PermissionLevelDto permissionLevelDto = new PermissionLevelDto
-                                    (
-                                        name: roleDefinition.Name,
-                                        selectedPersonalPermissions: personalPermissions,
-                                        groupName: GetAssignedGroup(roleDefinition),
-                                        members: usersDtos,
-                                        assignedPermissionLevel: roleDefinition.Name,
-                                        accessRequestSettings: GetAccessRequestSettings(),
-                                        selectedListPermissions: GetSelectedListPermissions(roleDefinition)
-                                    ); ;
-                                    if (IsDefaultPermission(roleDefinition.BasePermissions))
+                                }
+                                PermissionLevelDto permissionLevelDto = new()
+                                {
+                                    Name = roleDefinition.Name,
+                                    SelectedPersonalPermissions = personalPermissions,
+                                    GroupName = groupName,
+                                    AssignedPermissionLevel = roleDefinition.Name,
+                                    AccessRequestSettings = GetAccessRequestSettings(),
+                                    SelectedListPermissions = GetSelectedListPermissions(roleDefinition)
+                                };
+                                if (IsDefaultPermission(roleDefinition.BasePermissions))
+                                {
+                                    if (!defaultPermissionDtos.Any(dto => dto.Name == permissionLevelDto.Name && dto.GroupName == permissionLevelDto.GroupName))
                                     {
                                         defaultPermissionDtos.Add(permissionLevelDto);
                                     }
-                                    else
+                                }
+                                else
+                                {
+                                    if (!customPermissionLevelDtos.Any(dto => dto.Name == permissionLevelDto.Name && dto.GroupName == permissionLevelDto.GroupName))
                                     {
                                         customPermissionLevelDtos.Add(permissionLevelDto);
                                     }
                                 }
-                                catch (Exception ex)
-                                {
-                                    _logger?.LogInformation($"Error Fechting User:{ex.Message}, StackTrace: {ex.StackTrace}");
-                                }
-                            }
-                            catch (Exception ex)
-                            {
-                                _logger?.LogInformation($"Error Fetching Group members {ex.Message}, StackTrace: {ex.StackTrace}");
                             }
                         }
                         catch (Exception ex)
                         {
-                            _logger?.LogInformation($"Error Fetching group.Owner: {ex.Message}, StackTrace: {ex.StackTrace}");
+                            _logger?.LogWarning($"Error fetching SiteGroup {siteGroup.Title}: {ex.Message}, StackTrace: {ex.StackTrace}");
                         }
-                        
+                    }
+
+                }
+                catch (Exception ex)
+                {
+                    _logger?.LogWarning($"Error fetching Web.SiteGroups: {ex.Message}, StackTrace: {ex.StackTrace}");
+                }
+                Ctx.Load(Web, w => w.SiteUsers);
+                try
+                {
+                    Ctx.ExecuteQuery();
+                    _logger?.LogWarning($"Fetching SiteUsers successful: {Web.SiteUsers.Count}");
+                    List<User> siteCollectionAdmins = new();
+                    foreach (User user in Web.SiteUsers)
+                    {
+                        Ctx.Load(user, u => u.Title, u => u.IsSiteAdmin, u => u.Email);
+                        try
+                        {
+                            Ctx.ExecuteQuery();
+                            _logger?.LogWarning($"Fetching User successful: {user.Title}");
+                            if (user.IsSiteAdmin)
+                            {
+                                siteOwnerMembers.Add(new UsersDto
+                                (
+                                    user.Title,
+                                    user.Email
+                                ));
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger?.LogWarning($"Error fetching User: {ex.Message}, StackTrace: {ex.StackTrace}");
+                        }
                     }
                 }
+                catch (Exception ex)
+                {
+                    _logger?.LogWarning($"Error fetching SiteUsers:  {ex.Message}, StackTrace: {ex.StackTrace}");
+                }
             }
+            catch (Exception ex)
+            {
+                _logger?.LogWarning($"Error fetching Web:  {ex.Message}, StackTrace: {ex.StackTrace}");
+            }
+            finally
+            {
+                Ctx.Dispose();
+            }
+            sitePermissionsDto.IsInheritedSecurity = Web.HasUniqueRoleAssignments;
+            sitePermissionsDto.DefaultPermissionLevels = defaultPermissionDtos.Distinct().ToList();
+            sitePermissionsDto.CustomPermissionLevels = customPermissionLevelDtos.Distinct().ToList();
             sitePermissionsDto.AvailablePermissionLevels = availablePermissionLevels;
+            sitePermissionsDto.AssociatedGroups = associatedGroupsDtos.Distinct().ToList();
             sitePermissionsDto.SiteCollectionAdministrators = siteOwnerMembers;
-            sitePermissionsDto.CustomPermissionLevels = customPermissionLevelDtos;
-            sitePermissionsDto.DefaultPermissionLevels = defaultPermissionDtos;
-            sitePermissionsDto.AssociatedGroups = groupDtos;
-            sitePermissionsDto.IsInheritedSecurity = hasUniqueRoleAssignments;
             FileName = fileSettings!.SitePermissionsFilePath!;
+            _logger?.LogInformation($"Export path to Sitesettings: {FileName}");
             DtoFile = sitePermissionsDto;
             ExportServices();
             return sitePermissionsDto;
         }
 
+
+        GroupDto ConvertToGroupDto(Group group)
+        {
+            List<UsersDto> usersDtos = new();
+            GroupDto groupDto = new();
+            Ctx.Load(group,
+                    g => g.Title,
+                    g => g.Description,
+                    g => g.LoginName,
+                    g => g.Owner,
+                    g => g.Users);
+            Ctx.Load(group.Owner, go => go.Title);
+            try
+            {
+                Ctx.ExecuteQuery();
+                _logger?.LogWarning($"Fetching Group properties for {group.Title} Successful");
+                foreach (var user in group.Users)
+                {
+                    Ctx.Load(user,
+                                u => u.UserPrincipalName,
+                                u => u.Title,
+                                u => u.Email);
+                    try
+                    {
+                        Ctx.ExecuteQuery();
+                        _logger?.LogWarning($"Fetching User properties for {user.UserPrincipalName} Successful");
+                        usersDtos.Add(new UsersDto(
+                            user.Title,
+                            user.Email
+                        ));
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger?.LogWarning($"Error fetching User properties:  {ex.Message}, StackTrace: {ex.StackTrace}");
+                    }
+                }
+                groupDto = new                
+                (
+                    group.Title,
+                    group.Description,
+                    group.LoginName,
+                    group.Owner.Title,
+                    usersDtos
+                );
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogWarning($"Error fetching Group properties:  {ex.Message}, StackTrace: {ex.StackTrace}");
+            }
+            return groupDto;
+        }
         private string GetAccessRequestSettings()
         {
             string status = string.Empty;
@@ -925,17 +893,19 @@ namespace MS365Provisioning.SharePoint.Services
                 _logger?.LogInformation($"Error loading Request Access Email: {ex.Message}, StackTrace: {ex.StackTrace}");
                 return string.Empty;
             }
-            return string.Empty;
+            return status;
         }
 
         private string GetAssignedGroup(RoleDefinition roleDefinition)
         {
             string groupName = string.Empty;
-            bool exist = roleDefinition.Name.Contains(groupName);
             switch (roleDefinition.Name)
             {
                 case "Full Control":
                     groupName = $"{Ctx.Web.Title} Owners";
+                    break;
+                case "Design":
+                    groupName = $"{Ctx.Web.Title} Design";
                     break;
                 case "Edit":
                     groupName = $"{Ctx.Web.Title} Members";
@@ -943,17 +913,22 @@ namespace MS365Provisioning.SharePoint.Services
                 case "Read":
                     groupName = $"{Ctx.Web.Title} Visitors";
                     break;
-                case "Design":
-                    groupName = $"{Ctx.Web.Title} Design";
+                case "Contribute":
+                    groupName = $"{Ctx.Web.Title} Contributors";
+                    break;
+                case "Limited Access":
+                    groupName = $"{Ctx.Web.Title} Limited Access";
                     break;
                 default:
                     break;
             }
-
             // Controleer of de groep al bestaat met de berekende groepsnaam
-            Group targetGroup = Web.SiteGroups.FirstOrDefault(g => g.LoginName == groupName);
+            Group? targetGroup = Web.SiteGroups.FirstOrDefault(g => g.Title == groupName);
+            Ctx.Load(targetGroup);
+            Ctx.ExecuteQuery();
             if (targetGroup != null)
             {
+                _logger?.LogWarning($"TargeGroup found: {groupName}");
                 return groupName;
             }
             else
@@ -964,20 +939,12 @@ namespace MS365Provisioning.SharePoint.Services
         private bool IsListPermission(PermissionKind permission)
         {
             // Check if the permission is related to lists
-            switch (permission)
+            return permission switch
             {
-                case PermissionKind.AddListItems:
-                case PermissionKind.EditListItems:
-                case PermissionKind.DeleteListItems:
-                case PermissionKind.OpenItems:
-                case PermissionKind.ViewVersions:
-                case PermissionKind.DeleteVersions:
-                case PermissionKind.CancelCheckout:
-                case PermissionKind.ManagePersonalViews:
-                    return true;
-                default:
-                    return false;
-            }
+                PermissionKind.ManageLists => true,
+                PermissionKind.EditListItems => true,
+                _ => false,
+            };
         }
         private bool IsDefaultPermission(BasePermissions basePermissions)
         {
@@ -992,7 +959,7 @@ namespace MS365Provisioning.SharePoint.Services
         }
         private List<string> GetSelectedListPermissions(RoleDefinition roleDefinition)
         {
-            List<string> selectedListPermissions = new List<string>();
+            List<string> selectedListPermissions = new();
             Ctx.Load(roleDefinition, rd => rd.BasePermissions);
             Ctx.ExecuteQuery();
             _logger?.LogInformation($"Selected List Permissions:");
@@ -1000,56 +967,40 @@ namespace MS365Provisioning.SharePoint.Services
             {
                 foreach (var permission in Enum.GetValues(typeof(PermissionKind)))
                 {
+                    bool isListPermission = IsListPermission((PermissionKind)permission);
                     if (roleDefinition.BasePermissions.Has((PermissionKind)permission) &&
-                        IsListPermission((PermissionKind)permission))
+                        isListPermission)
                     {
                         selectedListPermissions.Add(permission.ToString()!);
-                        _logger?.LogInformation($"  {permission.ToString()}");
+                        _logger?.LogInformation($"  {permission}");
                     }
                 }
             }
             return selectedListPermissions;
         }
-        private List<Users> GetGroupMembers(Group group)
-        {
-            List<Users> users = new();
-            UserCollection members = group.Users;
-            Ctx.Load(members);
-            Ctx.ExecuteQuery();
-            foreach (User user in group.Users)
-            {
-                users.Add(new Users
-                (
-                    user.UserPrincipalName,
-                    user.Email,
-                    user.Title,
-                    user.IsSiteAdmin
-                ));
-            }
-            return users;
-        }
-        private string GetRoleDefinitionForGroup(string groupName, RoleType roleType)
-        {
-            Ctx.Load(Web.RoleAssignments,
-             wra => wra.Include(ra => ra.RoleDefinitionBindings));
-            Ctx.ExecuteQuery();
+ 
+        //private string GetRoleDefinitionForGroup(RoleType roleType)
+        //{
+        //    Ctx.Load(Web.RoleAssignments,
+        //     wra => wra.Include(ra => ra.RoleDefinitionBindings));
+        //    Ctx.ExecuteQuery();
 
-            var roleAssignment = Web.RoleAssignments.FirstOrDefault(ra =>
-                ra.RoleDefinitionBindings.Any(rdb => rdb.RoleTypeKind == roleType));
+        //    var roleAssignment = Web.RoleAssignments.FirstOrDefault(ra =>
+        //        ra.RoleDefinitionBindings.Any(rdb => rdb.RoleTypeKind == roleType));
 
-            if (roleAssignment != null)
-            {
-                var roleDefinition = roleAssignment.RoleDefinitionBindings
-                    .FirstOrDefault(rdb => rdb.RoleTypeKind == roleType);
+        //    if (roleAssignment != null)
+        //    {
+        //        var roleDefinition = roleAssignment.RoleDefinitionBindings
+        //            .FirstOrDefault(rdb => rdb.RoleTypeKind == roleType);
 
-                if (roleDefinition != null)
-                {
-                    return roleDefinition.Name;
-                }
-            }
+        //        if (roleDefinition != null)
+        //        {
+        //            return roleDefinition.Name;
+        //        }
+        //    }
 
-            return string.Empty;
-        }
+        //    return string.Empty;
+        //}
         private List<string> GetListContentTypes(List list)
         {
             List<string> contentTypes = new();
