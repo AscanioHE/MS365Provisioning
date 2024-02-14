@@ -1,0 +1,59 @@
+[
+  {
+    "ListName": "Style Library",
+    "ViewName": "All Documents",
+    "DefaultView": true,
+    "ViewFields": [
+      "DocIcon",
+      "LinkFilename",
+      "Modified",
+      "Editor"
+    ],
+    "RowLimit": 30,
+    "ListScope": "DefaultValue",
+    "JsonFormatterFile": "Style Library"
+  },
+  {
+    "ListName": "Style Library",
+    "ViewName": "Relink Documents",
+    "DefaultView": false,
+    "ViewFields": [
+      "DocIcon",
+      "LinkFilenameNoMenu",
+      "RepairDocument",
+      "Modified",
+      "Editor",
+      "ContentType",
+      "TemplateUrl"
+    ],
+    "RowLimit": 30,
+    "ListScope": "DefaultValue",
+    "JsonFormatterFile": "Style Library"
+  },
+  {
+    "ListName": "Style Library",
+    "ViewName": "assetLibTemp",
+    "DefaultView": false,
+    "ViewFields": [
+      "LinkFilename"
+    ],
+    "RowLimit": 20,
+    "ListScope": "DefaultValue",
+    "JsonFormatterFile": "Style Library"
+  },
+  {
+    "ListName": "Style Library",
+    "ViewName": "Merge Documents",
+    "DefaultView": false,
+    "ViewFields": [
+      "DocIcon",
+      "LinkFilename",
+      "Combine",
+      "Modified",
+      "Editor"
+    ],
+    "RowLimit": 30,
+    "ListScope": "DefaultValue",
+    "JsonFormatterFile": "Style Library"
+  }
+]

@@ -4,6 +4,7 @@ using Microsoft.SharePoint.Client;
 using MS365Provisioning.Common;
 using MS365Provisioning.SharePoint.Model;
 using MS365Provisioning.SharePoint.Settings;
+using PnP.Core.Model.SharePoint;
 using System.Collections;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
@@ -14,16 +15,13 @@ using Field = Microsoft.SharePoint.Client.Field;
 using FieldCollection = Microsoft.SharePoint.Client.FieldCollection;
 using Group = Microsoft.SharePoint.Client.Group;
 using List = Microsoft.SharePoint.Client.List;
-using ListItem = Microsoft.SharePoint.Client.ListItem;
 using NavigationNode = Microsoft.SharePoint.Client.NavigationNode;
 using PermissionKind = Microsoft.SharePoint.Client.PermissionKind;
 using RoleAssignment = Microsoft.SharePoint.Client.RoleAssignment;
 using RoleAssignmentCollection = Microsoft.SharePoint.Client.RoleAssignmentCollection;
 using RoleDefinition = Microsoft.SharePoint.Client.RoleDefinition;
-using RoleType = Microsoft.SharePoint.Client.RoleType;
 using User = Microsoft.SharePoint.Client.User;
 using View = Microsoft.SharePoint.Client.View;
-using WebPart = Microsoft.SharePoint.Client.WebParts.WebPart;
 
 namespace MS365Provisioning.SharePoint.Services
 {
@@ -127,13 +125,14 @@ namespace MS365Provisioning.SharePoint.Services
                 w => w.CustomMasterUrl,
                 w => w.Navigation.QuickLaunch,
                 w => w.Navigation.TopNavigationBar);
+            ObjectSharingSettings objectSharingSettings = web.GetObjectSharingSettingsForSite(true);
+            var sharingSettings = web.GetObjectSharingSettingsForSite;
+            bool privacySettings = sharingSettings.Method.IsPublic;
+            Ctx.Load(web.RegionalSettings, rs => rs.TimeZone.Id, rs => rs.DateFormat, rs => rs.LocaleId, rs => rs.TimeZone.Description);
             try
             {
-                ObjectSharingSettings objectSharingSettings = web.GetObjectSharingSettingsForSite(true);
-                var sharingSettings = web.GetObjectSharingSettingsForSite;
-                bool privacySettings = sharingSettings.Method.IsPublic;
-                Ctx.Load(web.RegionalSettings, rs => rs.TimeZone.Id, rs => rs.DateFormat, rs => rs.LocaleId, rs => rs.TimeZone.Description);
                 Ctx.ExecuteQuery();
+                _logger?.LogError(message: $"Fetching Web properties successful: {web.Title}");
 
                 string title = web.Title;
                 string url = web.Url;
@@ -170,6 +169,10 @@ namespace MS365Provisioning.SharePoint.Services
                 {
                     FileName = fileSettings.SiteSettingsFilePath;
                 }
+                else
+                {
+                    _logger?.LogError(message: $"Filepath is empty");
+                }
                 WebTemplateCollection webTemplateCollection = Ctx.Web.GetAvailableWebTemplates(1033, true);
                 Ctx.Load(webTemplateCollection);
                 Ctx.ExecuteQuery();
@@ -178,6 +181,10 @@ namespace MS365Provisioning.SharePoint.Services
                     if (!webTemplates.ContainsKey(webTemplate.Title))
                     {
                         webTemplates.Add(webTemplate.Title, webTemplate.Lcid);
+                    }
+                    else
+                    {
+                        _logger?.LogError(message: $"webTemplates does not contain a key with the title {webTemplate.Title}");
                     }
                 }
 
@@ -202,7 +209,7 @@ namespace MS365Provisioning.SharePoint.Services
             }
             catch (Exception ex)
             {
-                _logger?.LogError(message: $"Error fetching the Webtemplates : {ex.Message}, StackTrace: {{ex.StackTrace}}\"");
+                _logger?.LogError(message: $"Error fetching the Webtemplates : {ex.Message}, StackTrace: {ex.StackTrace}");
             }
             finally
             {
@@ -210,6 +217,7 @@ namespace MS365Provisioning.SharePoint.Services
             }
             DtoFile = siteSettingsDtos;
             ExportServices();
+            _logger?.LogError(message: $"Sitesetting successfully exported to {FileName}");
             return siteSettingsDtos;
         }
 
@@ -227,7 +235,12 @@ namespace MS365Provisioning.SharePoint.Services
             try
             {
                 Ctx.ExecuteQuery();
-                if (_lists == null || _lists.Count <= 0) return listsSettingsDto;
+                _logger?.LogError(message: $"Fetching visible Lists successful: {_lists.Count}");
+                if (_lists == null || _lists.Count <= 0)
+                {
+                    _logger?.LogError(message: $"No Lists Found");
+                    return listsSettingsDto;
+                }
                 foreach (List list in _lists)
                 {
                     if (!list.Hidden)
@@ -248,6 +261,7 @@ namespace MS365Provisioning.SharePoint.Services
                         try
                         {
                             Ctx.ExecuteQuery();
+                            _logger?.LogError(message: $"Fetching List properties successful");
                             List<string> contentTypes = GetListContentTypes(list);
                             Dictionary<string, string> listPermissions = GetPermissionDetails(list);
                             Guid enterpiseKeywordsValue = GetEnterpriseKeywordsValue();
@@ -303,9 +317,10 @@ namespace MS365Provisioning.SharePoint.Services
         private List<string> GetQuickLaunchHeaders()
         {
             List<string> quickLaunchHeaders = new();
+            Ctx.Load(Ctx.Web.Navigation.QuickLaunch);
             try
             {
-                Ctx.Load(Ctx.Web.Navigation.QuickLaunch);
+                _logger?.LogError(message: $"Fetching QuickLaunchHeader successful");
                 Ctx.ExecuteQuery();
                 foreach (NavigationNode navigationNode in Ctx.Web.Navigation.QuickLaunch)
                 {
@@ -317,6 +332,7 @@ namespace MS365Provisioning.SharePoint.Services
                     try
                     {
                         Ctx.ExecuteQuery();
+                        _logger?.LogError(message: $"Fetching NavigationNode Children successful");
                         foreach (NavigationNode childNode in navigationNode.Children)
                         {
                             quickLaunchHeaders.Add(childNode.Title);
@@ -338,20 +354,21 @@ namespace MS365Provisioning.SharePoint.Services
         private Guid GetEnterpriseKeywordsValue()
         {
             Guid enterpriseKeywordsValue = Guid.Empty;
-            try
+            Field enterpriseKeywords = Ctx.Web.Fields.GetByInternalNameOrTitle("EnterpriseKeywords");
+            if (enterpriseKeywords != null)
             {
-                Field enterpriseKeywords = Ctx.Web.Fields.GetByInternalNameOrTitle("EnterpriseKeywords");
-                if (enterpriseKeywords != null)
+                Ctx.Load(enterpriseKeywords);
+                try
                 {
-                    Ctx.Load(enterpriseKeywords);
                     Ctx.ExecuteQuery();
+                    _logger?.LogError(message: $"Fetching enterpriseKeywords successful: {enterpriseKeywords.Title}");
                     enterpriseKeywordsValue = enterpriseKeywords.Id;
                 }
-            }
-            catch (Exception ex)
-            {
-                _logger?.LogInformation($"Error fetching Enterprise Keywords value: {ex.Message}, StackTrace: {ex.StackTrace}");
-                enterpriseKeywordsValue = Guid.Empty;
+                catch (Exception ex)
+                {
+                    _logger?.LogInformation($"Error fetching Enterprise Keywords value: {ex.Message}, StackTrace: {ex.StackTrace}");
+                    enterpriseKeywordsValue = Guid.Empty;
+                }
             }
             return enterpriseKeywordsValue;
         }
@@ -365,6 +382,7 @@ namespace MS365Provisioning.SharePoint.Services
             try
             {
                 Ctx.ExecuteQuery();
+                _logger?.LogError(message: $"Fetching RoleDefinitionBindings successful for: {list.Title}");
 
                 foreach (RoleAssignment ra in roles)
                 {
@@ -405,6 +423,7 @@ namespace MS365Provisioning.SharePoint.Services
             try
             {
                 Ctx.ExecuteQuery();
+                _logger?.LogError(message: $"Fetching Visible Lists successful: {_lists.Count}");
                 foreach (List list in _lists)
                 {
                     if (!list.Hidden)
@@ -428,13 +447,14 @@ namespace MS365Provisioning.SharePoint.Services
         private List<ListViewDto> GetListViews(List list)
         {
             List<ListViewDto> listviewDto = new();
-            Microsoft.SharePoint.Client.ViewCollection listViews = list.Views;
+            ViewCollection listViews = list.Views;
             Ctx.Load(list,
                 l => l.Title);
             Ctx.Load(listViews);
             try
             {
                 Ctx.ExecuteQuery();
+                _logger?.LogError(message: $"Fetching ListViews successful for: {list.Title}");
                 foreach (View listView in listViews)
                 {
                     Ctx.Load(listView);
@@ -448,20 +468,28 @@ namespace MS365Provisioning.SharePoint.Services
                     try
                     {
                         Ctx.ExecuteQuery();
+                        _logger?.LogError(message: $"Fetching ListView Properties successful for: {listView.Title}");
                         List<string> viewFields = new();
                         foreach (string field in listView.ViewFields)
                         {
                             viewFields.Add(field);
                         }
-                        listviewDto.Add(new(
-                            list.Title,
-                            listView.Title,
-                            listView.DefaultView,
-                            viewFields,
-                            listView.RowLimit,
-                            listView.Scope.ToString(),
-                            $"{list.Title}"
-                            ));
+                        try
+                        {
+                            listviewDto.Add(new(
+                                list.Title,
+                                listView.Title,
+                                listView.DefaultView,
+                                viewFields,
+                                listView.RowLimit,
+                                listView.Scope.ToString(),
+                                $"{list.Title}"
+                                ));
+                        }
+                        catch(Exception ex)
+                        {
+                            _logger?.LogError(message: $"Error creating Data Transfer Object listViewDto");
+                        }
                     }
                     catch (Exception ex)
                     {
@@ -717,7 +745,7 @@ namespace MS365Provisioning.SharePoint.Services
                                 _logger?.LogWarning($"Error fetching Available permissionlevels: {ex.Message}, StackTrace: {ex.StackTrace}");
 
                             }
-                            RoleDefinitionCollection roleDefinitions = Web.RoleDefinitions;
+                            Microsoft.SharePoint.Client.RoleDefinitionCollection roleDefinitions = Web.RoleDefinitions;
                             foreach (RoleDefinition roleDefinition in roleDefinitions)
                             {
                                 _logger?.LogInformation($"Roledefinition: {roleDefinition.Name}");
@@ -856,7 +884,7 @@ namespace MS365Provisioning.SharePoint.Services
                         _logger?.LogWarning($"Error fetching User properties:  {ex.Message}, StackTrace: {ex.StackTrace}");
                     }
                 }
-                groupDto = new                
+                groupDto = new
                 (
                     group.Title,
                     group.Description,
@@ -978,7 +1006,7 @@ namespace MS365Provisioning.SharePoint.Services
             }
             return selectedListPermissions;
         }
- 
+
         //private string GetRoleDefinitionForGroup(RoleType roleType)
         //{
         //    Ctx.Load(Web.RoleAssignments,
@@ -1004,9 +1032,9 @@ namespace MS365Provisioning.SharePoint.Services
         private List<string> GetListContentTypes(List list)
         {
             List<string> contentTypes = new();
+            Ctx!.Load(list.ContentTypes);
             try
             {
-                Ctx!.Load(list.ContentTypes);
                 Ctx.ExecuteQuery();
                 if (list.ContentTypes.Count == 0)
                 {
@@ -1027,61 +1055,86 @@ namespace MS365Provisioning.SharePoint.Services
         public List<WebPartPagesDto> LoadWebParts()
         {
             List<WebPartPagesDto> webPartPagesDtos = new();
-            List<WebPart> webparts = new();
+            List<WebPartItem> webPartsDtos = new();
+            List pageslibrary = _lists.GetByTitle("Site Pages");
+            CamlQuery query = CamlQuery.CreateAllItemsQuery();
+            ListItemCollection pageList = pageslibrary.GetItems(query);
+            Ctx.Load(pageList);
             try
             {
-                List pagesList = Ctx.Web.Lists.GetByTitle("Site Pages");
-                CamlQuery camlQuery = new();
-                Ctx.Load(pagesList);
                 Ctx.ExecuteQuery();
-                ListItemCollection pages = pagesList.GetItems(camlQuery);
-                Ctx.Load(pages);
-                Ctx.ExecuteQuery();
-                foreach (ListItem item in pages)
+                _logger?.LogInformation($"Fetching Site pages successful: nr of pages {pageList.Count}");
+                if (pageList.Count > 0)
                 {
-                    Ctx.Load(item, I => I.DisplayName, I => I.File);
-                    Ctx.ExecuteQueryRetry();
-                    if (item.DisplayName == "Home")
+                    foreach (ListItem page in pageList)
                     {
-                        var file = item.File;
-                        Ctx.Load(file);
-                        Ctx.ExecuteQuery();
-                        var page = Ctx.Web.LoadClientSidePage(item.DisplayName);
-                        Ctx.ExecuteQuery();
-                        var webParts = page.Controls;
-                        if (webParts != null && webParts.Count > 0)
-                        {
-                            foreach (var control in webparts)
-                            {
-                                foreach (object o in control.Properties.FieldValues)
-                                {
-                                    var i = o.GetType().Name;
-                                    var j = o.ToString();
-                                }
-
-                            }
-                        }
+                        Ctx.Load(
+                            page,
+                            p => p.DisplayName,
+                            p => p.File,
+                            p => p.File.Properties,
+                            p => p.File.ServerRelativeUrl);
                         try
                         {
+                            Ctx.ExecuteQuery();
+                            _logger?.LogInformation($"Loading Page properties successful: {page.DisplayName}");
 
+                            WebPartPagesDto webPartPagesDto = new WebPartPagesDto();
+                            webPartPagesDto.Title = page.DisplayName;
+                            IPage clientSidePage = Ctx.Web.LoadClientSidePage(page.DisplayName);
+                            if (clientSidePage != null)
+                            {
+                                foreach (IPageWebPart control in clientSidePage.Controls)
+                                {
+                                    string webPartType = control.Type.Name;
+                                    WebPartItem webPartsDto = new();
+                                    _logger?.LogInformation($"Webpart type: {webPartType}");
+                                    switch (webPartType)
+                                    {
+                                        case "PageWebPart":
+                                            var pageWebPart = (IPageWebPart)control;
+                                            _logger?.LogInformation($"Name: {pageWebPart.Title}");
+                                            _logger?.LogInformation($"Id: {pageWebPart.WebPartId}");
+                                            _logger?.LogInformation($"PropertiesJson: {pageWebPart.PropertiesJson}");
+                                            webPartsDto.Name = pageWebPart.Title;
+                                            webPartsDto.WebPartID = pageWebPart.WebPartId;
+                                            webPartsDto.PropertiesJson = pageWebPart.PropertiesJson;
+                                            webPartsDtos.Add(webPartsDto);
+                                            webPartPagesDto.Name = control.Type.Name;
+                                            webPartPagesDto.WebPartType = control.Type;
+                                            webPartPagesDto.webPartItems = webPartsDtos.Distinct().ToList();
+                                            webPartPagesDto.List = page.DisplayName;
+                                            //TODO:
+                                            webPartPagesDto.View = "ToCheck";
+                                            break;
+                                        default:
+                                            break;
+                                    }
+
+                                }
+                            }
+                            webPartPagesDtos.Add(webPartPagesDto);
                         }
                         catch (Exception ex)
                         {
-                            _logger?.LogInformation($"Error fetching WebParts: {ex.Message}, StackTrace: {ex.StackTrace}");
-                        }
+                            _logger?.LogInformation($"Error fetching Page properties: {ex.Message}, StackTrace: {ex.StackTrace}");
 
+                        }
                     }
                 }
             }
             catch (Exception ex)
             {
-                _logger?.LogInformation($"Error fetching Pages: {ex.Message}, StackTrace: {ex.StackTrace}");
+                _logger?.LogInformation($"Error fetching PageList: {ex.Message}, StackTrace: {ex.StackTrace}");
             }
 
+            FileName = fileSettings!.WebPartsFilePath!;
+            _logger?.LogInformation($"Export path to Sitesettings: {FileName}");
             DtoFile = webPartPagesDtos;
             ExportServices();
             return webPartPagesDtos;
         }
+
         public void ExportServices()
         {
             ExportServices exportServices = new()

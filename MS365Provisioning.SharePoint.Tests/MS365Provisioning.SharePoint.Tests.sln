@@ -11,6 +11,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MS365Provisioning.Common", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MS365Provisioning.Common.Tests", "..\MS365Provisioning.Common.Tests\MS365Provisioning.Common.Tests.csproj", "{2EBA9B6A-07D7-4038-AE40-F86885CB0FB1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MS365Provisioning.Teams", "..\MS365Provisioning.Teams\MS365Provisioning.Teams.csproj", "{C1AF3A7B-50BF-49F9-A2E9-2EF58E441661}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MS365Provisioning.Teams.Test", "..\MS365Provisioning.Teams.Test\MS365Provisioning.Teams.Test.csproj", "{5123712F-8B72-4E63-9712-68EF063DF0A6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +37,14 @@ Global
 		{2EBA9B6A-07D7-4038-AE40-F86885CB0FB1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2EBA9B6A-07D7-4038-AE40-F86885CB0FB1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2EBA9B6A-07D7-4038-AE40-F86885CB0FB1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C1AF3A7B-50BF-49F9-A2E9-2EF58E441661}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C1AF3A7B-50BF-49F9-A2E9-2EF58E441661}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C1AF3A7B-50BF-49F9-A2E9-2EF58E441661}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C1AF3A7B-50BF-49F9-A2E9-2EF58E441661}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5123712F-8B72-4E63-9712-68EF063DF0A6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5123712F-8B72-4E63-9712-68EF063DF0A6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5123712F-8B72-4E63-9712-68EF063DF0A6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5123712F-8B72-4E63-9712-68EF063DF0A6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
